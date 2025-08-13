@@ -212,7 +212,7 @@
 }
 
 .page-header {
-    background: linear-gradient(rgba(116, 153, 66, .5), rgba(116, 153, 66, .5)), url(../img/carousel-1.jpg) center center no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../img/carousel-1.jpg) center center no-repeat;
     background-size: cover;
 }
 
@@ -303,7 +303,7 @@
 
 /*** About ***/
 .video {
-    background: linear-gradient(rgba(116, 153, 66, .5), rgba(116, 153, 66, .5)), url(../img/video-bg.jpg) center center no-repeat;
+    background: linear-gradient(rgba(115, 153, 66, 0.075), rgba(116, 153, 66, .075)), url(../img/home_video.jpeg) center center no-repeat;
     background-size: cover;
 }
 
@@ -433,7 +433,7 @@
 
 /*** Testimonial ***/
 .testimonial {
-    background: linear-gradient(rgba(116, 153, 66, .5), rgba(116, 153, 66, .5)), url(../img/testimonial-bg.jpg) center center no-repeat;
+    background: linear-gradient(rgba(255, 255, 255, 0.377), rgb(0, 0, 0)), url(../img/testimonial-bg.jpg) center center no-repeat;
     background-size: cover;
 }
 
@@ -762,3 +762,16 @@
 .slider--btn:hover{
     background-color: #028304;
 }
+
+table {
+  border-spacing: 0.5rem;
+  border-collapse: separate;
+}
+
+table tr td{
+    padding: 0.5rem;
+    border: 1px solid #999;
+    background-color: #f5fff3;
+    text-align: center;
+}
+
