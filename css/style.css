@@ -763,15 +763,29 @@
     background-color: #028304;
 }
 
-table {
-  border-spacing: 0.5rem;
-  border-collapse: separate;
-}
 
-table tr td{
-    padding: 0.5rem;
+/* RESPONSIVE DISEASE GRID */
+.disease-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+}
+.disease-grid .disease-item {
+    background: #f5fff3;
     border: 1px solid #999;
-    background-color: #f5fff3;
+    border-radius: .3rem;
+    padding: .75rem 1rem;
+    font-size: .95rem;
     text-align: center;
+    transition: .3s;
+}
+.disease-grid .disease-item:hover {
+    background: #116600;
+    color: #f5fff3;
 }
 
+/* Responsive breakpoints */
+@media (max-width: 1200px) { .disease-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 992px)  { .disease-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px)  { .disease-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 350px)  { .disease-grid { grid-template-columns: 1fr; } }

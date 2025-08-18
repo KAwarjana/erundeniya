@@ -100,3 +100,14 @@
     
 })(jQuery);
 
+
+document.querySelectorAll('.service-item').forEach((item, index) => {
+    const button = item.querySelector('button[data-bs-target]');
+    const collapse = item.querySelector('.collapse');
+
+    if (button && collapse) {
+        const uniqueId = `collapse-${index}`;
+        collapse.id = uniqueId;
+        button.setAttribute('data-bs-target', `#${uniqueId}`);
+    }
+});
