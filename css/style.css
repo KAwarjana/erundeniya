@@ -478,7 +478,7 @@
 /*** Footer ***/
 .footer {
     color: #B0B9AE;
-    background: linear-gradient(rgba(3, 27, 78, .3), rgba(3, 27, 78, .3)), url(../img/footer.png) center center no-repeat;
+    background: linear-gradient(#252c304d, #252c3054), url(../img/footer.png) center center no-repeat;
     background-size: cover;
 }
 
@@ -789,3 +789,51 @@
 @media (max-width: 992px)  { .disease-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px)  { .disease-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 350px)  { .disease-grid { grid-template-columns: 1fr; } }
+
+
+.disease-item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-carousel .product-item {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* ensure equal card height inside carousel */
+}
+
+.product-carousel .product-item img {
+    width: 100%;
+    height: auto;
+}
+
+.product-carousel .product-item .bg-white {
+    flex: 1;
+    overflow: hidden; /* prevent content overflow */
+    position: relative;
+}
+
+.product-carousel .product-item .text-body {
+    display: block;
+}
+.card-content {
+    max-height: 100px; /* show only part of the content initially */
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    position: relative;
+}
+
+.card-content.expanded {
+    max-height: 1000px; /* big enough to fit full content */
+}
+
+.read-more-btn {
+    display: inline-block;
+    margin-top: 10px;
+    color: #6e6e6e;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    align-items: center;
+}
