@@ -167,6 +167,7 @@
 
 
 /*** Header ***/
+
 .carousel-caption {
     top: 0;
     left: 0;
@@ -303,7 +304,7 @@
 
 /*** About ***/
 .video {
-    background: linear-gradient(rgba(115, 153, 66, 0.075), rgba(116, 153, 66, .075)), url(../img/home_video.jpeg) center center no-repeat;
+    background: linear-gradient(#00530769, #00530769), url(../img/gallery-8.jpg) center center no-repeat;
     background-size: cover;
 }
 
@@ -568,6 +569,7 @@
 .icon-box-light::before {
     background: var(--bs-light);
 }
+
 
 .testimonial-carousel .owl-nav .owl-prev,
 .testimonial-carousel .owl-nav .owl-next {

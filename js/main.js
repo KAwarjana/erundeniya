@@ -111,3 +111,6 @@ document.querySelectorAll('.service-item').forEach((item, index) => {
         button.setAttribute('data-bs-target', `#${uniqueId}`);
     }
 });
+
+
+
