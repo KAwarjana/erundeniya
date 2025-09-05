@@ -820,10 +820,10 @@
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>+94 71 291 9408</p>
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
                     <div class="d-flex pt-3">
-                        
+
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i
                                 class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
                                 class="fab fa-instagram"></i></a>
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i
                                 class="fab fa-youtube"></i></a>
@@ -836,8 +836,11 @@
                     <a class="btn btn-link" href="services.php">Our Services</a>
                     <a class="btn btn-link" href="about.php">About Us</a>
                     <a class="btn btn-link" href="contact.php">Contact Us</a>
-                    <a class="btn btn-link" href="terms.php">Terms & Condition</a>
-                   
+                    <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
+                    <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
+                    <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
+
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>

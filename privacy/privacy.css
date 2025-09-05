@@ -19,7 +19,10 @@
 }
 
 
-
+ul {
+  list-style-image: url('../img/double.png');
+  
+}
 
 @font-face {
     font-family: "poorich";
@@ -53,180 +56,12 @@ body {
 
 }
 
-/* banner start  */
 
 
-/* .privacy-sec1-div1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin: auto;
-    margin-bottom: 3rem;
 
-
-}
-
-.privacy-sec1-div2 {
-    width: 100%;
-    background-image: url("../resources/portfolio/5.webp");
-    background-size: cover;
-    background-position: center;
-    margin-bottom: 1rem;
-    height: 20rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.banner-span {
-    text-align: center;
-    font-family: "Inter_Regular";
-    color: white;
-    font-size: 3rem;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.411);
-}
-
-.privacy-sec1-div3 {
-    width: fit-content;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 18.5rem;
-    column-gap: 1rem;
-    background-color: #E6E8E6;
-    border-radius: 30px;
-    padding: 0.8rem 2rem;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-
-}
-
-.banner-span2 {
-    font-family: "OpenSans";
-    color: var(--colorText);
-    font-size: 0.9rem;
-}
-
-.banner-span2 a {
-    color: var(--colorText);
-    text-decoration: none;
-}
-
-.banner-icon {
-    width: 25px;
-}
-
-@media screen and (min-width:300px) and (max-width:449px) {
-
-    .privacy-sec1-div2 {
-        height: 14rem;
-
-    }
-
-    .banner-span {
-        font-size: 1.5rem;
-
-    }
-
-    .privacy-sec1-div3 {
-        padding: 0.6rem 1rem;
-        top: 12.7rem;
-        column-gap: 0.5rem;
-
-    }
-
-
-    .banner-icon {
-        width: 20px;
-    }
-
-}
-
-@media screen and (min-width:450px) and (max-width:549px) {
-    .privacy-sec1-div2 {
-        height: 14rem;
-
-    }
-
-    .banner-span {
-        font-size: 2rem;
-
-    }
-
-    .privacy-sec1-div3 {
-        padding: 0.6rem 1rem;
-        top: 12.7rem;
-        column-gap: 0.5rem;
-
-    }
-
-
-    .banner-icon {
-        width: 20px;
-    }
-
-
-}
-
-@media screen and (min-width:550px)and (max-width:949px) {
-
-
-    .privacy-sec1-div2 {
-        height: 14rem;
-
-    }
-
-    .banner-span {
-        font-size: 2.3em;
-
-    }
-
-    .privacy-sec1-div3 {
-        padding: 0.6rem 1rem;
-        top: 12.7rem;
-        column-gap: 0.5rem;
-
-    }
-
-
-    .banner-icon {
-        width: 20px;
-    }
-
-}
-
-@media screen and (min-width:950px) and (max-width:1200px) {
-
-    .privacy-sec1-div2 {
-        height: 18rem;
-
-    }
-
-    .banner-span {
-        font-size: 3rem;
-
-    }
-
-    .privacy-sec1-div3 {
-        padding: 0.6rem 1rem;
-        top: 16.7rem;
-        column-gap: 0.5rem;
-
-    }
-
-
-    .banner-icon {
-        width: 20px;
-    }
-
-} */
-
-/* banner end  */
 .privacy-empty{
     width: 100%;
-    height: 7rem;
+    height: 5rem;
 }
 
 
@@ -239,27 +74,27 @@ body {
   
 }
 
-.tab-container {
+.tab-container1 {
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
-    box-shadow: 0 0.8rem 1rem var(--box-shadow);
+    /* box-shadow: 0 0.8rem 1rem var(--box-shadow); */
 }
 
 @media (max-width: 767px) {
-    .tab-container {
+    .tab-container1 {
         width: 90%;
     }
 }
 
 
-.tab-filter-container {
+.tab-filter-container1 {
     width: fit-content;
     margin: auto;
     padding: 0.5rem;
     border-radius: 20rem;
     text-align: center;
-    background: var(--colorMain);
+    background: #252C30;
     list-style: none;
     display: flex;
 }
@@ -280,31 +115,31 @@ body {
 }
 
 .filter-btn.active {
-    background: var(--colorOther);
-    color: var(--colorText);
+    background: #ffffff;
+    color: #252C30;
 
 
 }
 
-.tab-filter-item-container {
+.tab-filter-item-container1 {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    background: rgba(159, 184, 173, .65);
+    /* background: #02830434; */
     border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(7.8px);
+    /* box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); */
     -webkit-backdrop-filter: blur(7.8px);
-    border: 1px solid rgba(71, 88, 65, 0.51);
-
+    backdrop-filter: blur(7.8px);
+    /* border: 1px solid rgba(71, 88, 65, 0.51); */
+box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
 
 
-.tab-item {
+.tab-item1 {
     width: 100%;
     height: auto;
     min-height: fit-content;
@@ -321,29 +156,31 @@ body {
 
 }
 
-.tab-item-container {
+.tab-item1-container {
     display: flex;
     flex-direction: row;
     /* text-align: justify; */
     /* column-gap: 10rem; */
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0rem;
 }
 
-.tab-item-span {
+.tab-item1-span {
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 2.5rem;
     font-weight: 600;
-    color: var(--colorText);
+    color: #252C30;
     padding: 1rem;
+    
+    
 }
 
-.tab-item-span2 {
+.tab-item1-span2 {
 text-align: justify;
     font-size: 1rem;
-    color: var(--colorText);
+    color: #252C30;
     font-family: "poppins_regular";
   
    
@@ -355,6 +192,8 @@ text-align: justify;
 
 .tab-content-right {
     width: 65%;
+    display: flex;
+    flex-direction: column;
 }
 
 .tab-content-left span {
@@ -365,7 +204,7 @@ text-align: justify;
 
 }
 
-.tab-content-right span {
+.tab-content-right-span {
     font-family: "poppins_regular";
     font-size: 1rem;
     font-weight: 600;
@@ -387,7 +226,7 @@ text-align: justify;
 }
 
 
-.tab-item.select_tab {
+.tab-item1.select_tab {
     transform: translateY(0);
     transition: transform 0.5s ease-in-out;
     /* background: var(--white-light); */
@@ -410,16 +249,16 @@ text-align: justify;
 .privacy-hr {
     border: solid #3f403f5e 2px;
     border-radius: 10px;
-    margin: 1rem 0;
+    margin: rem 0;
 }
 
 
 @media screen and (min-width:300px) and (max-width:600px) {
-    .tab-filter-container {
+    .tab-filter-container1 {
         padding: 0.3rem;
         border-radius: 20rem;
         text-align: center;
-        background: var(--colorMain);
+        
         list-style: none;
         display: flex;
     }
@@ -433,14 +272,14 @@ text-align: justify;
 
     }
 
-    .tab-item-container {
+    .tab-item1-container {
         display: flex;
         flex-direction: column;
         /* justify-content: center;
         align-items: center; */
         /* column-gap: 10rem; */
-        margin-top: 1rem;
-        margin-bottom: 1rem;
+        margin-top: 0rem;
+        margin-bottom: 0rem;
     }
 
     .tab-content-left {
@@ -459,7 +298,7 @@ text-align: justify;
 
     }
 
-    .tab-content-right span {
+    .tab-content-right-span {
         font-size: 1rem;
 
     }
@@ -473,12 +312,12 @@ text-align: justify;
 
     }
 
-    .tab-item-span {
+    .tab-item1-span {
         font-size: 1.8rem;
         text-align: center;
     }
 
-    .tab-item {
+    .tab-item1 {
         padding: 1rem 1rem;
 
     }
@@ -488,13 +327,13 @@ text-align: justify;
 
 
 @media screen and (min-width:601px) and (max-width:1000px) {
-    .tab-filter-container {
+    .tab-filter-container1 {
         width: fit-content;
         margin: auto;
         padding: 0.5rem;
         border-radius: 20rem;
         text-align: center;
-        background: var(--colorMain);
+ 
         list-style: none;
         display: flex;
     }
@@ -512,14 +351,14 @@ text-align: justify;
 
     }
 
-    .tab-item-container {
+    .tab-item1-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         /* column-gap: 10rem; */
-        margin-top: 2rem;
-        margin-bottom: 1rem;
+        margin-top: 0rem;
+        margin-bottom: 0rem;
     }
 
      .tab-content-left {
@@ -538,7 +377,7 @@ text-align: justify;
 
     }
 
-    .tab-content-right span {
+    .tab-content-right-span {
         font-size: 1rem;
 
     }
@@ -552,14 +391,16 @@ text-align: justify;
 
     }
 
-    .tab-item-span {
+    .tab-item1-span {
         font-size: 1.8rem;
         text-align: center;
     }
 
-    .tab-item {
+    .tab-item1 {
         padding: 1rem 1rem;
 
     }
 
 }
+
+
