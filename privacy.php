@@ -174,9 +174,9 @@
 
                     <div class="tab-item1 privacypg select_tab">
                         <h1 class="tab-item1-span  privacy "> Privacy & Policy</h1><br>
-              
-                        
-                            <span class="">At Erundeniya Ayurveda Hospital, we are committed to protecting the privacy and security of all patients who book appointments through our online system. This Privacy Policy outlines how we collect, use, and safeguard your information. By using our online appointment booking service, you consent to the practices described in this policy.</span></span>
+
+
+                        <span class="">At Erundeniya Ayurveda Hospital, we are committed to protecting the privacy and security of all patients who book appointments through our online system. This Privacy Policy outlines how we collect, use, and safeguard your information. By using our online appointment booking service, you consent to the practices described in this policy.</span></span>
 
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
@@ -194,7 +194,7 @@
 
                             </div>
                         </div>
-                       
+
 
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
@@ -214,7 +214,7 @@
 
                             </div>
                         </div>
-                       
+
 
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
@@ -251,7 +251,7 @@
                                 </ul>
                             </div>
                         </div>
-                        
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
@@ -267,7 +267,7 @@
                                 </ul>
                             </div>
                         </div>
-                       
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
@@ -284,24 +284,24 @@
                                 </ul>
                             </div>
                         </div>
-                      
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
                                 <span class="pri7_leftspan">Updates to This Policy</span>
                             </div>
                             <div class="tab-content-right">
-                       
+
                                 <ul>
                                     <li class="pri7_rightli1">This Privacy Policy may be updated from time to time to reflect changes in our practices or legal obligations. The latest version will always be available on our website under the Privacy Notice section.</li>
-                                   
+
                                 </ul>
-                               
+
 
                             </div>
                         </div>
-                        
-                       
+
+
                         <hr class="privacy-hr">
 
                         <div class="tab-item1-container">
@@ -336,209 +336,118 @@
 
                     <div class="tab-item1 termspg">
                         <span class="tab-item1-span terms"> Terms and Conditions</span><br>
-                       
-                            <span class="pri_wel">Welcome to the Erundeniya Ayurveda Hospital official website. These Terms and Conditions govern your use of our online appointment booking system. By booking an appointment through our platform, you agree to the terms outlined below. Please read them carefully.</span><br>
-                       
+
+                        <span class="pri_wel">Welcome to the Erundeniya Ayurveda Hospital official website. These Terms and Conditions govern your use of our online appointment booking system. By booking an appointment through our platform, you agree to the terms outlined below. Please read them carefully.</span><br>
+
                         </span>
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
                                 <span class="term1_leftspan">Scope of Service</span>
                             </div>
                             <div class="tab-content-right">
-                    
-                            </div>
-                        </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term2_leftspan">Services</span>
-                            </div>
-                            <div class="tab-content-right">
-                               
-                            </div>
-                        </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term3_leftspan">Quotes & Pricing</span>
-                            </div>
-                            <div class="tab-content-right">
-                               
-                            </div>
-                        </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term4_leftspan">Payments</span>
-                            </div>
-                            <div class="tab-content-right">
-
                                 <ul>
-                                    <li class="term4_rightli1">A deposit (typically 30–50%) may be required before the start of the project.</li>
-                                    <li class="term4_rightli2">The remaining balance is due upon final delivery.</li>
-                                    <li class="term4_rightli3">Payments can be made via bank transfer, invoice, via website or other agreed methods.</li>
-                                    <li class="term4_rightli4">Late payments may incur interest or delay delivery.</li>
+                                    <li>Our online booking system is currently available only for scheduling consultations with our physicians.</li>
+                                    <li>Additional services (such as medication, lab reports, or follow-up care) are not included in this booking and will be handled separately during your visit.</li>
+                                </ul>
+                            </div>
+                        </div>
 
+                        <hr class="privacy-hr">
+                        <div class="tab-item1-container">
+                            <div class="tab-content-left">
+                                <span class="term2_leftspan">Appointment Booking and Payments</span>
+                            </div>
+                            <div class="tab-content-right">
+                                <ul>
+                                    <li>All appointments must be booked and paid for online at the time of booking.</li>
+                                    <li>An appointment is considered confirmed only after full payment has been successfully processed.</li>
                                 </ul>
 
                             </div>
                         </div>
-                        <br>
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
-                                <span class="term5_leftspan">Project Delivery & Revisions</span>
+                                <span class="term3_leftspan">Refunds and Rescheduling</span>
                             </div>
                             <div class="tab-content-right">
-
                                 <ul>
-                                    <li class="term5_rightli1">Trevida will deliver the agreed visual content in digital format (e.g., images, animations).</li>
-                                    <li class="term5_rightli2">The number of revisions included will be stated in the project agreement.</li>
-                                    <li class="term5_rightli3">Major scope changes or additional revisions beyond the agreed number may incur extra costs.</li>
-
+                                    <li>Payments are non-refundable. Once an appointment is booked and paid for, the fee cannot be returned.</li>
+                                    <li>Patients may reschedule their appointment only if notice is given at least 24 hours prior to the scheduled time.</li>
+                                    <li>If the patient fails to appear on time or cancels within less than 24 hours, the payment will be forfeited</li>
                                 </ul>
 
                             </div>
                         </div>
-                        <br>
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
-                                <span class="term6_leftspan">Intellectual Property</span>
+                                <span class="term4_leftspan">Patient Responsibilities</span>
                             </div>
                             <div class="tab-content-right">
 
                                 <ul>
-                                    <li class="term6_rightli1">Trevida™ is a registered trademark of Chipz3D Studios AB.</li>
-                                    <li class="term6_rightli2">Unless otherwise agreed, Chipz3D Studios AB retains the copyright of all content produced under the Trevida brand until full payment is received. </li>
-                                    <li class="term6_rightli3">Upon full payment, clients are granted a non-exclusive license to use the final deliverables for the agreed purpose(s).</li>
-                                    <li class="term6_rightli4">Trevida reserves the right to display completed projects in our portfolio, website, or marketing materials unless the client explicitly requests otherwise in writing.</li>
-
-                                </ul>
-
-                            </div>
-                        </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term7_leftspan">Client Responsibilities</span>
-                            </div>
-                            <div class="tab-content-right">
-
-                                <ul>
-                                    <li class="term7_rightli1">Clients must provide all necessary project materials and timely feedback to avoid delays.</li>
-                                    <li class="term7_rightli2">Trevida is not responsible for delays caused by late submissions or incomplete project information.</li>
+                                    <li class="term4_rightli1">Patients are required to provide accurate and truthful information when booking an appointment (such as full name and phone number).</li>
+                                    <li class="term4_rightli2">Providing false, misleading, or incomplete details may result in the cancellation of the appointment without refund.</li>
 
 
                                 </ul>
 
                             </div>
                         </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term8_leftspan">Confidentiality</span>
-                            </div>
-                            <div class="tab-content-right">
-                                <span class="term8_rightspan">All project-related information exchanged between the client and Trevida (Chipz3D Studios AB) will be treated as confidential and will not be shared with third parties without written consent, except when legally required.</span>
-
-                            </div>
-                        </div>
-
-                        <br>
 
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
-                                <span class="term11_leftspan">Cancellations & Refunds</span>
+                                <span class="term5_leftspan">Hospital Rights</span>
                             </div>
                             <div class="tab-content-right">
 
                                 <ul>
-                                    <li class="term11_rightli1">If a project is canceled by the client after work has begun, a portion of the payment may be retained to cover completed work.</li>
-                                    <li class="term11_rightli2">No refunds will be issued after the final delivery of materials</li>
+                                    <li class="term5_rightli1">The hospital reserves the right to cancel or reschedule appointments in cases of emergencies, technical errors, or false information provided by patients.</li>
+                                    <li class="term5_rightli2">The hospital is not liable for any inconvenience caused if the patient arrives late, misses the appointment, or fails to comply with instructions.</li>
 
 
                                 </ul>
 
                             </div>
                         </div>
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term12_leftspan">Limitation of Liability</span>
-                            </div>
-                            <div class="tab-content-right">
-                                <span class="term12_rightspan">Trevida and Chipz3D Studios AB are not liable for any indirect, incidental, or consequential damages related to the use of our services or deliverables. Clients are responsible for reviewing and approving final visuals before use.</span>
 
-                            </div>
-                        </div>
-                        <br>
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
-                                <span class="term13_leftspan">Website Usage</span>
+                                <span class="term6_leftspan">Liability Disclaimer</span>
                             </div>
                             <div class="tab-content-right">
 
                                 <ul>
-                                    <li class="term13_rightli1">All content on trevida.se, including text, graphics, images, and branding, is owned by Chipz3D Studios AB or licensed appropriately.</li>
-                                    <li class="term13_rightli2">Unauthorized use, reproduction, or distribution of any content without written permission is strictly prohibited.</li>
+                                    <li>Treatment results may vary depending on the individual’s health condition and response to therapy. The hospital cannot guarantee specific outcomes.</li>
+                                    <li>While we strive to maintain secure and reliable online services, the hospital is not responsible for technical issues, internet connectivity failures, or third-party service interruptions that may affect appointment booking. </li>
 
 
                                 </ul>
 
                             </div>
                         </div>
-                        <br>
+
                         <hr class="privacy-hr">
                         <div class="tab-item1-container">
                             <div class="tab-content-left">
-                                <span class="term14_leftspan">Changes to Terms</span>
+                                <span class="term7_leftspan">Amendments</span>
                             </div>
                             <div class="tab-content-right">
-                                <span class="term14_rightspan">We reserve the right to update or change these Terms and Conditions at any time. Updates will be posted on this page with a new effective date. Continued use of the site and services after such changes constitutes acceptance.</span>
 
-                            </div>
-                        </div>
-
-                        <br>
-                        <hr class="privacy-hr">
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="term15_leftspan">Governing Law</span>
-                            </div>
-                            <div class="tab-content-right">
-                                <span class="term1_rightspan15">These Terms and Conditions are governed by the laws of Sweden. Any disputes arising from this agreement shall be resolved in a Swedish court of law.</span>
-
-                            </div>
-                        </div>
-
-                        <br>
-                        <hr class="privacy-hr">
-
-                        <div class="tab-item1-container">
-                            <div class="tab-content-left">
-                                <span class="pri9_leftspan">Contact Information</span>
-                            </div>
-                            <div class="tab-content-right">
-                                <span class="term16_rightspan">For questions, feedback, or legal concerns, please contact us at:</span>
                                 <ul>
-                                    <li><strong class="pri9_rightli1">Email :</strong><span class="pri9_rightspan1"> info@trevida.se</span></li>
-                                    <li><strong class="pri9_rightli2">Phone :</strong><span class="pri9_rightspan2"> +46 765 977 220</span></li>
-                                    <li><strong class="pri9_rightli3">Chipz3D Studios AB, Sweden</strong></li>
-                                    <li><strong class="pri9_rightli4">Website :</strong><span class="pri9_rightspan3"> www.trevida.se</span></li>
+                                    <li>Erundeniya Ayurveda Hospital reserves the right to update or modify these Terms & Conditions at any time. All changes will be posted on the official website.</li>
+                                    <li>Continued use of the online booking system after updates constitutes acceptance of the revised terms.</li>
 
                                 </ul>
 
                             </div>
                         </div>
+
 
 
 

@@ -32,24 +32,24 @@ function activateTab(tabName, shouldScroll = true) {
         targetTab.classList.add('select_tab');
 
         // Update height
-        // setTimeout(setContainerHeight, 100);
+        setTimeout(setContainerHeight, 100);
 
         // Scroll to tab container with offset for fixed header
-        // if (shouldScroll) {
-        //     setTimeout(() => {
-        //         const tabContainer = document.querySelector('.tab-container1');
-        //         if (tabContainer) {
-        //             const headerOffset = 120; // Adjust based on your header height
-        //             const elementPosition = tabContainer.offsetTop;
-        //             const offsetPosition = elementPosition - headerOffset;
+        if (shouldScroll) {
+            setTimeout(() => {
+                const tabContainer = document.querySelector('.tab-container1');
+                if (tabContainer) {
+                    const headerOffset = 120; // Adjust based on your header height
+                    const elementPosition = tabContainer.offsetTop;
+                    const offsetPosition = elementPosition - headerOffset;
 
-        //             window.scrollTo({
-        //                 top: offsetPosition,
-        //                 behavior: 'smooth'
-        //             });
-        //         }
-        //     }, 200);
-        // }
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 200);
+        }
 
         return true;
     }
