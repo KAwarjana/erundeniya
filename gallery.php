@@ -447,7 +447,9 @@
                     <a class="btn btn-link" href="services.php">Our Services</a>
                     <a class="btn btn-link" href="about.php">About Us</a>
                     <a class="btn btn-link" href="contact.php">Contact Us</a>
-                    <a class="btn btn-link" href="terms.php">Terms & Condition</a>
+                     <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
+                    <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
+                    <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
                    
                 </div>
                 <div class="col-lg-3 col-md-6">
