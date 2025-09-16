@@ -40,8 +40,8 @@
     </div>
     <!-- Spinner End -->
 
-    <!-- Topbar Start -->
-        <div class="container-fluid bg-dark text-light px-0 py-2">
+        <!-- Topbar Start -->
+    <div class="container-fluid bg-dark text-light px-0 py-2">
         <div class="row gx-0 d-none d-lg-flex">
             <div class="col-lg-7 px-5 text-start">
                 <div class="h-100 d-inline-flex align-items-center me-4">
@@ -56,7 +56,7 @@
             <div class="col-lg-5 px-5 text-end">
                 <div class="h-100 d-inline-flex align-items-center mx-n2">
                     <span>Follow Us:</span>
-                    <a class="btn btn-link text-light" href="https://web.facebook.com/erundeniyaayurvedahospital"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                    <a class="btn btn-link text-light" href="https://www.facebook.com/profile.php?id=100059604372833"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                             width="22" height="22" viewBox="0,0,256,256">
                             <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
                                 stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
@@ -128,10 +128,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto">
-                        <a href="index.php" class="nav-item nav-link">Home</a>
+                        <a href="index.php" class="nav-item nav-link active">Home</a>
                         <a href="services.php" class="nav-item nav-link">Services</a>
                         <a href="about.php" class="nav-item nav-link">About</a>
-                        <a href="contact.php" class="nav-item nav-link active">Contact</a>
+                        <a href="contact.php" class="nav-item nav-link">Contact</a>
                         <a href="gallery.php" class="nav-item nav-link">Gallery</a>
                         <a href="" class="nav-item" style="align-self: center; width: 100%;">
                             <div class="">
@@ -147,7 +147,6 @@
         </div>
     </div>
     <!-- Navbar End -->
-
 
     <!-- Page Header Start -->
     <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
@@ -416,7 +415,7 @@
     <!-- Testimonial End -->
   <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
-        <div class="container py-5">
+        <div class="container py-0">
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <img src="img/logof.png" class="footer--logo">
@@ -428,10 +427,10 @@
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>+94 71 291 9408</p>
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
                     <div class="d-flex pt-3">
-                        
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i
+
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i
                                 class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
                                 class="fab fa-instagram"></i></a>
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i
                                 class="fab fa-youtube"></i></a>
@@ -444,25 +443,40 @@
                     <a class="btn btn-link" href="services.php">Our Services</a>
                     <a class="btn btn-link" href="about.php">About Us</a>
                     <a class="btn btn-link" href="contact.php">Contact Us</a>
-                      <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
+                    <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
                     <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
                     <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
-                   
+
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>
-                    <p class="mb-1">Monday - Friday</p>
-                    <h6 class="text-light">09:00 am - 07:00 pm</h6>
-                    <p class="mb-1">Saturday</p>
-                    <h6 class="text-light">09:00 am - 12:00 pm</h6>
-                    <p class="mb-1">Sunday</p>
+                    <p class="mb-1">Monday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Tuesday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Wednesday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
+                    <p class="mb-1">Thursday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Friday</p>
                     <h6 class="text-light">Closed</h6>
+
+                    <p class="mb-1">Saturday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Sunday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
                 </div>
             </div>
         </div>
     </div>
     <!-- Footer End -->
-
 
     <!-- Copyright Start -->
     <div class="container-fluid copyright py-4">

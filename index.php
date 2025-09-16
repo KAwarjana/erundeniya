@@ -62,7 +62,7 @@
             <div class="col-lg-5 px-5 text-end">
                 <div class="h-100 d-inline-flex align-items-center mx-n2">
                     <span>Follow Us:</span>
-                    <a class="btn btn-link text-light" href="https://web.facebook.com/erundeniyaayurvedahospital"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                    <a class="btn btn-link text-light" href="https://www.facebook.com/profile.php?id=100059604372833"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                             width="22" height="22" viewBox="0,0,256,256">
                             <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
                                 stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
@@ -533,21 +533,21 @@
     <div class="modal modal-video fade" id="videoModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content rounded-0">
+            <div class="modal-content rounded-0 ">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="exampleModalLabel">Erundeniya Hospital</h3>
+                    <!-- <h3 class="modal-title" id="exampleModalLabel">Erundeniya Hospital</h3> -->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- 16:9 aspect ratio -->
                     <div class="ratio ratio-16x9">
-                        <iframe width="100%" height="100%" class="embed-responsive-item" allowfullscreen
-                            allow="autoplay" src="https://www.youtube.com/embed/lzlc2I430A8?si=V9iQsg0pQFn2r7zD"
+                        <!-- <iframe width="100%" height="100%" class="embed-responsive-item" allowfullscreen
+                            allow="autoplay" src="https://youtu.be/ixLG8ARsKRw?si=TdbB6ePePL5YDLcL"
                             title="YouTube video player" frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                        <!-- <iframe class="embed-responsive-item" src="" id="video" allowfullscreen
-                            allowscriptaccess="always" allow="autoplay"></iframe> -->
+                        -->
+                            <iframe width="560" height="315"  src="https://www.youtube.com/embed/ixLG8ARsKRw?si=OHA4Wja8FvOK-FVm&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
@@ -588,7 +588,7 @@
                         with unique expertise in treating a wide range of complex and chronic conditions.
                     </p>
                     <div class="d-flex">
-                        <a class="btn btn-lg-square btn-primary me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-lg-square btn-primary me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i class="fab fa-facebook-f"></i></a>
                         <a class="btn btn-lg-square btn-primary me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i class="fab fa-instagram"></i></a>
                         <a class="btn btn-lg-square btn-primary me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i class="fab fa-youtube"></i></a>
                         <a class="btn btn-lg-square btn-primary me-2" href="https://api.whatsapp.com/send?phone=94712919408"><i class="fab fa-whatsapp"></i></a>
@@ -820,7 +820,7 @@
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
                     <div class="d-flex pt-3">
 
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i
                                 class="fab fa-facebook-f"></i></a>
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
                                 class="fab fa-instagram"></i></a>

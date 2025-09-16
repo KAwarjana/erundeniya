@@ -123,3 +123,123 @@ document.querySelectorAll('.service-item').forEach((item, index) => {
         });
     }
 });
+
+
+
+
+class CustomImagePopup {
+            constructor() {
+                this.popup = document.getElementById('imagePopup');
+                this.popupImage = document.getElementById('popupImage');
+                this.closeBtn = document.getElementById('closePopup');
+                this.prevBtn = document.getElementById('prevImage');
+                this.nextBtn = document.getElementById('nextImage');
+                this.counter = document.getElementById('popupCounter');
+                
+                this.images = [];
+                this.currentIndex = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                // Collect all gallery images
+                const galleryItems = document.querySelectorAll('.gallery-item');
+                galleryItems.forEach((item, index) => {
+                    const imageUrl = item.dataset.popupImage || item.querySelector('img').src;
+                    const altText = item.querySelector('img').alt || `Gallery Image ${index + 1}`;
+                    this.images.push({ url: imageUrl, alt: altText });
+                    
+                    // Add click event to gallery item
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.openPopup(index);
+                    });
+
+                    // Add click event to button inside gallery item
+                    const button = item.querySelector('button');
+                    if (button) {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.openPopup(index);
+                        });
+                    }
+                });
+                
+                // Event listeners
+                this.closeBtn.addEventListener('click', () => this.closePopup());
+                this.prevBtn.addEventListener('click', () => this.prevImage());
+                this.nextBtn.addEventListener('click', () => this.nextImage());
+                
+                // Close on background click
+                this.popup.addEventListener('click', (e) => {
+                    if (e.target === this.popup) {
+                        this.closePopup();
+                    }
+                });
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (!this.popup.classList.contains('active')) return;
+                    
+                    switch(e.key) {
+                        case 'Escape':
+                            this.closePopup();
+                            break;
+                        case 'ArrowLeft':
+                            this.prevImage();
+                            break;
+                        case 'ArrowRight':
+                            this.nextImage();
+                            break;
+                    }
+                });
+            }
+            
+            openPopup(index) {
+                this.currentIndex = index;
+                this.updatePopup();
+                this.popup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            closePopup() {
+                this.popup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            prevImage() {
+                this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+                this.updatePopup();
+            }
+            
+            nextImage() {
+                this.currentIndex = (this.currentIndex + 1) % this.images.length;
+                this.updatePopup();
+            }
+            
+            updatePopup() {
+                const currentImage = this.images[this.currentIndex];
+                this.popupImage.src = currentImage.url;
+                this.popupImage.alt = currentImage.alt;
+                this.counter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
+                
+                // Hide nav buttons if only one image
+                if (this.images.length <= 1) {
+                    this.prevBtn.style.display = 'none';
+                    this.nextBtn.style.display = 'none';
+                } else {
+                    this.prevBtn.style.display = 'flex';
+                    this.nextBtn.style.display = 'flex';
+                }
+            }
+        }
+        
+        // Initialize WOW.js
+        new WOW().init();
+        
+        // Initialize the popup when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CustomImagePopup();
+        });

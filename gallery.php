@@ -43,8 +43,8 @@
     </div>
     <!-- Spinner End -->
 
-    <!-- Topbar Start -->
-       <div class="container-fluid bg-dark text-light px-0 py-2">
+        <!-- Topbar Start -->
+    <div class="container-fluid bg-dark text-light px-0 py-2">
         <div class="row gx-0 d-none d-lg-flex">
             <div class="col-lg-7 px-5 text-start">
                 <div class="h-100 d-inline-flex align-items-center me-4">
@@ -59,7 +59,7 @@
             <div class="col-lg-5 px-5 text-end">
                 <div class="h-100 d-inline-flex align-items-center mx-n2">
                     <span>Follow Us:</span>
-                    <a class="btn btn-link text-light" href="https://web.facebook.com/erundeniyaayurvedahospital"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                    <a class="btn btn-link text-light" href="https://www.facebook.com/profile.php?id=100059604372833"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                             width="22" height="22" viewBox="0,0,256,256">
                             <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
                                 stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
@@ -131,11 +131,11 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto">
-                        <a href="index.php" class="nav-item nav-link">Home</a>
+                        <a href="index.php" class="nav-item nav-link active">Home</a>
                         <a href="services.php" class="nav-item nav-link">Services</a>
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
-                        <a href="gallery.php" class="nav-item nav-link active">Gallery</a>
+                        <a href="gallery.php" class="nav-item nav-link">Gallery</a>
                         <a href="" class="nav-item" style="align-self: center; width: 100%;">
                             <div class="">
                                 <button type="button" class="btn btn-primary rounded-pill">Appointments</button>
@@ -175,249 +175,165 @@
                 <p class="mb-0">Step into the world of authentic healing through our gallery. At Erundeniya Ayurveda, every picture tells a story of tradition, wellness, and natural harmony. Browse through our collection to experience the serene environment of our hospital, the time-tested Ayurvedic treatments we offer, and the peaceful lifestyle we promote.
                 </p>
             </div>
-            <div class="row g-4">
-                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-1.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-1.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-1" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-2.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-2.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-2" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-3.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-3.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-3" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.2s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-4.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-4.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-4" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-5.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-5.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-5" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-6.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-6.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-6" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-7.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-7.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-7" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-8.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-8.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-8" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-9.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-9.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-9" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-10.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-10.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-10" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-11.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-11.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-11" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-12.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-12.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-12" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-13.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-13.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-13" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-14.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-14.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-14" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-15.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-15.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-15" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-16.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-16.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-16" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-20.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-20.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-17" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-18.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-18.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-18" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-19.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-19.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-19" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-17.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-17.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-20" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-21.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-21.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-21" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-22.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-22.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-22" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-23.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-23.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-23" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-24.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-24.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-24" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-25.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-25.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-25" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="gallery-item">
-                        <img src="img/gallery-26.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                        <div class="search-icon">
-                            <a href="img/gallery-26.jpg" class="btn btn-light btn-lg-square rounded-circle"
-                                data-lightbox="Gallery-26" target="_blank"><i class="fas fa-search-plus"></i></a>
-                        </div>
+           <div class="row g-4">
+            <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery1.jpg">
+                    <img src="img/gallery/gallery1.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery2.jpg">
+                    <img src="img/gallery/gallery2.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery3.jpg">
+                    <img src="img/gallery/gallery3.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery4.jpg">
+                    <img src="img/gallery/gallery4.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery5.jpg">
+                    <img src="img/gallery/gallery5.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery6.jpg">
+                    <img src="img/gallery/gallery6.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery7.jpg">
+                    <img src="img/gallery/gallery7.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery8.jpg">
+                    <img src="img/gallery/gallery8.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery9.jpg">
+                    <img src="img/gallery/gallery9.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery10.jpg">
+                    <img src="img/gallery/gallery10.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery11.jpg">
+                    <img src="img/gallery/gallery11.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery12.jpg">
+                    <img src="img/gallery/gallery12.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item" data-popup-image="img/gallery/gallery13.jpg">
+                    <img src="img/gallery/gallery13.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <button class="btn btn-light btn-lg-square rounded-circle">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Custom Popup Modal -->
+    <div class="image-popup" id="imagePopup">
+        <div class="popup-content">
+            <button class="popup-close" id="closePopup">
+                <i class="fas fa-times"></i>
+            </button>
+            <button class="popup-nav popup-prev" id="prevImage">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="popup-nav popup-next" id="nextImage">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <img src="" alt="Popup Image" id="popupImage">
+            <div class="popup-counter" id="popupCounter">1 / 13</div>
+        </div>
+    </div>
+
+
+
         </div>
     </div>
     <!-- Gallery End -->
 
    <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
-        <div class="container py-5">
+        <div class="container py-0">
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <img src="img/logof.png" class="footer--logo">
@@ -429,10 +345,10 @@
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>+94 71 291 9408</p>
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
                     <div class="d-flex pt-3">
-                        
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i
+
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i
                                 class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
                                 class="fab fa-instagram"></i></a>
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i
                                 class="fab fa-youtube"></i></a>
@@ -445,25 +361,40 @@
                     <a class="btn btn-link" href="services.php">Our Services</a>
                     <a class="btn btn-link" href="about.php">About Us</a>
                     <a class="btn btn-link" href="contact.php">Contact Us</a>
-                     <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
+                    <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
                     <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
                     <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
-                   
+
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>
-                    <p class="mb-1">Monday - Friday</p>
-                    <h6 class="text-light">09:00 am - 07:00 pm</h6>
-                    <p class="mb-1">Saturday</p>
-                    <h6 class="text-light">09:00 am - 12:00 pm</h6>
-                    <p class="mb-1">Sunday</p>
+                    <p class="mb-1">Monday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Tuesday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Wednesday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
+                    <p class="mb-1">Thursday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Friday</p>
                     <h6 class="text-light">Closed</h6>
+
+                    <p class="mb-1">Saturday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Sunday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
                 </div>
             </div>
         </div>
     </div>
     <!-- Footer End -->
-
 
     <!-- Copyright Start -->
     <div class="container-fluid copyright py-4">
@@ -488,6 +419,7 @@
 
 
     <!-- JavaScript Libraries -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="lib/wow/wow.min.js"></script>
