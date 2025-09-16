@@ -152,7 +152,7 @@
     <!-- Navbar End -->
 
     <!-- Page Header Start -->
-    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container-fluid page-header py-5 mb-0 wow fadeIn" data-wow-delay="0.1s">
         <div class="container text-center py-5">
             <h1 class="display-2 mb-4 animated slideInDown" style="color: rgb(255, 255, 255);">Gallery</h1>
             <nav aria-label="breadcrumb animated slideInDown">
@@ -167,14 +167,12 @@
     <!-- Page Header End -->
 
     <!-- Gallery Start -->
-    <div class="container-fluid gallery py-5">
+    <div class="container-fluid gallery py-2">
         <div class="container py-5">
             <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
-                <h4 class="text-primary">Our Gallery</h4>
-                <h1 class="display-5 mb-4">Heading for gallery</h1>
-                <p class="mb-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur adipisci facilis
-                    cupiditate recusandae aperiam temporibus corporis itaque quis facere, numquam, ad culpa deserunt
-                    sint dolorem autem obcaecati, ipsam mollitia hic.
+                <!-- <h4 class="text-primary">Our Gallery</h4> -->
+                <h1 class="text-primary display-5 mb-4">Our Gallery</h1>
+                <p class="mb-0">Step into the world of authentic healing through our gallery. At Erundeniya Ayurveda, every picture tells a story of tradition, wellness, and natural harmony. Browse through our collection to experience the serene environment of our hospital, the time-tested Ayurvedic treatments we offer, and the peaceful lifestyle we promote.
                 </p>
             </div>
             <div class="row g-4">

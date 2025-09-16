@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="utf-8">
     <title>Home</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -33,8 +34,6 @@
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
-
-
 
 
 </head>
@@ -161,8 +160,8 @@
         <div id="header-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img class="w-100" src="img/carousel-1.jpg" alt="Image">
-                    <div class="carousel-caption">
+                    <img class="w-100" src="img/carousel-1.webp" alt="Image">
+                    <!-- <div class="carousel-caption">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-7 text-center">
@@ -175,11 +174,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="carousel-item">
-                    <img class="w-100" src="img/carousel-2.jpg" alt="Image">
-                    <div class="carousel-caption">
+                    <img class="w-100" src="img/carousel-2.webp" alt="Image">
+                    <!-- <div class="carousel-caption">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-7 text-center">
@@ -192,11 +191,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="carousel-item">
-                    <img class="w-100" src="img/carousel-3.jpg" alt="Image">
-                    <div class="carousel-caption">
+                    <img class="w-100" src="img/carousel-3.webp" alt="Image">
+                    <!-- <div class="carousel-caption">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-7 text-center">
@@ -209,9 +208,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <div class="carousel-item">
+                <!-- <div class="carousel-item">
                     <img class="w-100" src="img/carousel-4.jpg" alt="Image">
                     <div class="carousel-caption">
                         <div class="container">
@@ -227,7 +226,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -284,9 +283,9 @@
                     <div class="border-top mb-4"></div>
                     <div class="row g-3">
                         <div class="col-sm-8">
-                            <h5>Located in a peaceful setting district of Kegalle in Sri Lanka</h5>
+                            <h5>Located in a peaceful setting of Kegalle district in Sri Lanka  </h5>
                             <p class="mb-0">
-                                Located in a peaceful setting district of Kegalle in Sri Lanka, Erundeniya Ayurvedic
+                                Located in a peaceful setting of Kegalle district in Sri Lanka, Erundeniya Ayurvedic
                                 Hospital offers inpatient care as well as outpatient clinic services.
                             </p>
                         </div>
@@ -607,8 +606,8 @@
             <div class="row gy-5 gx-0">
                 <div class="section-title col-lg-6 pe-lg-0 mx-auto wow fadeInUp" data-wow-delay="0.1s"
                     style="max-width: 500px;">
-                    <p class="fs-5 fw-medium fst-italic text-white">Testimonials</p>
-                    <h1 class="display-6 mb-4">What our clients says about our traditional and Ayurvedic
+                    <p class="fs-5 fw-medium fst-italic text-white">Patient Testimonials</p>
+                    <h1 class="display-6 mb-4">What our Patients says about our traditional and Ayurvedic
                         treatments. </h1>
                     <p class="text-white mb-5">
                         At Erundeniya Ayurveda Hospital, we are proud to present real-life stories of hope
@@ -620,7 +619,7 @@
                 <div class="col-lg-6 mb-n5 wow fadeIn" data-wow-delay="0.5s">
                     <div class="bg-white p-5">
                         <div class="owl-carousel testimonial-carousel wow fadeIn" data-wow-delay="0.1s">
-                            <div class="testimonial-item">
+                            <!-- <div class="testimonial-item">
                                 <div class="icon-box-primary mb-4">
                                     <i class="bi bi-chat-left-quote text-dark"></i>
                                 </div>
@@ -636,7 +635,7 @@
                                         <span class="text-primary">Sri Lanka</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="testimonial-item">
                                 <div class="icon-box-primary mb-4">
                                     <i class="bi bi-chat-left-quote text-dark"></i>
@@ -808,7 +807,7 @@
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
-        <div class="container py-5">
+        <div class="container py-0">
             <div class="row g-5">
                 <div class="col-lg-3 col-md-6">
                     <img src="img/logof.png" class="footer--logo">
@@ -844,12 +843,27 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>
-                    <p class="mb-1">Monday - Friday</p>
-                    <h6 class="text-light">09:00 am - 07:00 pm</h6>
-                    <p class="mb-1">Saturday</p>
-                    <h6 class="text-light">09:00 am - 12:00 pm</h6>
-                    <p class="mb-1">Sunday</p>
+                    <p class="mb-1">Monday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Tuesday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Wednesday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
+                    <p class="mb-1">Thursday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Friday</p>
                     <h6 class="text-light">Closed</h6>
+
+                    <p class="mb-1">Saturday</p>
+                    <h6 class="text-light">Treatment only</h6>
+
+                    <p class="mb-1">Sunday</p>
+                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
+
                 </div>
             </div>
         </div>

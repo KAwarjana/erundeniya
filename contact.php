@@ -262,8 +262,8 @@
             <div class="row gy-5 gx-0">
                 <div class="section-title col-lg-6 pe-lg-0 mx-auto wow fadeInUp" data-wow-delay="0.1s"
                     style="max-width: 500px;">
-                    <p class="fs-5 fw-medium fst-italic text-white">Testimonials</p>
-                    <h1 class="display-6 mb-4">What our clients says about our traditional and Ayurvedic
+                    <p class="fs-5 fw-medium fst-italic text-white">Patient Testimonials</p>
+                    <h1 class="display-6 mb-4">What our Patients says about our traditional and Ayurvedic
                         treatments. </h1>
                     <p class="text-white mb-5">
                         At Erundeniya Ayurveda Hospital, we are proud to present real-life stories of hope
@@ -275,7 +275,7 @@
                 <div class="col-lg-6 mb-n5 wow fadeIn" data-wow-delay="0.5s">
                     <div class="bg-white p-5">
                         <div class="owl-carousel testimonial-carousel wow fadeIn" data-wow-delay="0.1s">
-                            <div class="testimonial-item">
+                            <!-- <div class="testimonial-item">
                                 <div class="icon-box-primary mb-4">
                                     <i class="bi bi-chat-left-quote text-dark"></i>
                                 </div>
@@ -291,7 +291,7 @@
                                         <span class="text-primary">Sri Lanka</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="testimonial-item">
                                 <div class="icon-box-primary mb-4">
                                     <i class="bi bi-chat-left-quote text-dark"></i>

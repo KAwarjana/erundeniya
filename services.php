@@ -44,7 +44,7 @@
     <!-- Spinner End -->
 
     <!-- Topbar Start -->
-        <div class="container-fluid bg-dark text-light px-0 py-2">
+    <div class="container-fluid bg-dark text-light px-0 py-2">
         <div class="row gx-0 d-none d-lg-flex">
             <div class="col-lg-7 px-5 text-start">
                 <div class="h-100 d-inline-flex align-items-center me-4">
@@ -184,7 +184,7 @@
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                                <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Sciatica Treatments</h5>
@@ -208,16 +208,19 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#1" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
+
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                            <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Koshtuka Shiro Therapy</h5>
@@ -240,16 +243,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#2" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                           <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                               <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Shirodhara (Herbal Oil Pouring Therapy on Forehead)</h5>
@@ -271,16 +276,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#3" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                                <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Netra Vasti (Herbal Oil Retention for Eyes)</h5>
@@ -302,16 +309,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#4" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                            <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Karna Poorana (Herbal Ear Oil Therapy)</h5>
@@ -334,16 +343,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#5" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Nasya (Nasal Cleansing Therapy)</h5>
@@ -364,16 +375,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#6" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                            <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Hasta Anguli & Pada Anguli Therapies</h5>
@@ -394,16 +407,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#7" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                           <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                                <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Hisahori Therapy (Traditional Head Therapy)</h5>
@@ -424,16 +439,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#8" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                             <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Abhyanga (Full Body Massage with Medicated Oils)</h5>
@@ -454,16 +471,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#9" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                           <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                                <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Shirolepa (Herbal Paste Application on Head)</h5>
@@ -483,16 +502,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#10" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Steam Bath (Bashpa Sweda)</h5>
@@ -513,16 +534,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#11" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Thalam (Herbal Paste Application on Crown)</h5>
@@ -542,16 +565,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#12" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                               <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Netra Dhara (Herbal Decoction Pouring Over Eyes)</h5>
@@ -571,16 +596,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#13" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                           <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                               <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Hrid Vasti (Herbal Oil Retention Over Chest)</h5>
@@ -601,16 +628,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#14" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                               <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Sinus Purification Procedures</h5>
@@ -630,16 +659,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#15" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Hemorrhoid Management (Arshas Pratikara)</h5>
@@ -659,16 +690,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#16" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                               <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Uterine-Related Treatments</h5>
@@ -689,16 +722,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#17" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                           <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Skin Condition Treatments</h5>
@@ -718,16 +753,18 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#18" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="service-item">
                             <div class="icon-box-primary mb-4">
-                                                              <img src="img/medicine.svg" alt="">
+                                <img src="img/medicine.svg" alt="">
 
                             </div>
                             <h5 class="mb-3">Nila Therapy (Exclusive to Erundeniya Ayurveda)</h5>
@@ -749,10 +786,12 @@
                                 </p>
                             </div>
 
-                            <button class="btn btn-light px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#19" aria-expanded="false">
-                                Read More <i class="bi bi-chevron-double-down ms-1"></i>
+                            <button class="btn btn-light px-3 toggle-btn-collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#1" aria-expanded="false">
+                                <span class="show-when-collapsed">Read More <i class="bi bi-chevron-double-down ms-1"></i></span>
+                                <span class="show-when-expanded">Read Less <i class="bi bi-chevron-double-up ms-1"></i></span>
                             </button>
+                            
                         </div>
                     </div>
                 </div>
@@ -779,11 +818,11 @@
                         <h3 class="mb-3">Consultation Days: </h3>
                         <p class="mb-4">
                             Every <b>Wednesday</b> and <b>Sunday</b> from <b>9:00 AM</b>
-                            to <b>8:00 PM</b>
+                            to <b>6:00 PM</b>
                         </p>
                     </div>
                     <div class="wow fadeIn" data-wow-delay="0.5s">
-                        <h3 class="mb-3">Diseases Consulted:</h3>
+                        <h3 class="mb-3">Main Medical Conditions Treated:</h3>
                         <p class="mb-4">
                         <div class="disease-grid">
                             <div class="disease-item">Cancer<br />පිළිකා</div>
@@ -803,7 +842,7 @@
                             <div class="disease-item">Nerve Disorders<br />ස්නායු රෝග</div>
                             <div class="disease-item">Sciatica<br />සයටිකා</div>
                             <div class="disease-item">Male and Female Infertility<br />ස්ත්‍රී පුරුෂ මදසරුභාවය</div>
-                            <div class="disease-item">All Female Diseases<br />සියලුම කාන්තා රෝග</div>
+                            <div class="disease-item">Gynecological Treatments<br />සියලුම කාන්තා රෝග</div>
                             <div class="disease-item">Fractures & Bone Injuries<br />කැඩුම් බිදුම් ප්‍රතිකාර</div>
                             <div class="disease-item">Poisoning<br />වස විෂ</div>
 
@@ -811,28 +850,28 @@
                             <div class="disease-item">Indigestion<br />අජීරණ රෝග</div>
                             <div class="disease-item">Abdominal Disorders<br />බඩවැල් ආශ්‍රිත රෝග</div>
                             <div class="disease-item">Mental Disorders<br />මානසික රෝග</div>
-                            <div class="disease-item">Sexual Weakness<br />ලිංගික බෙලහීනතාවය</div>
+                            <div class="disease-item">sexual Dysfunction<br />ලිංගික බෙලහීනතාවය</div>
                             <div class="disease-item">Subfertility<br />දරුඵල ප්‍රමාදය</div>
 
                             <div class="disease-item">Rheumatoid Arthritis<br />රක්තවාතය</div>
-                            <div class="disease-item">Leprosy<br />කුෂ්ඨ රෝග</div>
-                            <div class="disease-item">Cartilage Erosion<br />කාටිලේච ගෙවීම</div>
+                            <div class="disease-item">Dermatitis<br />කුෂ්ඨ රෝග</div>
+                            <div class="disease-item">cartilage Degeneration (Osteoarthritis)<br />කාටිලේච ගෙවීම</div>
                             <div class="disease-item">Tuberculosis<br />සෙම් රෝග හතිය</div>
                             <div class="disease-item">Obesity<br />අධික තරබාරුව</div>
                             <div class="disease-item">Neurological Disorders<br />ශ්‍රීර්ශ රෝග</div>
 
                             <div class="disease-item">Pediatric Diseases<br />ළමා රෝග</div>
                             <div class="disease-item">Snake Poisoning<br />සර්පවිෂ</div>
-                            <div class="disease-item">Migraine<br />මිඩ්ග්‍රේන්</div>
-                            <div class="disease-item">Gallstones<br />ගල් තැලුම්</div>
-                            <div class="disease-item">Nasal Polyps<br />නහර ගැට ගැසීම</div>
+                            <div class="disease-item">Migraine<br />ඉරුවාරදය</div>
+                            <div class="disease-item">Corns & Calluses<br />ගල් තැලුම්</div>
+                            <div class="disease-item">Varicosities<br />නහර ගැට ගැසීම</div>
                             <div class="disease-item">Lumps & Swellings<br />ශරීරයේ හට ගන්න ගෙඩි වණ</div>
 
                             <div class="disease-item">Urinary Disorders<br />මුත්‍රා රෝග</div>
                             <div class="disease-item">Underweight<br />අධික කෘෂ බව</div>
                             <div class="disease-item">Epilepsy<br />අපස්මාර</div>
                             <div class="disease-item">Insanity<br />උන්මාද</div>
-                            <div class="disease-item">Syphilis<br />සෙංගමාලය</div>
+                            <div class="disease-item">Liver Dysfunction<br />සෙංගමාලය</div>
                             <div class="disease-item">Goiter (Thyroid enlargement)<br />ගලගන්ඩය</div>
 
                             <div class="disease-item">Nocturnal Emission (Dhathu Pittawima)<br />ස්වප්න රෝග (ධාතු
@@ -844,7 +883,7 @@
                             <div class="disease-item">Liver Diseases (Fatty Liver etc.)<br />අක්මාගත රෝග (ෆැටිලිවර් ආදී)
                             </div>
 
-                            <div class="disease-item">Diseases of Eye, Ear, and Nose<br />ඇස කන නාසය ආශ්‍රිත රෝග</div>
+                            <div class="disease-item">Eye, Ear, Nose Related Illnesses<br />ඇස කන නාසය ආශ්‍රිත රෝග</div>
                             <div class="disease-item">Thyroid gland enlargement<br />ගලගණ්ඩය</div>
                             <div class="disease-item">Vesical Calculi<br />මුත්‍රාශයේ ගල්</div>
                         </div>
@@ -870,7 +909,7 @@
         <div class="container py-5">
             <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
                 <p class="fs-5 fw-medium fst-italic text-primary">Our Products</p>
-                <h1 class="display-6">Tea has a complex positive effect on the body</h1>
+                <h1 class="display-6">Special medicines that has  complex positive effects on the body</h1>
                 <p class="mb-1">
                     At Erundeniya Ayurveda Hospital, we produce a range of trusted traditional
                     Ayurvedic products prepared using ancient family recipes passed down through
@@ -909,27 +948,27 @@
                     <div class="bg-white shadow-sm text-center p-4 position-relative mt-n5 mx-4">
                         <h4 class="text-primary">Erundeniya Pain Reliever (Vedana Nashakaya)</h4>
                         <div class="card-content">
-                        <span class="text-body">
-                            A powerful traditional herbal pain relief oil made using an ancient family formula.
-                            Provides instant relief for various body aches and joint pains.
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Effective for</b></span>
-                        <br />
-                        <span class="text-body">
-                            Joint pains <br />
-                            Severe headaches<br />
-                            Neck and back pain<br />
-                            Bone and muscle aches
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Prepared using</b></span>
-                        <br />
-                        <span class="text-body">
-                            A blend of traditional herbal oils and rare medicinal ingredients.
-                        </span>
+                            <span class="text-body">
+                                A powerful traditional herbal pain relief oil made using an ancient family formula.
+                                Provides instant relief for various body aches and joint pains.
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Effective for</b></span>
+                            <br />
+                            <span class="text-body">
+                                Joint pains <br />
+                                Severe headaches<br />
+                                Neck and back pain<br />
+                                Bone and muscle aches
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Prepared using</b></span>
+                            <br />
+                            <span class="text-body">
+                                A blend of traditional herbal oils and rare medicinal ingredients.
+                            </span>
                         </div>
-                         <span class="read-more-btn">Read more...</span>
+                        <span class="read-more-btn">Read more...</span>
                     </div>
                 </div>
                 <div class="d-block product-item rounded">
@@ -937,27 +976,27 @@
                     <div class="bg-white shadow-sm text-center p-4 position-relative mt-n5 mx-4">
                         <h4 class="text-primary">Erundeniya Human Immunity Booster</h4>
                         <div class="card-content">
-                        <span class="text-body">
-                            An effective traditional herbal immunity tonic made from ancient Ayurvedic recipes.
-                            Specially designed to boost the immune system and protect against respiratory
-                            infections and contagious diseases.
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Helpful for</b></span>
-                        <br />
-                        <span class="text-body">
-                            Cough, cold, and flu<br />Fever and throat infections<br />COVID-19 related
-                            symptoms<br />General fatigue and immunity improvement
-                            cancer
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Main Ingredients</b></span>
-                        <br />
-                        <span class="text-body">
-                            White garlic, Aralu, Ginger, Coriander seeds, Venivelgeta.
-                        </span>
+                            <span class="text-body">
+                                An effective traditional herbal immunity tonic made from ancient Ayurvedic recipes.
+                                Specially designed to boost the immune system and protect against respiratory
+                                infections and contagious diseases.
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Helpful for</b></span>
+                            <br />
+                            <span class="text-body">
+                                Cough, cold, and flu<br />Fever and throat infections<br />COVID-19 related
+                                symptoms<br />General fatigue and immunity improvement
+                                cancer
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Main Ingredients</b></span>
+                            <br />
+                            <span class="text-body">
+                                White garlic, Aralu, Ginger, Coriander seeds, Venivelgeta.
+                            </span>
                         </div>
-                         <span class="read-more-btn">Read more...</span>
+                        <span class="read-more-btn">Read more...</span>
                     </div>
                 </div>
                 <div class="d-block product-item rounded">
@@ -965,27 +1004,27 @@
                     <div class="bg-white shadow-sm text-center p-4 position-relative mt-n5 mx-4">
                         <h4 class="text-primary">Erundeniya Respi Relief</h4>
                         <div class="card-content">
-                        <span class="text-body">
-                            A trusted traditional Ayurvedic remedy specially formulated for respiratory system
-                            related disorders. Helps to relieve nasal congestion, headaches, earaches, and
-                            symptoms associated with common colds and viral infections.
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Effective for</b></span>
-                        <br />
-                        <span class="text-body">
-                            Respiratory infections<br />Headaches and sinus congestion<br />Ear pain<br />Persistent
-                            cough and COVID-19-related symptoms
-                            cancer
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Main Ingredients</b></span>
-                        <br />
-                        <span class="text-body">
-                            Cinnamon, Nika, Yakinara, Kamranga (Starfruit)
-                        </span>
+                            <span class="text-body">
+                                A trusted traditional Ayurvedic remedy specially formulated for respiratory system
+                                related disorders. Helps to relieve nasal congestion, headaches, earaches, and
+                                symptoms associated with common colds and viral infections.
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Effective for</b></span>
+                            <br />
+                            <span class="text-body">
+                                Respiratory infections<br />Headaches and sinus congestion<br />Ear pain<br />Persistent
+                                cough and COVID-19-related symptoms
+                                cancer
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Main Ingredients</b></span>
+                            <br />
+                            <span class="text-body">
+                                Cinnamon, Nika, Yakinara, Kamranga (Starfruit)
+                            </span>
                         </div>
-                         <span class="read-more-btn">Read more...</span>
+                        <span class="read-more-btn">Read more...</span>
                     </div>
                 </div>
                 <div class="d-block product-item rounded">
@@ -993,38 +1032,38 @@
                     <div class="bg-white shadow-sm text-center p-4 position-relative mt-n5 mx-4">
                         <h4 class="text-primary">Erundeniya Dantha Suwaya (Herbal Dental Care Powder)</h4>
                         <div class="card-content">
-                        <span class="text-body">
-                            A trusted traditional Ayurvedic oral care formula specially prepared to
-                            maintain oral hygiene and treat various mouth-related conditions. Crafted
-                            using a time-honored family recipe, this herbal powder offers natural
-                            protection and relief from oral health problems.
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Benefits</b></span>
-                        <br />
-                        <span class="text-body">
-                            Prevents the development of oral cancers<br />
-                            Controls gum diseases and infections<br />
-                            Heals mouth ulcers, bleeding gums, and wounds<br />
-                            Promotes overall oral hygiene and fresh breath
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Effective for</b></span>
-                        <br />
-                        <span class="text-body">
-                            Mouth cancers and oral lesions<br />
-                            Gum recession and tissue damage<br />
-                            Bleeding, swelling, and pain in the oral cavity<br />
-                            Mouth ulcers and infections
-                        </span>
-                        <br /><br />
-                        <span class="text-body"><b>Main Ingredients</b></span>
-                        <br />
-                        <span class="text-body">
-                            A blend of valuable traditional herbal ingredients according to an ancient family recipe.
-                        </span>
+                            <span class="text-body">
+                                A trusted traditional Ayurvedic oral care formula specially prepared to
+                                maintain oral hygiene and treat various mouth-related conditions. Crafted
+                                using a time-honored family recipe, this herbal powder offers natural
+                                protection and relief from oral health problems.
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Benefits</b></span>
+                            <br />
+                            <span class="text-body">
+                                Prevents the development of oral cancers<br />
+                                Controls gum diseases and infections<br />
+                                Heals mouth ulcers, bleeding gums, and wounds<br />
+                                Promotes overall oral hygiene and fresh breath
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Effective for</b></span>
+                            <br />
+                            <span class="text-body">
+                                Mouth cancers and oral lesions<br />
+                                Gum recession and tissue damage<br />
+                                Bleeding, swelling, and pain in the oral cavity<br />
+                                Mouth ulcers and infections
+                            </span>
+                            <br /><br />
+                            <span class="text-body"><b>Main Ingredients</b></span>
+                            <br />
+                            <span class="text-body">
+                                A blend of valuable traditional herbal ingredients according to an ancient family recipe.
+                            </span>
                         </div>
-                         <span class="read-more-btn">Read more...</span>
+                        <span class="read-more-btn">Read more...</span>
                     </div>
                 </div>
             </div>
@@ -1076,7 +1115,7 @@
     </div>
     <!-- Article End -->
 
-     <!-- Footer Start -->
+    <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
             <div class="row g-5">
@@ -1090,10 +1129,10 @@
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>+94 71 291 9408</p>
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
                     <div class="d-flex pt-3">
-                        
+
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://web.facebook.com/erundeniyaayurvedahospital"><i
                                 class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
                                 class="fab fa-instagram"></i></a>
                         <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i
                                 class="fab fa-youtube"></i></a>
@@ -1106,10 +1145,10 @@
                     <a class="btn btn-link" href="services.php">Our Services</a>
                     <a class="btn btn-link" href="about.php">About Us</a>
                     <a class="btn btn-link" href="contact.php">Contact Us</a>
-                      <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
+                    <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
                     <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
                     <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
-                   
+
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>
@@ -1160,18 +1199,18 @@
     <script src="js/main.js"></script>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".read-more-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            const content = btn.previousElementSibling;
-            content.classList.toggle("expanded");
-            btn.textContent = content.classList.contains("expanded") 
-                ? "Read less..." 
-                : "Read more...";
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".read-more-btn").forEach(function(btn) {
+                btn.addEventListener("click", function() {
+                    const content = btn.previousElementSibling;
+                    content.classList.toggle("expanded");
+                    btn.textContent = content.classList.contains("expanded") ?
+                        "Read less..." :
+                        "Read more...";
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 
 
 </body>

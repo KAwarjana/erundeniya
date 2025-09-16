@@ -106,11 +106,20 @@ document.querySelectorAll('.service-item').forEach((item, index) => {
     const collapse = item.querySelector('.collapse');
 
     if (button && collapse) {
+        // Set unique IDs (your existing functionality)
         const uniqueId = `collapse-${index}`;
         collapse.id = uniqueId;
         button.setAttribute('data-bs-target', `#${uniqueId}`);
+
+        // Add click event listener to toggle classes
+        button.addEventListener('click', function() {
+            // Toggle the button classes
+            button.classList.toggle('toggle-btn-collapsed');
+            button.classList.toggle('toggle-btn-expanded');
+            
+            // Update aria-expanded attribute
+            const isExpanded = button.classList.contains('toggle-btn-expanded');
+            button.setAttribute('aria-expanded', isExpanded);
+        });
     }
 });
-
-
-

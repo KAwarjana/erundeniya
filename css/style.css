@@ -647,6 +647,19 @@
     color: var(--bs-white) !important;
 }
 
+.toggle-btn-collapsed .show-when-expanded {
+    display: none;
+}
+
+.toggle-btn-expanded .show-when-collapsed {
+    display: none;
+}
+
+.toggle-btn-collapsed .show-when-collapsed,
+.toggle-btn-expanded .show-when-expanded {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
 
 /*** Team ***/
 .container-team {
