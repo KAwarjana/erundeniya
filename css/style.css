@@ -991,6 +991,12 @@
     /* ensure equal card height inside carousel */
 }
 
+.product-carousel:hover .product-item {
+  cursor: pointer;
+}
+
+
+
 .product-carousel .product-item img {
     width: 100%;
     height: auto;
@@ -1029,3 +1035,4 @@
     font-size: 0.9rem;
     align-items: center;
 }
+

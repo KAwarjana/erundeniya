@@ -139,7 +139,7 @@
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
                         <a href="gallery.php" class="nav-item nav-link">Gallery</a>
-                        <a href="" class="nav-item" style="align-self: center; width: 100%;">
+                        <a href="appointment.php" class="nav-item" style="align-self: center; width: 100%;">
                             <div class="">
                                 <button type="button" class="btn btn-primary rounded-pill">Appointments</button>
                             </div>
@@ -832,9 +832,12 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Quick Links</h4>
-                    <a class="btn btn-link" href="services.php">Our Services</a>
-                    <a class="btn btn-link" href="about.php">About Us</a>
-                    <a class="btn btn-link" href="contact.php">Contact Us</a>
+                     <a class="btn btn-link" href="index.php">Home</a>
+                    <a class="btn btn-link" href="services.php">Services</a>
+                    <a class="btn btn-link" href="about.php">About</a>
+                    <a class="btn btn-link" href="contact.php">Contact</a>
+                    <a class="btn btn-link" href="gallery.php">Gallery</a>
+                    <a class="btn btn-link" href="appointment.php">Appointments</a>
                     <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
                     <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
                     <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
