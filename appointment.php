@@ -201,11 +201,17 @@
                 </div>
 
                 <div class="appointment-sec1-div7">
-                    <label>Wednesday,13 Aug 2025</label>
-                    <hr>
-                    
+
+                    <div class="appointment-expand">
+                        <span class="appointment-expand-span">Wednesday,13 Aug 2025</span>
+                        <div class="appointment-sec1-div8"><img src="img/arrow_down.png" class="appointment-expand-img"> </div>
+                    </div>
+
+                    <hr class="appointment-hr2">
+
                     <div class="appointment-cards-search">
-                    <input type="text" placeholder="Search Your Time Slot..">
+                        <input type="text" placeholder="Search Your Time Slot.." class="time-search">
+                        <button class="search-btn"><img src="img/search.png" class="search-btn-img" alt=""></button>
                     </div>
 
                     <br>
