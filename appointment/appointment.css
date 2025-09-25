@@ -176,6 +176,20 @@ body {
 
 }
 
+.appointment-status1 {
+    /* position: absolute; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 7rem;
+    height: 0.5rem;
+    background-color: #ff0000;
+    top: 0;
+    border-radius: 20px;
+
+}
+
 .appointment-card-details {
     padding: 1rem;
    
@@ -215,6 +229,11 @@ body {
    cursor: pointer;
 }
 
+.appointment-btn1:disabled {
+    background-color: #02830431;
+   cursor:not-allowed ;
+}
+
 @media screen and (max-width:650px) {
     .appointment-sec1-div2{
         flex-direction: column;
@@ -248,3 +267,7 @@ body {
 
     
 }
+
+
+
+
