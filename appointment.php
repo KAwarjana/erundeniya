@@ -203,6 +203,10 @@
                 <div class="appointment-sec1-div7">
                     <label>Wednesday,13 Aug 2025</label>
                     <hr>
+                    
+                    <div class="appointment-cards-search">
+                    <input type="text" placeholder="Search Your Time Slot..">
+                    </div>
 
                     <br>
                     <div class="appointment-cards">
@@ -407,7 +411,7 @@
 
 
 
-                            
+
                             </div>
                         </div>
 

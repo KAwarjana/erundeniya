@@ -271,3 +271,10 @@ body {
 
 
 
+.appointment-cards-search{
+    width: 98%;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: end;
+}
