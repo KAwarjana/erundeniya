@@ -216,6 +216,7 @@
                         </div>
 
                         <br>
+
                         <div class="appointment-cards collapsible-cards">
 
                             <div class="appointment-card">
@@ -235,7 +236,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -279,7 +280,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -301,7 +302,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -323,7 +324,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -345,7 +346,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -367,7 +368,7 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
@@ -389,60 +390,140 @@
                                         <span class="appointment-card-span1">Time</span>
                                         <span class="appointment-card-span2">9.00AM</span>
                                     </div>
-                                    <button class="appointment-btn1">BOOK NOW</button>
+                                    <button class="appointment-btn1" id="open">BOOK NOW</button>
                                 </div>
 
                             </div>
-
-
-                            <div class="modal-container">
-                                <div class="modal">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                </div>
-                            </div>
-
-
-
-
-
-
-
 
 
 
                         </div>
+
+
                     </div>
+
+
 
                 </div>
 
-            </div>
-            <div>
 
+
+
+            </div>
+
+            <div class="model-container" id="model_container">
+                <div class="model">
+
+                    <div class="model-div1">
+                        <div class="model-div2">
+                            <span class="model-span1">Place Appointment</span>
+                        </div>
+                        <div class="model-div3">
+                            <img src="img/close_btn.png" id="close" class="close-btn">
+
+                        </div>
+                    </div>
+                    <br>
+                    <div class="model-div4">
+                        <div class="model-div5">
+                            <div class="model-div6">
+                                <span class="model-span2">Applicant Details</span>
+                                <span class="model-span3">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</span>
+                            </div>
+                            <br>
+                            <div class="model-div7">
+                                <div class="model-div8">
+
+                                    <div class="model-div9">
+                                        <div class="model-div10">
+                                            <label for="title" class="model-label">Title</label>
+                                            <select name="title" id="title" required class="model-input1">
+                                                <!-- <option value="" disabled selected>Mr.</option> -->
+                                                <option value="Mr">Mr.</option>
+                                                <option value="Mrs">Mrs.</option>
+                                                <option value="Miss">Miss.</option>
+                                                <option value="Ms">Ms.</option>
+                                                <option value="Dr">Dr.</option>
+                                                <option value="Prof">Prof.</option>
+                                            </select>
+                                        </div>
+                                        <div class="model-div11">
+                                            <label for="" class="model-label">Name (Required)</label>
+                                            <input type="text" class="model-input1" placeholder="Name">
+                                        </div>
+                                    </div>
+
+                                    <div class="model-div12">
+                                        <label for="" class="model-label">Mobile (Required)</label>
+                                        <input type="tel" class="model-input1" placeholder="0000000000">
+                                    </div>
+
+                                </div>
+
+                                <div class="model-div8">
+                                    <div class="model-div13">
+                                        <label for="" class="model-label">Email(Optional)</label>
+                                        <input type="email" class="model-input1" placeholder="Email">
+                                    </div>
+                                    <div class="model-div12">
+                                        <label for="" class="model-label">Patient Number(Optional)</label>
+                                        <input type="text" class="model-input1" placeholder="">
+                                    </div>
+                                </div>
+
+                                <div class="model-div14">
+                                    <label for="" class="model-label">Note(Optional)</label>
+                                    <input type="text" class="model-input2" placeholder="Note">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="model-div15">
+                            <div class="model-div16">
+                                <div class="model-div6">
+                                    <span class="model-span2">Payment Details</span>
+                                    <span class="model-span3">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</span>
+                                </div>
+
+                                <hr>
+                                <div class="model-div20">
+                                    <div class="model-div17">
+                                        <div class="model-div18"><span class="model-span3">eChannelling fee</span></div>
+                                        <div class="model-div19"><span class="model-span4">Rs. 200.00</span></div>
+                                    </div>
+
+                                    <div class="model-div17">
+                                        <div class="model-div18"><span class="model-span3">Discount</span></div>
+                                        <div class="model-div19"><span class="model-span4">Rs. 0.00</span></div>
+                                    </div>
+                                </div>
+
+
+                                <hr>
+
+                                <div class="model-div17">
+                                    <div class="model-div18"><span class="model-span5">Total fee</span></div>
+                                    <div class="model-div19"><span class="model-span6">Rs. 200.00</span></div>
+                                </div>
+                            </div>
+                            <div class="model-div21">
+                                <button class="model-btn1">Pay Now</button>
+                                <button class="model-btn2">Cancel Process</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
             </div>
 
 
         </div>
+
+
+
 
     </section>
 
