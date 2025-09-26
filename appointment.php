@@ -201,235 +201,237 @@
                 </div>
 
                 <div class="appointment-sec1-div7">
-
-                    <div class="appointment-expand">
-                        <span class="appointment-expand-span">Wednesday,13 Aug 2025</span>
-                        <div class="appointment-sec1-div8"><img src="img/arrow_down.png" class="appointment-expand-img"> </div>
-                    </div>
-
-                    <hr class="appointment-hr2">
-
-                    <div class="appointment-cards-search">
-                        <input type="text" placeholder="Search Your Time Slot.." class="time-search">
-                        <button class="search-btn"><img src="img/search.png" class="search-btn-img" alt=""></button>
-                    </div>
-
-                    <br>
-                    <div class="appointment-cards">
-
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
-
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
-                            </div>
-
+                    <div class="collapsible">
+                        <input type="checkbox" id="collapsible-head" class="checkbox-input">
+                        <div class="appointment-expand">
+                            <label for="collapsible-head" class="appointment-expand-span">Wednesday,13 Aug 2025</label>
+                            <div class="appointment-sec1-div8"><img src="img/arrow_down.png" class="appointment-expand-img"> </div>
                         </div>
 
-                        <div class="appointment-card">
-                            <div class="appointment-status1"></div>
-                            <div class="appointment-card-details">
+                        <hr class="appointment-hr2">
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1" disabled>BOOK NOW</button>
-                            </div>
-
+                        <div class="appointment-cards-search">
+                            <input type="text" placeholder="Search Your Time Slot.." class="time-search">
+                            <button class="search-btn"><img src="img/search.png" class="search-btn-img" alt=""></button>
                         </div>
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                        <br>
+                        <div class="appointment-cards collapsible-cards">
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
+
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status1"></div>
+                                <div class="appointment-card-details">
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1" disabled>BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
 
-                        <div class="appointment-card">
-                            <div class="appointment-status"></div>
-                            <div class="appointment-card-details">
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
                                 </div>
 
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Appointment No:</span>
-                                    <span class="appointment-card-span2">00001</span>
-                                </div>
-                                <div class="appointment-details">
-                                    <span class="appointment-card-span1">Time</span>
-                                    <span class="appointment-card-span2">9.00AM</span>
-                                </div>
-                                <button class="appointment-btn1">BOOK NOW</button>
                             </div>
 
-                        </div>
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
 
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
 
-                        <div class="modal-container">
-                            <div class="modal">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
+                                </div>
 
                             </div>
+
+                            <div class="appointment-card">
+                                <div class="appointment-status"></div>
+                                <div class="appointment-card-details">
+
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Appointment No:</span>
+                                        <span class="appointment-card-span2">00001</span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="appointment-card-span1">Time</span>
+                                        <span class="appointment-card-span2">9.00AM</span>
+                                    </div>
+                                    <button class="appointment-btn1">BOOK NOW</button>
+                                </div>
+
+                            </div>
+
+
+                            <div class="modal-container">
+                                <div class="modal">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+
                         </div>
-
-
-
-
-
-
-
-
-
-
                     </div>
 
                 </div>
