@@ -133,3 +133,15 @@ Stroke effects - Nucleo outline icons
   -o-transform: translateX(0.5px) translateY(0.5px);
   transform: translateX(0.5px) translateY(0.5px);
 }
+
+
+.nav--logout:hover{
+  background-color: rgba(255, 0, 0, 0.247);
+}
+
+
+@media screen and (max-width:355px) {
+  .searchbar--header{
+    display: block;
+  }
+}
