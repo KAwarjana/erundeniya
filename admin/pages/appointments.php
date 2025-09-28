@@ -51,6 +51,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .filter-btn {
@@ -60,6 +61,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .filter-btn.active {
@@ -77,14 +79,16 @@
         }
 
         .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: 5px;
+            position: relative;
             background: #f44336;
             color: white;
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 10px;
+            margin-top: -30px;
+            margin-left: 10px;
+            display: flex;
+            flex-direction: row;
         }
 
         .action-buttons {
@@ -109,6 +113,199 @@
             border-radius: 8px;
             margin-top: 10px;
         }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .filter-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .btn-sm {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+
+            .table-responsive {
+                font-size: 12px;
+            }
+
+            .text-sm {
+                font-size: 11px !important;
+            }
+
+            .text-xs {
+                font-size: 10px !important;
+            }
+
+            .card-header h6 {
+                font-size: 14px;
+            }
+
+            .breadcrumb-item {
+                font-size: 11px !important;
+            }
+
+            /* Stack search and filter controls on mobile */
+            .search-filters-row {
+                flex-direction: column;
+            }
+
+            .search-filters-row>div {
+                margin-bottom: 10px;
+            }
+
+            /* Make table more mobile-friendly */
+            .table th {
+                font-size: 9px !important;
+                padding: 8px 4px !important;
+            }
+
+            .table td {
+                padding: 8px 4px !important;
+                vertical-align: middle;
+            }
+
+            /* Hide less important columns on very small screens */
+            .table .d-none-mobile {
+                display: none !important;
+            }
+
+            /* Adjust stats cards for mobile */
+            .col-xl-3.col-sm-6 {
+                margin-bottom: 15px;
+            }
+
+            .icon.icon-md {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            .card-header p-2 {
+                padding: 15px !important;
+            }
+
+            /* Mobile-specific button adjustments */
+            .btn.bg-gradient-success {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .btn.bg-gradient-dark {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .card {
+                margin-bottom: 15px;
+            }
+
+            .ms-3 {
+                margin-left: 10px !important;
+            }
+
+            h3.h4 {
+                font-size: 18px !important;
+            }
+
+            .mb-4 p {
+                font-size: 12px;
+            }
+
+            /* Further compress table on very small screens */
+            .table {
+                font-size: 10px;
+            }
+
+            .status-badge {
+                font-size: 9px;
+                padding: 2px 4px;
+            }
+
+            /* Stack action buttons vertically on very small screens */
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                margin-bottom: 2px;
+            }
+
+            /* Adjust navbar for mobile */
+            .navbar-main {
+                flex-wrap: wrap;
+            }
+
+            .searchbar--header {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .navbar-nav {
+                margin-top: 10px;
+            }
+        }
+
+        /* Responsive table adjustments */
+        @media (max-width: 992px) {
+            .table-responsive {
+                border: none;
+            }
+
+            .table {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Ensure buttons don't break on smaller screens */
+        @media (max-width: 400px) {
+            .btn {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+
+            .material-symbols-rounded {
+                font-size: 16px !important;
+            }
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container-fluid {
+            flex: 1;
+        }
+
+        .footer {
+            margin-top: auto;
+        }
     </style>
 </head>
 
@@ -124,43 +321,43 @@
         <hr class="horizontal dark mt-0 mb-2">
         <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
             <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link text-dark" href="../pages/dashboard.php">
-            <i class="material-symbols-rounded opacity-5">dashboard</i>
-            <span class="nav-link-text ms-1">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <a class="nav-link active bg-gradient-dark text-white" href="../pages/appointments.php">
-            <i class="material-symbols-rounded opacity-5">calendar_today</i>
-            <span class="nav-link-text ms-1">Appointments</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <a class="nav-link text-dark" href="../pages/book_appointments.php">
-            <i class="material-symbols-rounded opacity-5">add_circle</i>
-            <span class="nav-link-text ms-1">Book Appointment</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <a class="nav-link text-dark" href="../pages/dashboard.html">
-            <i class="material-symbols-rounded opacity-5">people</i>
-            <span class="nav-link-text ms-1">Patients</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <a class="nav-link text-dark" href="../pages/dashboard.html">
-            <i class="material-symbols-rounded opacity-5">receipt</i>
-            <span class="nav-link-text ms-1">Bills</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <a class="nav-link text-dark" href="../pages/prescription.php">
-            <i class="material-symbols-rounded opacity-5">medication</i>
-            <span class="nav-link-text ms-1">Prescriptions</span>
-          </a>
-        </li>
-      </ul>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="../pages/dashboard.php">
+                        <i class="material-symbols-rounded opacity-5">dashboard</i>
+                        <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link active bg-gradient-dark text-white" href="../pages/appointments.php">
+                        <i class="material-symbols-rounded opacity-5">calendar_today</i>
+                        <span class="nav-link-text ms-1">Appointments</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-dark" href="../pages/book_appointments.php">
+                        <i class="material-symbols-rounded opacity-5">add_circle</i>
+                        <span class="nav-link-text ms-1">Book Appointment</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-dark" href="../pages/dashboard.html">
+                        <i class="material-symbols-rounded opacity-5">people</i>
+                        <span class="nav-link-text ms-1">Patients</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-dark" href="../pages/create_bill.php">
+                        <i class="material-symbols-rounded opacity-5">receipt</i>
+                        <span class="nav-link-text ms-1">Bills</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-dark" href="../pages/prescription.php">
+                        <i class="material-symbols-rounded opacity-5">medication</i>
+                        <span class="nav-link-text ms-1">Prescriptions</span>
+                    </a>
+                </li>
+            </ul>
         </div>
         <div class="sidenav-footer">
             <ul class="navbar-nav">
@@ -214,7 +411,7 @@
                         </li>
                         <li class="nav-item d-flex align-items-center">
                             <a href="#" class="nav-link text-body font-weight-bold px-0">
-                                <img src="../../img/user.png" width="20" height="20"> &nbsp;Admin
+                                <img src="../../img/user.png" width="20" height="20"> &nbsp;<span class="d-none d-sm-inline">Admin</span>
                             </a>
                         </li>
                     </ul>
@@ -299,7 +496,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="filter-buttons">
-                        <button class="filter-btn active" data-status="all" onclick="filterAppointments('all')">All Appointments</button>
+                        <button class="filter-btn active" data-status="all" onclick="filterAppointments('all')">All</button>
                         <button class="filter-btn" data-status="booked" onclick="filterAppointments('booked')">Booked</button>
                         <button class="filter-btn" data-status="confirmed" onclick="filterAppointments('confirmed')">Confirmed</button>
                         <button class="filter-btn" data-status="attended" onclick="filterAppointments('attended')">Attended</button>
@@ -310,19 +507,19 @@
             </div>
 
             <!-- Search and Date Filter -->
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row search-filters-row">
+                <div class="col-lg-6 col-md-12">
                     <div class="input-group input-group-outline mb-3">
                         <input type="text" class="form-control" placeholder="Search by appointment number, patient name, or mobile..." id="appointmentSearch">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="input-group input-group-outline mb-3">
                         <input type="date" class="form-control" id="dateFilter" onchange="filterByDate()">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <button class="btn bg-gradient-dark shadow-dark shadow text-center border-radius-lg" onclick="exportAppointments()">Export to Excel</button>
+                <div class="col-lg-2 col-md-6">
+                    <button class="btn bg-gradient-dark shadow-dark shadow text-center border-radius-lg w-100" onclick="exportAppointments()">Export to Excel</button>
                 </div>
             </div>
 
@@ -330,10 +527,10 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                            <h6>All Appointments</h6>
-                            <a href="book-appointment.html" class="btn bg-gradient-success">
-                                <i class="material-symbols-rounded">add</i> New Appointment
+                        <div class="card-header pb-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                            <h6 class="mb-2 mb-md-0">All Appointments</h6>
+                            <a href="book_appointments.php" class="btn bg-gradient-success">
+                                <i class="material-symbols-rounded">add</i> <span class="d-none d-sm-inline">New Appointment</span>
                             </a>
                         </div>
                         <div class="card-body px-0 pb-2">
@@ -341,11 +538,11 @@
                                 <table class="table align-items-center mb-0" id="appointmentsTable">
                                     <thead>
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Appointment Details</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Patient Information</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Schedule</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Appointment</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Patient</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">Schedule</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Payment</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-lg-table-cell">Payment</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                                         </tr>
                                     </thead>
@@ -355,6 +552,7 @@
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm font-weight-bold">APT001</h6>
+                                                        <p class="text-xs text-secondary mb-0 d-md-none">2024-10-02, 10:30 AM</p>
                                                         <p class="text-xs text-secondary mb-0">Online Booking</p>
                                                     </div>
                                                 </div>
@@ -363,10 +561,10 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">Mr. Kamal Silva</span>
                                                     <span class="text-xs text-secondary">071-1234567</span>
-                                                    <span class="text-xs text-secondary">kamal@email.com</span>
+                                                    <span class="text-xs text-secondary d-none d-lg-inline">kamal@email.com</span>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-md-table-cell">
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">2024-10-02</span>
                                                     <span class="text-xs text-secondary">Wednesday</span>
@@ -375,8 +573,9 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-booked">Booked</span>
+                                                <div class="text-xs text-secondary d-lg-none mt-1">Rs. 200.00 - Paid</div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-lg-table-cell">
                                                 <span class="text-sm font-weight-bold text-success">
                                                     <i class="material-symbols-rounded text-sm">check_circle</i> Paid
                                                 </span>
@@ -385,13 +584,13 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn btn-sm btn-outline-success" onclick="markAttendance('APT001', 'Attended')">
-                                                        <i class="material-symbols-rounded text-sm">check</i> Attended
+                                                        <i class="material-symbols-rounded text-sm">check</i> <span class="d-none d-xl-inline">Attended</span>
                                                     </button>
                                                     <button class="btn btn-sm btn-outline-warning" onclick="markAttendance('APT001', 'No-Show')">
-                                                        <i class="material-symbols-rounded text-sm">close</i> No Show
+                                                        <i class="material-symbols-rounded text-sm">close</i> <span class="d-none d-xl-inline">No Show</span>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-info" onclick="sendReminder('APT001')">
-                                                        <i class="material-symbols-rounded text-sm">sms</i> Remind
+                                                    <button class="btn btn-sm btn-outline-info d-none d-md-inline-block" onclick="sendReminder('APT001')">
+                                                        <i class="material-symbols-rounded text-sm">sms</i> <span class="d-none d-xl-inline">Remind</span>
                                                     </button>
                                                 </div>
                                             </td>
@@ -401,6 +600,7 @@
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm font-weight-bold">APT002</h6>
+                                                        <p class="text-xs text-secondary mb-0 d-md-none">2024-09-28, 11:00 AM</p>
                                                         <p class="text-xs text-secondary mb-0">Manual Booking</p>
                                                     </div>
                                                 </div>
@@ -409,10 +609,10 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">Mrs. Nirmala Perera</span>
                                                     <span class="text-xs text-secondary">077-9876543</span>
-                                                    <span class="text-xs text-secondary">nirmala@email.com</span>
+                                                    <span class="text-xs text-secondary d-none d-lg-inline">nirmala@email.com</span>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-md-table-cell">
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">2024-09-28</span>
                                                     <span class="text-xs text-secondary">Saturday</span>
@@ -421,8 +621,9 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-attended">Attended</span>
+                                                <div class="text-xs text-secondary d-lg-none mt-1">Rs. 200.00 - Paid</div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-lg-table-cell">
                                                 <span class="text-sm font-weight-bold text-success">
                                                     <i class="material-symbols-rounded text-sm">check_circle</i> Paid
                                                 </span>
@@ -431,10 +632,10 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn btn-sm btn-primary" onclick="createBill('APT002')">
-                                                        <i class="material-symbols-rounded text-sm">receipt</i> Create Bill
+                                                        <i class="material-symbols-rounded text-sm">receipt</i> <span class="d-none d-xl-inline">Create Bill</span>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails('APT002')">
-                                                        <i class="material-symbols-rounded text-sm">visibility</i> View
+                                                    <button class="btn btn-sm btn-outline-info" onclick="window.location='appointment_single_view.php';">
+                                                        <i class="material-symbols-rounded text-sm">visibility</i> <span class="d-none d-xl-inline">View</span>
                                                     </button>
                                                 </div>
                                             </td>
@@ -444,6 +645,7 @@
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm font-weight-bold">APT003</h6>
+                                                        <p class="text-xs text-secondary mb-0 d-md-none">2024-10-05, 09:15 AM</p>
                                                         <p class="text-xs text-secondary mb-0">Online Booking</p>
                                                     </div>
                                                 </div>
@@ -452,10 +654,10 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">Dr. Saman Fernando</span>
                                                     <span class="text-xs text-secondary">075-5555555</span>
-                                                    <span class="text-xs text-secondary">saman@email.com</span>
+                                                    <span class="text-xs text-secondary d-none d-lg-inline">saman@email.com</span>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-md-table-cell">
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">2024-10-05</span>
                                                     <span class="text-xs text-secondary">Saturday</span>
@@ -464,8 +666,9 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-confirmed">Confirmed</span>
+                                                <div class="text-xs text-secondary d-lg-none mt-1">Rs. 200.00 - Paid</div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-lg-table-cell">
                                                 <span class="text-sm font-weight-bold text-success">
                                                     <i class="material-symbols-rounded text-sm">check_circle</i> Paid
                                                 </span>
@@ -474,13 +677,13 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn btn-sm btn-outline-success" onclick="markAttendance('APT003', 'Attended')">
-                                                        <i class="material-symbols-rounded text-sm">check</i> Attended
+                                                        <i class="material-symbols-rounded text-sm">check</i> <span class="d-none d-xl-inline">Attended</span>
                                                     </button>
                                                     <button class="btn btn-sm btn-outline-warning" onclick="markAttendance('APT003', 'No-Show')">
-                                                        <i class="material-symbols-rounded text-sm">close</i> No Show
+                                                        <i class="material-symbols-rounded text-sm">close</i> <span class="d-none d-xl-inline">No Show</span>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment('APT003')">
-                                                        <i class="material-symbols-rounded text-sm">cancel</i> Cancel
+                                                    <button class="btn btn-sm btn-outline-danger d-none d-md-inline-block" onclick="cancelAppointment('APT003')">
+                                                        <i class="material-symbols-rounded text-sm">cancel</i> <span class="d-none d-xl-inline">Cancel</span>
                                                     </button>
                                                 </div>
                                             </td>
@@ -490,6 +693,7 @@
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm font-weight-bold">APT004</h6>
+                                                        <p class="text-xs text-secondary mb-0 d-md-none">2024-09-25, 02:30 PM</p>
                                                         <p class="text-xs text-secondary mb-0">Online Booking</p>
                                                     </div>
                                                 </div>
@@ -498,10 +702,10 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">Miss Ruwan Jayawardena</span>
                                                     <span class="text-xs text-secondary">078-1111111</span>
-                                                    <span class="text-xs text-secondary">ruwan@email.com</span>
+                                                    <span class="text-xs text-secondary d-none d-lg-inline">ruwan@email.com</span>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-md-table-cell">
                                                 <div class="d-flex flex-column">
                                                     <span class="text-sm font-weight-bold">2024-09-25</span>
                                                     <span class="text-xs text-secondary">Wednesday</span>
@@ -510,8 +714,9 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-no-show">No Show</span>
+                                                <div class="text-xs text-secondary d-lg-none mt-1">Rs. 200.00 - Paid</div>
                                             </td>
-                                            <td>
+                                            <td class="d-none d-lg-table-cell">
                                                 <span class="text-sm font-weight-bold text-success">
                                                     <i class="material-symbols-rounded text-sm">check_circle</i> Paid
                                                 </span>
@@ -520,10 +725,10 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment('APT004')">
-                                                        <i class="material-symbols-rounded text-sm">schedule</i> Reschedule
+                                                        <i class="material-symbols-rounded text-sm">schedule</i> <span class="d-none d-xl-inline">Reschedule</span>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails('APT004')">
-                                                        <i class="material-symbols-rounded text-sm">visibility</i> View
+                                                    <button class="btn btn-sm btn-outline-info" onclick="window.location='appointment_single_view.php';">
+                                                        <i class="material-symbols-rounded text-sm">visibility</i> <span class="d-none d-xl-inline">View</span>
                                                     </button>
                                                 </div>
                                             </td>
@@ -536,9 +741,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer py-4  ">
+            <div class="container-fluid">
+                <div class="row align-items-center justify-content-lg-between">
+                    <div class="mb-lg-0 mb-4">
+                        <div class="copyright text-center text-sm text-muted text-lg-start">
+                            © <script>
+                                document.write(new Date().getFullYear())
+                            </script>,
+                            design and develop by
+                            <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Evon Technologies Software Solution (PVT) Ltd.</a>
+                            All rights received.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </main>
 
     <!-- Scripts -->
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
+
     <script>
         // Filter appointments by status
         function filterAppointments(status) {
@@ -664,40 +893,40 @@
                 case 'attended':
                     buttonsHTML = `
                         <button class="btn btn-sm btn-primary" onclick="createBill('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">receipt</i> Create Bill
+                            <i class="material-symbols-rounded text-sm">receipt</i> <span class="d-none d-xl-inline">Create Bill</span>
                         </button>
                         <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">visibility</i> View
+                            <i class="material-symbols-rounded text-sm">visibility</i> <span class="d-none d-xl-inline">View</span>
                         </button>
                     `;
                     break;
                 case 'no-show':
                     buttonsHTML = `
                         <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">schedule</i> Reschedule
+                            <i class="material-symbols-rounded text-sm">schedule</i> <span class="d-none d-xl-inline">Reschedule</span>
                         </button>
                         <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">visibility</i> View
+                            <i class="material-symbols-rounded text-sm">visibility</i> <span class="d-none d-xl-inline">View</span>
                         </button>
                     `;
                     break;
                 case 'cancelled':
                     buttonsHTML = `
                         <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">visibility</i> View
+                            <i class="material-symbols-rounded text-sm">visibility</i> <span class="d-none d-xl-inline">View</span>
                         </button>
                     `;
                     break;
                 default:
                     buttonsHTML = `
                         <button class="btn btn-sm btn-outline-success" onclick="markAttendance('${row.querySelector('.font-weight-bold').textContent}', 'Attended')">
-                            <i class="material-symbols-rounded text-sm">check</i> Attended
+                            <i class="material-symbols-rounded text-sm">check</i> <span class="d-none d-xl-inline">Attended</span>
                         </button>
                         <button class="btn btn-sm btn-outline-warning" onclick="markAttendance('${row.querySelector('.font-weight-bold').textContent}', 'No-Show')">
-                            <i class="material-symbols-rounded text-sm">close</i> No Show
+                            <i class="material-symbols-rounded text-sm">close</i> <span class="d-none d-xl-inline">No Show</span>
                         </button>
-                        <button class="btn btn-sm btn-outline-info" onclick="sendReminder('${row.querySelector('.font-weight-bold').textContent}')">
-                            <i class="material-symbols-rounded text-sm">sms</i> Remind
+                        <button class="btn btn-sm btn-outline-info d-none d-md-inline-block" onclick="sendReminder('${row.querySelector('.font-weight-bold').textContent}')">
+                            <i class="material-symbols-rounded text-sm">sms</i> <span class="d-none d-xl-inline">Remind</span>
                         </button>
                     `;
             }
