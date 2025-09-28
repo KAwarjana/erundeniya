@@ -646,19 +646,18 @@
                                                 <option value="Mr">Mr.</option>
                                                 <option value="Mrs">Mrs.</option>
                                                 <option value="Miss">Miss.</option>
-                                                <option value="Ms">Ms.</option>
-                                                <option value="Dr">Dr.</option>
-                                                <option value="Prof">Prof.</option>
+                                                <option value="Ms">Rev.</option>
+                                                
                                             </select>
                                         </div>
                                         <div class="model-div11">
-                                            <label for="" class="model-label">Name (Required)</label>
+                                            <label for="" class="model-label">Name&nbsp;(Required)</label>
                                             <input type="text" class="model-input1" placeholder="Name">
                                         </div>
                                     </div>
 
                                     <div class="model-div12">
-                                        <label for="" class="model-label">Mobile (Required)</label>
+                                        <label for="" class="model-label">Mobile&nbsp;(Required)</label>
                                         <input type="tel" class="model-input1" placeholder="0000000000">
                                     </div>
 
@@ -666,18 +665,18 @@
 
                                 <div class="model-div8">
                                     <div class="model-div13">
-                                        <label for="" class="model-label">Email(Optional)</label>
+                                        <label for="" class="model-label">Email&nbsp;(Optional)</label>
                                         <input type="email" class="model-input1" placeholder="Email">
                                     </div>
                                     <div class="model-div12">
-                                        <label for="" class="model-label">Patient Number(Optional)</label>
+                                        <label for="" class="model-label">Patient Number&nbsp;(Optional)</label>
                                         <input type="text" class="model-input1" placeholder="">
                                     </div>
                                 </div>
 
                                 <div class="model-div14">
-                                    <label for="" class="model-label">Note(Optional)</label>
-                                    <input type="text" class="model-input2" placeholder="Note">
+                                    <label for="" class="model-label">Note&nbsp;(Optional)</label>
+                                    <textarea class="model-input2" placeholder="Note"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -689,7 +688,7 @@
                                     <span class="model-span3">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</span>
                                 </div>
 
-                                <hr>
+                                <hr class="model-hr">
                                 <div class="model-div20">
                                     <div class="model-div17">
                                         <div class="model-div18"><span class="model-span3">eChannelling fee</span></div>
@@ -703,7 +702,7 @@
                                 </div>
 
 
-                                <hr>
+                                <hr class="model-hr">
 
                                 <div class="model-div17">
                                     <div class="model-div18"><span class="model-span5">Total fee</span></div>
