@@ -1,3 +1,78 @@
+<?php
+require_once 'page_guards.php';
+PageGuards::guardAppointments();
+
+require_once 'auth_manager.php';
+require_once '../../connection/connection.php';
+
+Database::setUpConnection();
+
+$currentUser = AuthManager::getCurrentUser();
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+$menuItems = [
+    ['title' => 'Dashboard', 'url' => 'dashboard.php', 'icon' => 'dashboard', 'allowed_roles' => ['Admin'], 'show_to_all' => true],
+    ['title' => 'Appointments', 'url' => 'appointments.php', 'icon' => 'calendar_today', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    ['title' => 'Book Appointment', 'url' => 'book_appointments.php', 'icon' => 'add_circle', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    ['title' => 'Patients', 'url' => 'patients.php', 'icon' => 'people', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    ['title' => 'Bills', 'url' => 'create_bill.php', 'icon' => 'receipt', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    ['title' => 'Prescriptions', 'url' => 'prescription.php', 'icon' => 'medication', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    ['title' => 'OPD Treatments', 'url' => 'opd.php', 'icon' => 'local_hospital', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true]
+];
+
+function hasAccessToPage($allowedRoles)
+{
+    if (!AuthManager::isLoggedIn()) return false;
+    return in_array($_SESSION['role'], $allowedRoles);
+}
+
+function renderSidebarMenu($menuItems, $currentPage)
+{
+    $currentRole = $_SESSION['role'] ?? 'Guest';
+    foreach ($menuItems as $item) {
+        $isActive = ($currentPage === $item['url']);
+        $hasAccess = hasAccessToPage($item['allowed_roles']);
+
+        if ($hasAccess) {
+            $linkClass = $isActive ? 'nav-link active bg-gradient-dark text-white' : 'nav-link text-dark';
+            $href = $item['url'];
+            $onclick = '';
+            $style = '';
+            $tooltip = '';
+        } else {
+            $linkClass = 'nav-link text-muted';
+            $href = '#';
+            $onclick = 'event.preventDefault(); showAccessDenied(\'' . $item['title'] . '\');';
+            $style = 'opacity: 0.6; cursor: default;';
+            $tooltip = 'title="Access Restricted to Admin only" data-bs-toggle="tooltip"';
+        }
+
+        echo '<li class="nav-item mt-3">';
+        echo '<a class="' . $linkClass . '" href="' . $href . '" onclick="' . $onclick . '" style="' . $style . '" ' . $tooltip . '>';
+        echo '<i class="material-symbols-rounded opacity-5">' . $item['icon'] . '</i>';
+        echo '<span class="nav-link-text ms-1">' . $item['title'];
+        if (!$hasAccess) {
+            echo ' <i class="fas fa-lock" style="font-size: 10px; margin-left: 5px;"></i>';
+        }
+        echo '</span></a></li>';
+    }
+}
+
+Database::setUpConnection();
+
+// Get pending appointments count for notification badge
+try {
+    $pendingQuery = "SELECT COUNT(*) as count FROM appointment WHERE status = 'Booked'";
+    $pendingResult = Database::search($pendingQuery);
+    $pendingCount = $pendingResult->fetch_assoc()['count'];
+} catch (Exception $e) {
+    error_log("Pending count error: " . $e->getMessage());
+    $pendingCount = 0;
+}
+
+$currentUser = AuthManager::getCurrentUser();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,9 +81,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="../../img/logof1.png">
-    <title>Book Appointment - Erundeniya Medical Center</title>
+    <title>Book Appointment - Admin</title>
 
-    <!-- Fonts and icons -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
     <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -16,269 +90,200 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
 
+    <!-- Flatpickr CSS for Calendar -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <style>
-        .appointment-slot {
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .slot-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            width: 160px;
-            display: flex;
-            flex-direction: column;
-            background: #f8f9fa;
-            overflow: hidden;
-            position: relative;
+            background: #fff;
         }
 
-        .icon-aligned {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .slot-card.available {
+            border-color: #4CAF50;
+            background: #f8fff8;
         }
 
-        .appointment-slot:hover {
+        .slot-card.available:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
-        .slot-available {
-            border: 2px solid #4caf4f62;
-        }
-
-        .slot-available .slot-status-bar {
-            background: #4CAF50;
-            width: 60%;
-            border-radius: 5px;
-            height: 8px;
-            align-self: center;
-        }
-
-        .slot-booked {
-            border: 2px solid #f4433665;
+        .slot-card.booked {
+            border-color: #f44336;
+            background: #fff5f5;
             cursor: not-allowed;
             opacity: 0.7;
         }
 
-        .slot-booked .slot-status-bar {
-            background: #f44336;
-            width: 60%;
-            border-radius: 5px;
-            height: 8px;
-            align-self: center;
+        .slot-card.blocked {
+            border-color: #ff9800;
+            background: #fff8e1;
         }
 
-        .slot-selected {
-            border: 2px solid #2196F3;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-
-        .slot-selected .slot-status-bar {
-            background: #2196F3;
-        }
-
-        .slot-status-bar {
-            height: 4px;
-            width: 100%;
-        }
-
-        .slot-content {
-            padding: 20px;
+        .slot-card.selected {
+            border-color: #2196F3;
+            background: #e3f2fd;
+            transform: scale(1.05);
         }
 
         .slot-time {
-            font-size: 20px;
+            font-size: 14px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
-        .slot-appointment-label {
-            color: #999;
-            font-size: 12px;
-            margin-bottom: 2px;
+        .slot-status {
+            font-size: 11px;
+            color: #666;
         }
 
-        .slot-appointment-no {
-            color: #4CAF50;
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 12px;
+        .action-buttons {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .slot-booking-label {
-            color: #999;
-            font-size: 12px;
-            margin-bottom: 2px;
-        }
-
-        .slot-booking-fee {
-            color: #4CAF50;
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .slot-book-btn {
-            width: 100%;
-            padding: 5px 12px;
-            border: none;
+        .btn-block-action {
+            padding: 10px 20px;
             border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
+            border: none;
             cursor: pointer;
+            font-weight: 600;
             transition: all 0.3s;
-            text-transform: uppercase;
         }
 
-        .slot-book-btn.available {
+        .btn-block {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-block:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+
+        .btn-unblock {
             background: #4CAF50;
             color: white;
         }
 
-        .slot-book-btn.available:hover {
-            background: #45a049;
+        .btn-unblock:hover {
+            background: #388E3C;
+            transform: translateY(-2px);
         }
 
-        .slot-book-btn.booked {
-            background: #a5d6a7;
-            color: #2e7d32;
-            cursor: not-allowed;
+        .btn-clear {
+            background: #9E9E9E;
+            color: white;
         }
 
-        .time-slot-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: flex-start;
+        .btn-book {
+            background: #2196F3;
+            color: white;
         }
 
-        .date-navigation {
-            text-align: center;
-            margin-bottom: 25px;
-            padding: 20px;
+        .stats-card {
+            padding: 15px;
+            border-radius: 10px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
-        .date-nav-btn {
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            background: #000000ff;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            margin: 0 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .date-nav-btn:hover {
-            background: #222222ff;
-            transform: translateY(-2px);
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
         }
 
-        .date-nav-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .day-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .day-header {
-            background: linear-gradient(45deg, #000000ff, #202020ff);
-            color: white;
-            border-radius: 13px 13px 0 0;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .manual-booking-card {
-            border: 2px solid #000000ff;
-            border-radius: 15px;
-            background: white;
-            margin-bottom: 20px;
-        }
-
-        .manual-booking-header {
-            background: linear-gradient(45deg, #000000ff, #202020ff);
-            color: white;
-            padding: 15px;
-            border-radius: 13px 13px 0 0;
-            text-align: center;
-        }
-
-        /* Manual Slot Cards */
-        .manual-slot-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            margin-bottom: 15px;
-            overflow: hidden;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .manual-slot-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .manual-slot-card.available {
-            border-color: #4CAF50;
-        }
-
-        .manual-slot-card.booked {
-            border-color: #f44336;
-            opacity: 0.7;
-        }
-
-        .book-now-btn {
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
 
-        .book-now-btn.available {
-            background: #4CAF50;
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .notification-badge {
+            position: relative;
+            background: #f44336;
             color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin-top: -30px;
+            margin-left: 10px;
+            display: flex;
+            flex-direction: row;
         }
 
-        .book-now-btn.available:hover {
-            background: #45a049;
-            transform: translateY(-1px);
-        }
-
-        .book-now-btn.booked {
-            background: #a5d6a7;
-            color: #2e7d32;
-            cursor: not-allowed;
-        }
-
-        .card-body {
-            padding: 15px;
-        }
-
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -323,10 +328,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .manual-modal-header {
-            background: linear-gradient(45deg, #000000ff, #202020ff);
         }
 
         .close {
@@ -406,81 +407,6 @@
             margin-left: 15px;
         }
 
-        .btn-manual {
-            background: linear-gradient(45deg, #000000ff, #202020ff);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .btn-manual:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .notification-badge {
-            position: relative;
-            background: #f44336;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            margin-top: -30px;
-            margin-left: 10px;
-            display: flex;
-            flex-direction: row;
-        }
-
-        .slot-legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: #f8f9fa;
-        }
-
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            border: 2px solid;
-        }
-
-        .card--header--text {
-            color: white;
-        }
-
-        .icon-aligned {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .icon-aligned .material-symbols-rounded {
-            vertical-align: middle;
-            font-size: 20px;
-            line-height: 1;
-        }
-
         .form-group label {
             display: flex;
             align-items: center;
@@ -514,23 +440,17 @@
             line-height: 1;
         }
 
-        .header-with-icon {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        /* Calendar styling */
+        #consultationDate {
+            cursor: pointer;
         }
 
-        .header-with-icon .material-symbols-rounded {
-            font-size: 24px;
-            vertical-align: middle;
-        }
-
-        .date--filter--span {
-            align-self: center;
-        }
-
-        .card--header--text {
-            color: white;
+        .book--appointment--input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
         }
     </style>
 </head>
@@ -539,7 +459,8 @@
     <!-- Sidebar -->
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-radius-lg fixed-start ms-2 bg-white my-2" id="sidenav-main">
         <div class="sidenav-header">
-            <a class="navbar-brand px-4 py-3 m-0" href="dashboard.html">
+            <i class="fas fa-times p-3 cursor-pointer text-dark opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand px-4 py-3 m-0" href="dashboard.php">
                 <img src="../../img/logoblack.png" class="navbar-brand-img" width="40" height="50" alt="main_logo">
                 <span class="ms-1 text-sm text-dark" style="font-weight: bold;">Erundeniya</span>
             </a>
@@ -547,48 +468,13 @@
         <hr class="horizontal dark mt-0 mb-2">
         <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="dashboard.php">
-                        <i class="material-symbols-rounded opacity-5">dashboard</i>
-                        <span class="nav-link-text ms-1">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link text-dark" href="appointments.php">
-                        <i class="material-symbols-rounded opacity-5">calendar_today</i>
-                        <span class="nav-link-text ms-1">Appointments</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link active bg-gradient-dark text-white" href="book_appointments.php">
-                        <i class="material-symbols-rounded opacity-5">add_circle</i>
-                        <span class="nav-link-text ms-1">Book Appointment</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link text-dark" href="patients.html">
-                        <i class="material-symbols-rounded opacity-5">people</i>
-                        <span class="nav-link-text ms-1">Patients</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link text-dark" href="create_bill.php">
-                        <i class="material-symbols-rounded opacity-5">receipt</i>
-                        <span class="nav-link-text ms-1">Bills</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link text-dark" href="prescription.php">
-                        <i class="material-symbols-rounded opacity-5">medication</i>
-                        <span class="nav-link-text ms-1">Prescriptions</span>
-                    </a>
-                </li>
+                <?php renderSidebarMenu($menuItems, $currentPage); ?>
             </ul>
         </div>
-        <div class="collapse navbar-collapse sidenav-footer w-auto bottom-0">
+        <div class="sidenav-footer">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#" onclick="logout()">
+                    <a class="nav-link text-dark" href="#" onclick="logout(); return false;">
                         <i class="material-symbols-rounded opacity-5">logout</i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
@@ -600,30 +486,45 @@
     <!-- Main Content -->
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
         <!-- Navbar -->
-        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl mt-3 card" id="navbarBlur" data-scroll="true" style="background-color: white;">
+        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl mt-3 card">
             <div class="container-fluid py-1 px-3">
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb bg-transparent mb-1 pb-0 pt-1 px-0 me-sm-6 me-5">
-                        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="dashboard.html">Pages</a></li>
-                        <li class="breadcrumb-item text-sm text-dark active">Book Appointment</li>
+                    <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="dashboard.php">Dashboard</a></li>
+                        <li class="breadcrumb-item text-sm text-dark active">Book Appointments</li>
                     </ol>
                 </nav>
-                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4">
-                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
                         <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
                         </div>
                     </div>
-                    <ul class="navbar-nav d-flex align-items-center justify-content-end">
+                    <ul class="navbar-nav d-flex align-items-center  justify-content-end">
+                        <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
+                            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                                <div class="sidenav-toggler-inner">
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                </div>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown pe-3 d-flex align-items-center">
                             <a href="#" class="nav-link text-body p-0" onclick="toggleNotifications()">
                                 <img src="../../img/bell.png" width="20" height="20">
-                                <span class="notification-badge">3</span>
+                                <span class="notification-badge" id="notificationCount"><?php echo $pendingCount; ?></span>
                             </a>
+                            <div class="dropdown-menu dropdown-menu-end px-2 py-3" id="notificationDropdown">
+                                <div id="notificationsList">
+                                    <!-- Notifications will be loaded here -->
+                                </div>
+                            </div>
                         </li>
                         <li class="nav-item d-flex align-items-center">
                             <a href="#" class="nav-link text-body font-weight-bold px-0">
-                                <img src="../../img/user.png" width="20" height="20"> &nbsp;<span class="d-none d-sm-inline">Admin</span>
+                                <img src="../../img/user.png" width="20" height="20">
+                                &nbsp;<span class="d-none d-sm-inline"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
                             </a>
                         </li>
                     </ul>
@@ -634,419 +535,95 @@
         <!-- Page Content -->
         <div class="container-fluid py-2 mt-2">
             <div class="row">
-                <div class="ms-3">
-                    <h3 class="mb-0 h4 font-weight-bolder">Book Appointment</h3>
-                    <p class="mb-4">Schedule patient appointments for channeling sessions</p>
-                </div>
-            </div>
-
-            <!-- Slot Legend -->
-            <!-- <div class="row">
                 <div class="col-12">
-                    <div class="slot-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #f8fff8; border-color: #4CAF50;"></div>
-                            <span>Available</span>
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h5>Book Appointment & Manage Slots</h5>
+                            <p class="text-sm">Book appointments manually or block/unblock time slots</p>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #fff5f5; border-color: #f44336;"></div>
-                            <span>Booked</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #e3f2fd; border-color: #2196F3;"></div>
-                            <span>Selected</span>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Date Navigation -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="date-navigation">
-                        <button class="date-nav-btn" onclick="changeWeek(-1)" id="prevWeekBtn">
-                            <i class="material-symbols-rounded">chevron_left</i>
-                            <span>Previous Week</span>
-                        </button>
-                        <span id="currentWeekRange" class="mx-4 font-weight-bold text-lg date--filter--span">Oct 2 - Oct 8, 2024</span>
-                        <button class="date-nav-btn" onclick="changeWeek(1)" id="nextWeekBtn">
-                            <span>Next Week</span>
-                            <i class="material-symbols-rounded">chevron_right</i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Time Slots and Manual Booking -->
-            <div class="row">
-                <!-- Online Time Slots -->
-                <div class="col-lg-12">
-                    <div id="availableDates">
-                        <!-- Wednesday -->
-                        <div class="day-card available">
-                            <div class="day-header">
-                                <h5 class="mb-1 card--header--text">
-                                    <i class="material-symbols-rounded">event</i>
-                                    Wednesday, October 2, 2024 - Online Booking
-                                </h5>
-                                <p class="mb-0 opacity-8">Available Slots: 42 | Booked: 24</p>
+                        <div class="card-body">
+                            <!-- Date Selection -->
+                             <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <span class="material-symbols-rounded" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">event</span>
+                                        <span>Select Consultation Date</span>
+                                    </label>
+                                    <input type="text" id="consultationDate" class="form-control book--appointment--input" placeholder="Click to select date" readonly>
+                                    <small class="text-muted">Only Wednesdays and Sundays are available</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <span class="material-symbols-rounded" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">edit_note</span>
+                                        <span>Reason for Blocking (Optional)</span>
+                                    </label>
+                                    <input type="text" id="blockReason" class="form-control book--appointment--input" placeholder="e.g., Doctor unavailable">
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="time-slot-grid" id="wed-slots">
-                                    <!-- Morning Slots - 10 minute intervals with card design -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.00 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00001</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
 
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.10 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00002</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
+                            <!-- Statistics -->
+                            <div class="stats-card" id="statsCard" style="display: none;">
+                                <h6>Slot Statistics</h6>
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="totalSlots">0</div>
+                                        <div class="stat-label">Total Slots</div>
                                     </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:20', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.20 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00003</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value text-success" id="availableSlots">0</div>
+                                        <div class="stat-label">Available</div>
                                     </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.30 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00004</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value text-danger" id="bookedSlots">0</div>
+                                        <div class="stat-label">Booked</div>
                                     </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:40', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.40 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00005</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:50', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.50 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00006</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Afternoon Slots -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.00 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00007</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.10 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00008</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.20 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00009</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:30', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.30 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00010</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Evening Slots -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.00 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00011</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.10 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00012</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.20 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00013</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:30', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.30 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00014</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value text-warning" id="blockedSlots">0</div>
+                                        <div class="stat-label">Blocked</div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Saturday -->
-                        <div class="day-card available">
-                            <div class="day-header">
-                                <h5 class="mb-1 card--header--text">
-                                    <i class="material-symbols-rounded">event</i>
-                                    Saturday, October 5, 2024
-                                </h5>
-                                <p class="mb-0 opacity-8">Available Slots: 32 | Booked: 12</p>
+
+                            <!-- Legend -->
+                            <div class="legend" id="legend" style="display: none;">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #f8fff8; border-color: #4CAF50;"></div>
+                                    <span>Available</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #fff5f5; border-color: #f44336;"></div>
+                                    <span>Booked</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #fff8e1; border-color: #ff9800;"></div>
+                                    <span>Blocked</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #e3f2fd; border-color: #2196F3;"></div>
+                                    <span>Selected</span>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="time-slot-grid" id="wed-slots">
-                                    <!-- Morning Slots - 10 minute intervals with card design -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.00 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00001</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
 
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.10 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00002</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
+                            <!-- Action Buttons -->
+                            <div class="action-buttons" id="actionButtons" style="display: none;">
+                                <button class="btn-block-action btn-book" onclick="bookSelectedSlot()">
+                                    <i class="fas fa-calendar-plus"></i> Book Selected Slot
+                                </button>
+                                <button class="btn-block-action btn-block" onclick="blockSelectedSlots()">
+                                    <i class="fas fa-ban"></i> Block Selected Slots
+                                </button>
+                                <button class="btn-block-action btn-unblock" onclick="unblockSelectedSlots()">
+                                    <i class="fas fa-check-circle"></i> Unblock Selected Slots
+                                </button>
+                                <button class="btn-block-action btn-clear" onclick="clearSelection()">
+                                    <i class="fas fa-times"></i> Clear Selection
+                                </button>
+                            </div>
 
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:20', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.20 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00003</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.30 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00004</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:40', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.40 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00005</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '09:50', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">9.50 AM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00006</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Afternoon Slots -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.00 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00007</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.10 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00008</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.20 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00009</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '14:30', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">2.30 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00010</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Evening Slots -->
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:00', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.00 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00011</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:10', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.10 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00012</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-booked">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.20 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00013</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn booked" disabled>BOOKED</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="appointment-slot slot-available" onclick="selectTimeSlot('2024-10-02', '18:30', 'Wednesday')">
-                                        <div class="slot-status-bar"></div>
-                                        <div class="slot-content">
-                                            <div class="slot-time">6.30 PM</div>
-                                            <div class="slot-appointment-label">Appointment No.</div>
-                                            <div class="slot-appointment-no">00014</div>
-                                            <div class="slot-booking-label">Booking fee</div>
-                                            <div class="slot-booking-fee">Rs. 200.00</div>
-                                            <button class="slot-book-btn available">BOOK NOW</button>
-                                        </div>
-                                    </div>
+                            <!-- Slots Grid -->
+                            <div class="slot-grid" id="slotsGrid">
+                                <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                                    <p class="text-muted">Please select a consultation date to view available slots</p>
                                 </div>
                             </div>
                         </div>
@@ -1064,8 +641,7 @@
                             © <script>
                                 document.write(new Date().getFullYear())
                             </script>,
-                            design and develop by
-                            <a href="#" class="font-weight-bold">Evon Technologies Software Solution (PVT) Ltd.</a>
+                            design and develop by <a href="#" class="font-weight-bold">Evon Technologies Software Solution (PVT) Ltd.</a>
                             All rights reserved.
                         </div>
                     </div>
@@ -1074,11 +650,11 @@
         </footer>
     </main>
 
-    <!-- Online Booking Modal -->
+    <!-- Booking Modal -->
     <div id="bookingModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title card--header--text">
+                <h4 class="modal-title">
                     <i class="material-symbols-rounded">event_available</i>
                     <span>Book Appointment</span>
                 </h4>
@@ -1179,6 +755,14 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Processing...</p>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -1186,245 +770,350 @@
     <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
 
+    <!-- Flatpickr JS for Calendar -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
-        let currentWeek = 0;
-        let selectedSlot = null;
-        let manualBookingData = null;
+        let selectedSlots = new Set();
+        let currentDate = '';
+        let slotsData = [];
+        let selectedSlotData = null;
 
-        // Time slot selection for online booking
-        function selectTimeSlot(date, time, day) {
-            // Clear previous selections
-            document.querySelectorAll('.appointment-slot').forEach(slot => {
-                slot.classList.remove('slot-selected');
-            });
-
-            // Mark selected slot
-            event.target.classList.add('slot-selected');
-
-            selectedSlot = {
-                date: date,
-                time: time,
-                day: day
-            };
-
-            // Format time for display
-            const timeObj = new Date(`2024-01-01T${time}`);
-            const displayTime = timeObj.toLocaleString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-
-            document.getElementById('selectedDateTime').value = `${day}, ${date} at ${displayTime}`;
-            document.getElementById('bookingModal').style.display = 'block';
-        }
-
-        // Manual booking functions
-        function openManualBooking(time, appointmentNo, day) {
-            const timeObj = new Date(`2024-01-01T${time}`);
-            const displayTime = timeObj.toLocaleString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-
-            manualBookingData = {
-                time: time,
-                appointmentNo: appointmentNo,
-                day: day,
-                date: '2024-10-02'
-            };
-
-            document.getElementById('manualSelectedDateTime').value = `${day}, October 2, 2024 at ${displayTime}`;
-            document.getElementById('manualAppointmentNo').value = appointmentNo;
-            document.getElementById('manualBookingModal').style.display = 'block';
-        }
-
-        // Week navigation
-        function changeWeek(direction) {
-            currentWeek += direction;
-            updateWeekDisplay();
-            loadTimeSlots();
-        }
-
-        function updateWeekDisplay() {
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get next consultation date
             const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() + (currentWeek * 7));
+            let nextDate = new Date(today);
+            nextDate.setDate(nextDate.getDate() + 1);
 
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            // Find next Wednesday or Sunday
+            while (nextDate.getDay() !== 0 && nextDate.getDay() !== 3) {
+                nextDate.setDate(nextDate.getDate() + 1);
+            }
 
-            const options = {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            };
-            const start = startOfWeek.toLocaleDateString('en-US', options);
-            const end = endOfWeek.toLocaleDateString('en-US', options);
-
-            document.getElementById('currentWeekRange').textContent = `${start} - ${end}`;
-            document.getElementById('prevWeekBtn').disabled = currentWeek <= 0;
-        }
-
-        function loadTimeSlots() {
-            generateRandomAvailability();
-        }
-
-        function generateRandomAvailability() {
-            const slots = document.querySelectorAll('.appointment-slot');
-            slots.forEach(slot => {
-                if (!slot.classList.contains('slot-booked')) {
-                    if (Math.random() > 0.3) {
-                        slot.classList.remove('slot-booked');
-                        slot.classList.add('slot-available');
-                    } else {
-                        slot.classList.remove('slot-available');
-                        slot.classList.add('slot-booked');
-                        slot.onclick = null;
-                        const button = slot.querySelector('.slot-book-btn');
-                        button.classList.remove('available');
-                        button.classList.add('booked');
-                        button.textContent = 'BOOKED';
-                        button.disabled = true;
+            flatpickr("#consultationDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                defaultDate: nextDate,
+                enable: [
+                    function(date) {
+                        // Enable only Wednesdays (3) and Sundays (0)
+                        return (date.getDay() === 0 || date.getDay() === 3);
+                    }
+                ],
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (dateStr) {
+                        loadSlotsForDate(dateStr);
                     }
                 }
             });
+
+            // Load slots for the default date
+            const defaultDate = nextDate.toISOString().split('T')[0];
+            document.getElementById('consultationDate')._flatpickr.setDate(defaultDate);
+            loadSlotsForDate(defaultDate);
+        });
+
+        async function loadSlotsForDate(date) {
+            if (!date) {
+                document.getElementById('slotsGrid').innerHTML = `
+                    <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                        <p class="text-muted">Please select a consultation date</p>
+                    </div>
+                `;
+                hideControls();
+                return;
+            }
+
+            currentDate = date;
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_time_slots');
+                formData.append('date', date);
+
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    slotsData = data.slots;
+                    renderSlots(data.slots);
+                    updateStatistics(data.slots);
+                    showControls();
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to load slots');
+            } finally {
+                hideLoading();
+            }
         }
 
-        // Modal functions
-        function closeBookingModal() {
-            document.getElementById('bookingModal').style.display = 'none';
-            selectedSlot = null;
-            document.querySelectorAll('.appointment-slot').forEach(slot => {
-                slot.classList.remove('slot-selected');
+        function renderSlots(slots) {
+            const grid = document.getElementById('slotsGrid');
+            grid.innerHTML = '';
+
+            slots.forEach(slot => {
+                const card = document.createElement('div');
+                card.className = `slot-card ${slot.is_available ? 'available' : (slot.is_blocked ? 'blocked' : 'booked')}`;
+                card.dataset.time = slot.time;
+                card.dataset.status = slot.status;
+
+                card.innerHTML = `
+                    <div class="slot-time">${slot.display_time}</div>
+                    <div class="slot-status">${slot.status}</div>
+                    ${slot.appointment_number ? `<small style="color: #666;">${slot.appointment_number}</small>` : ''}
+                `;
+
+                if (slot.is_available || slot.is_blocked) {
+                    card.onclick = () => toggleSlot(slot.time, card);
+                }
+
+                grid.appendChild(card);
             });
         }
 
-        function closeManualBookingModal() {
-            document.getElementById('manualBookingModal').style.display = 'none';
-            manualBookingData = null;
+        function toggleSlot(time, element) {
+            if (selectedSlots.has(time)) {
+                selectedSlots.delete(time);
+                element.classList.remove('selected');
+            } else {
+                selectedSlots.add(time);
+                element.classList.add('selected');
+            }
         }
 
-        // Form handlers
-        document.getElementById('onlineBookingForm').addEventListener('submit', function(e) {
+        function updateStatistics(slots) {
+            const total = slots.length;
+            const available = slots.filter(s => s.is_available).length;
+            const booked = slots.filter(s => !s.is_available && !s.is_blocked).length;
+            const blocked = slots.filter(s => s.is_blocked).length;
+
+            document.getElementById('totalSlots').textContent = total;
+            document.getElementById('availableSlots').textContent = available;
+            document.getElementById('bookedSlots').textContent = booked;
+            document.getElementById('blockedSlots').textContent = blocked;
+        }
+
+        async function blockSelectedSlots() {
+            if (selectedSlots.size === 0) {
+                showError('Please select slots to block');
+                return;
+            }
+
+            const reason = document.getElementById('blockReason').value;
+
+            if (!confirm(`Block ${selectedSlots.size} slot(s)?`)) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'block_slots');
+                formData.append('date', currentDate);
+                formData.append('times', JSON.stringify(Array.from(selectedSlots)));
+                formData.append('reason', reason);
+
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    selectedSlots.clear();
+                    await loadSlotsForDate(currentDate);
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                showError('Failed to block slots');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function unblockSelectedSlots() {
+            if (selectedSlots.size === 0) {
+                showError('Please select slots to unblock');
+                return;
+            }
+
+            if (!confirm(`Unblock ${selectedSlots.size} slot(s)?`)) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'unblock_slots');
+                formData.append('date', currentDate);
+                formData.append('times', JSON.stringify(Array.from(selectedSlots)));
+
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    selectedSlots.clear();
+                    await loadSlotsForDate(currentDate);
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                showError('Failed to unblock slots');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function bookSelectedSlot() {
+            if (selectedSlots.size !== 1) {
+                showError('Please select exactly one slot to book');
+                return;
+            }
+
+            const time = Array.from(selectedSlots)[0];
+            const slot = slotsData.find(s => s.time === time);
+
+            if (!slot || !slot.is_available) {
+                showError('Selected slot is not available');
+                return;
+            }
+
+            selectedSlotData = {
+                date: currentDate,
+                time: time,
+                displayTime: slot.display_time
+            };
+
+            const dateObj = new Date(currentDate);
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const displayDate = dateObj.toLocaleDateString('en-US', options);
+
+            document.getElementById('selectedDateTime').value = `${displayDate} at ${slot.display_time}`;
+
+            document.getElementById('bookingModal').style.display = 'block';
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('onlineBookingForm').reset();
+        }
+
+        document.getElementById('onlineBookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            if (!selectedSlot) {
+            if (!selectedSlotData) {
                 alert('Please select a time slot');
                 return;
             }
 
-            const appointmentNumber = 'ONL' + Date.now().toString().slice(-6);
+            const formData = new FormData();
+            formData.append('action', 'book_appointment');
+            formData.append('date', selectedSlotData.date);
+            formData.append('time', selectedSlotData.time);
+            formData.append('title', document.getElementById('bookingTitle').value);
+            formData.append('name', document.getElementById('bookingName').value);
+            formData.append('mobile', document.getElementById('bookingMobile').value);
+            formData.append('email', document.getElementById('bookingEmail').value);
+            formData.append('address', document.getElementById('bookingAddress').value);
 
-            alert(`Online appointment ${appointmentNumber} created successfully!\\n\\nPatient details saved and appointment confirmed.`);
+            showLoading();
 
-            // Mark slot as booked immediately
-            const selectedElement = document.querySelector('.slot-selected');
-            if (selectedElement) {
-                selectedElement.classList.remove('slot-available', 'slot-selected');
-                selectedElement.classList.add('slot-booked');
-                const button = selectedElement.querySelector('.slot-book-btn');
-                button.classList.remove('available');
-                button.classList.add('booked');
-                button.textContent = 'BOOKED';
-                button.disabled = true;
-                selectedElement.onclick = null;
-            }
+            try {
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            closeBookingModal();
-            showNotification('Appointment booked successfully! Confirmation email sent.', 'success');
-        });
+                const result = await response.json();
 
-        document.getElementById('manualBookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+                if (result.success) {
+                    closeBookingModal();
+                    showSuccess(`Appointment ${result.appointment_number} booked successfully!`);
 
-            if (!manualBookingData) {
-                alert('No appointment data selected');
-                return;
-            }
-
-            const formData = {
-                title: document.getElementById('manualTitle').value,
-                name: document.getElementById('manualName').value,
-                mobile: document.getElementById('manualMobile').value,
-                email: document.getElementById('manualEmail').value,
-                address: document.getElementById('manualAddress').value,
-                appointmentNo: document.getElementById('manualAppointmentNo').value,
-                notes: document.getElementById('manualNotes').value,
-                ...manualBookingData
-            };
-
-            alert(`Manual appointment ${formData.appointmentNo} created successfully!\\n\\nPatient: ${formData.title} ${formData.name}\\nTime: ${formData.time}\\n\\nAppointment confirmed.`);
-
-            // Mark the manual slot as booked immediately
-            const manualSlots = document.querySelectorAll('.manual-slot-card');
-            manualSlots.forEach(card => {
-                const appointmentNoElement = card.querySelector('.slot-appointment-no');
-                if (appointmentNoElement && appointmentNoElement.textContent === formData.appointmentNo) {
-                    card.classList.remove('available');
-                    card.classList.add('booked');
-                    card.querySelector('.slot-status-bar').classList.remove('available');
-                    card.querySelector('.slot-status-bar').classList.add('booked');
-                    card.querySelector('.book-now-btn').classList.remove('available');
-                    card.querySelector('.book-now-btn').classList.add('booked');
-                    card.querySelector('.book-now-btn').textContent = 'BOOKED';
-                    card.querySelector('.book-now-btn').disabled = true;
-                    card.querySelector('.book-now-btn').onclick = null;
+                    selectedSlots.clear();
+                    selectedSlotData = null;
+                    await loadSlotsForDate(currentDate);
+                } else {
+                    alert(result.message);
                 }
-            });
-
-            this.reset();
-            closeManualBookingModal();
-            showNotification('Manual appointment booked successfully!', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                hideLoading();
+            }
         });
 
-        // Utility functions
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
-            notification.style.zIndex = '9999';
-            notification.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
-                    ${message}
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 4000);
+        function clearSelection() {
+            selectedSlots.clear();
+            document.querySelectorAll('.slot-card.selected').forEach(card => {
+                card.classList.remove('selected');
+            });
         }
 
-        function toggleNotifications() {
-            showNotification('Notifications feature coming soon!', 'info');
+        function showControls() {
+            document.getElementById('statsCard').style.display = 'block';
+            document.getElementById('legend').style.display = 'flex';
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+
+        function hideControls() {
+            document.getElementById('statsCard').style.display = 'none';
+            document.getElementById('legend').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        function showSuccess(message) {
+            alert('Success: ' + message);
         }
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                window.location.href = 'login.php';
+                window.location.href = '?logout=1';
             }
         }
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateWeekDisplay();
-            loadTimeSlots();
-
-            // Close modals when clicking outside
-            window.addEventListener('click', function(event) {
-                const bookingModal = document.getElementById('bookingModal');
-                const manualModal = document.getElementById('manualBookingModal');
-                if (event.target === bookingModal) {
-                    closeBookingModal();
-                }
-                if (event.target === manualModal) {
-                    closeManualBookingModal();
-                }
-            });
-
-            document.getElementById('globalSearch').addEventListener('input', function() {
-                showNotification('Search functionality will be available in patient database.', 'info');
-            });
+        window.addEventListener('click', function(event) {
+            const bookingModal = document.getElementById('bookingModal');
+            if (event.target === bookingModal) {
+                closeBookingModal();
+            }
         });
     </script>
 </body>

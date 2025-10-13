@@ -1,0 +1,166 @@
+
+==================================================
+2025-10-03 22:39:35 - PayHere Notification Received
+==================================================
+POST Data:
+Array
+(
+    [merchant_id] => 1228678
+    [order_id] => APT20251002001
+    [payment_id] => TEST_1759523975
+    [payhere_amount] => 200.00
+    [payhere_currency] => LKR
+    [status_code] => 2
+    [md5sig] => 183EE69A6E6CB2FFBADA39AFBD884F0C
+    [custom_1] => APT20251002001
+    [status_message] => Successfully completed the payment.
+    [method] => TEST
+)
+
+GET Data:
+Array
+(
+)
+
+Processing payment for Order ID: APT20251002001
+Status Code: 2
+Payment ID: TEST_1759523975
+Amount: 200.00
+Hash verified successfully
+CRITICAL ERROR: Appointment not found: APT20251002001
+Stack trace: #0 E:\xampp\htdocs\erundeniya\payment\test_notify.php(49): include()
+#1 {main}
+
+==================================================
+2025-10-03 22:41:21 - PayHere Notification Received
+==================================================
+POST Data:
+Array
+(
+    [merchant_id] => 1228678
+    [order_id] => APT20251003003
+    [payment_id] => TEST_1759524081
+    [payhere_amount] => 200.00
+    [payhere_currency] => LKR
+    [status_code] => 2
+    [md5sig] => C6F37E5772A95C859203C7A6D030DE88
+    [custom_1] => APT20251003003
+    [status_message] => Successfully completed the payment.
+    [method] => TEST
+)
+
+GET Data:
+Array
+(
+)
+
+Processing payment for Order ID: APT20251003003
+Status Code: 2
+Payment ID: TEST_1759524081
+Amount: 200.00
+Hash verified successfully
+Appointment found: APT20251003003
+Current payment status: Pending
+Processing successful payment...
+Update query executed. Affected rows: 1
+After update - Payment Status: Paid, Status: Confirmed
+Transaction committed successfully
+Owner notification email sent
+SUCCESS: Payment processed completely for APT20251003003
+
+==================================================
+2025-10-03 22:43:57 - PayHere Notification Received
+==================================================
+POST Data:
+Array
+(
+    [merchant_id] => 1228678
+    [order_id] => APT20251003003
+    [payment_id] => TEST_1759524237
+    [payhere_amount] => 200.00
+    [payhere_currency] => LKR
+    [status_code] => 2
+    [md5sig] => C6F37E5772A95C859203C7A6D030DE88
+    [custom_1] => APT20251003003
+    [status_message] => Successfully completed the payment.
+    [method] => TEST
+)
+
+GET Data:
+Array
+(
+)
+
+Processing payment for Order ID: APT20251003003
+Status Code: 2
+Payment ID: TEST_1759524237
+Amount: 200.00
+Hash verified successfully
+Appointment found: APT20251003003
+Current payment status: Paid
+Processing successful payment...
+Update query executed. Affected rows: 1
+After update - Payment Status: Paid, Status: Confirmed
+Transaction committed successfully
+Owner notification email sent
+SUCCESS: Payment processed completely for APT20251003003
+
+[TEST] 2025-10-09 23:00:54 - Test log entry
+
+[2025-10-09 23:00:54] ========================================
+
+[2025-10-09 23:00:54] PayHere Notification Received
+
+[2025-10-09 23:00:54] ========================================
+
+[2025-10-09 23:00:54] POST Data: Array
+(
+    [merchant_id] => 1228118
+    [order_id] => TEST-1760043654
+    [payment_id] => TEST-PAY-1760043654
+    [payhere_amount] => 200.00
+    [payhere_currency] => LKR
+    [status_code] => 2
+    [method] => TEST
+    [status_message] => Test Payment
+    [custom_1] => 
+    [md5sig] => 03F7ED5DF52C9D0F5EE3DCF3E330B40B
+)
+
+
+[2025-10-09 23:00:54] GET Data: Array
+(
+)
+
+
+[2025-10-09 23:00:54] Processing payment for Order ID: TEST-1760043654
+
+[2025-10-09 23:00:54] Status Code: 2
+
+[2025-10-09 23:00:54] Payment ID: TEST-PAY-1760043654
+
+[2025-10-09 23:00:54] Amount: 200.00
+
+[2025-10-09 23:00:54] ERROR: Hash verification failed!
+
+[2025-10-09 23:00:54] Received hash: 03F7ED5DF52C9D0F5EE3DCF3E330B40B
+
+[2025-10-09 23:00:54] ========================================
+✗✗✗ CRITICAL ERROR ✗✗✗
+========================================
+Error: Invalid hash - possible fraud attempt
+File: E:\xampp\htdocs\erundeniya\payment\payment_notify.php
+Line: 65
+Stack trace:
+#0 E:\xampp\htdocs\erundeniya\payment\test_notify.php(68): include()
+#1 {main}
+========================================
+
+
+[2025-10-09 23:00:54] ========================================
+
+[2025-10-09 23:00:54] Notification handler completed
+
+[2025-10-09 23:00:54] ========================================
+
+

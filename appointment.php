@@ -1,7 +1,5 @@
 <?php
-
 require_once 'connection/connection.php'; 
-
 ?>
 
 <!DOCTYPE html>
@@ -9,22 +7,16 @@ require_once 'connection/connection.php';
 
 <head>
     <meta charset="utf-8">
-    <title>Services</title>
+    <title>Appointments - Erundeniya Ayurveda Hospital</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
     <link rel="icon" href="img/logof.png">
 
-
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
-
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Playfair+Display:wght@700;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -32,7 +24,6 @@ require_once 'connection/connection.php';
 
     <!-- Libraries Stylesheet -->
     <link href="lib/animate/animate.min.css" rel="stylesheet">
-    <!-- <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"> -->
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -40,13 +31,11 @@ require_once 'connection/connection.php';
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
     <link href="appointment/appointment.css" rel="stylesheet">
-
 </head>
 
 <body>
     <!-- Spinner Start -->
-    <div id="spinner"
-        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
     </div>
     <!-- Spinner End -->
@@ -133,26 +122,22 @@ require_once 'connection/connection.php';
                 <a href="index.php" class="navbar-brand">
                     <img class="img-fluid" src="img/logo.png" alt="Logo">
                 </a>
-                <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
+                <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto">
-                        <a href="index.php" class="nav-item nav-link active">Home</a>
+                        <a href="index.php" class="nav-item nav-link">Home</a>
                         <a href="services.php" class="nav-item nav-link">Services</a>
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
                         <a href="gallery.php" class="nav-item nav-link">Gallery</a>
-                        <a href="appointment.php" class="nav-item" style="align-self: center; width: 100%;">
+                        <a href="appointment.php" class="nav-item active" style="align-self: center; width: 100%;">
                             <div class="">
                                 <button type="button" class="btn btn-primary rounded-pill">Appointments</button>
                             </div>
                         </a>
                     </div>
-                    <!-- <div class="border-start ps-4 d-none d-lg-block">
-                        <button type="button" class="btn btn-sm p-0"><i class="fa fa-search"></i></button>
-                    </div> -->
                 </div>
             </nav>
         </div>
@@ -166,7 +151,6 @@ require_once 'connection/connection.php';
             <nav aria-label="breadcrumb animated slideInDown">
                 <ol class="breadcrumb justify-content-center mb-0">
                     <li class="breadcrumb-item"><b><a href="index.php">Home</a></b></li>
-                    <!-- <li class="breadcrumb-item"><a href="#">Pages</a></li> -->
                     <li class="breadcrumb-item" aria-current="page">Appointments</li>
                 </ol>
             </nav>
@@ -174,43 +158,38 @@ require_once 'connection/connection.php';
     </div>
     <!-- Page Header End -->
 
-
+    <!-- Appointment Section Start -->
     <section class="appointment-sec1">
         <div class="appointment-sec1-div1">
             <div class="appointment-sec1-div2">
 
                 <div class="appointment-sec1-div3">
-
                     <div class="appointment-sec1-div4">
                         <img src="img/logoblack.png" class="appointment-logo">
                     </div>
 
                     <div class="appointment-sec1-div5">
-
                         <span class="appointment-span1 text-primary">Consultation Days:</span>
 
                         <div class="appointment-sec1-div6">
-
-                            <span class="appointment-span2">Wednesday </span>
-                            <span class="appointment-span3">9:00 - 20:00</span>
+                            <span class="appointment-span2">Wednesday</span>
+                            <span class="appointment-span3">9:00 AM - 8:00 PM</span>
                         </div>
 
                         <hr class="appointment-hr1">
 
                         <div class="appointment-sec1-div6">
                             <span class="appointment-span2">Sunday</span>
-                            <span class="appointment-span3">9:00 - 20:00</span>
+                            <span class="appointment-span3">9:00 AM - 8:00 PM</span>
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="appointment-sec1-div7">
-                    <!-- Dynamic content will be loaded here -->
+                    <!-- Dynamic content will be loaded here by JavaScript -->
                     <div class="loading-dates" style="text-align: center; padding: 40px;">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                         <p style="margin-top: 15px;">Loading consultation dates...</p>
                     </div>
@@ -218,17 +197,15 @@ require_once 'connection/connection.php';
 
             </div>
 
-            <!-- Updated Modal -->
+            <!-- Booking Modal -->
             <div class="model-container" id="model_container" style="display: none;">
                 <div class="model">
-
                     <div class="model-div1">
                         <div class="model-div2">
                             <span class="model-span1">Place Appointment</span>
                         </div>
                         <div class="model-div3">
                             <img src="img/close_btn.png" id="close" class="close-btn">
-
                         </div>
                     </div>
                     <br>
@@ -241,7 +218,6 @@ require_once 'connection/connection.php';
                             <br>
                             <div class="model-div7">
                                 <div class="model-div8">
-
                                     <div class="model-div9">
                                         <div class="model-div10">
                                             <label for="title" class="model-label">Title</label>
@@ -249,38 +225,37 @@ require_once 'connection/connection.php';
                                                 <option value="Mr.">Mr.</option>
                                                 <option value="Mrs.">Mrs.</option>
                                                 <option value="Miss">Miss.</option>
-                                                <option value="Ms">Ms.</option>
-                                                <option value="Dr">Dr.</option>
-                                                <option value="Prof">Prof.</option>
+                                                <option value="Ms.">Ms.</option>
+                                                <option value="Dr.">Dr.</option>
+                                                <option value="Prof.">Prof.</option>
                                             </select>
                                         </div>
                                         <div class="model-div11">
-                                            <label for="" class="model-label">Name (Required)</label>
-                                            <input type="text" class="model-input1" placeholder="Name">
+                                            <label for="patient_name" class="model-label">Name (Required)*</label>
+                                            <input type="text" id="patient_name" class="model-input1" placeholder="Enter patient name" required>
                                         </div>
                                     </div>
 
                                     <div class="model-div12">
-                                        <label for="" class="model-label">Mobile (Required)</label>
-                                        <input type="tel" class="model-input1" placeholder="0000000000">
+                                        <label for="patient_mobile" class="model-label">Mobile (Required)*</label>
+                                        <input type="tel" id="patient_mobile" class="model-input1" placeholder="0771234567" pattern="[0-9]{10}" required>
                                     </div>
-
                                 </div>
 
                                 <div class="model-div8">
                                     <div class="model-div13">
-                                        <label for="" class="model-label">Email(Optional)</label>
-                                        <input type="email" class="model-input1" placeholder="Email">
+                                        <label for="patient_email" class="model-label">Email (Optional)</label>
+                                        <input type="email" id="patient_email" class="model-input1" placeholder="patient@example.com">
                                     </div>
                                     <div class="model-div12">
-                                        <label for="" class="model-label">Patient Number(Optional)</label>
-                                        <input type="text" class="model-input1" placeholder="">
+                                        <label for="patient_number" class="model-label">Patient Number (Optional)</label>
+                                        <input type="text" id="patient_number" class="model-input1" placeholder="Previous patient number if any">
                                     </div>
                                 </div>
 
                                 <div class="model-div14">
-                                    <label for="" class="model-label">Note(Optional)</label>
-                                    <input type="text" class="model-input2" placeholder="Note">
+                                    <label for="patient_note" class="model-label">Note (Optional)</label>
+                                    <input type="text" id="patient_note" class="model-input2" placeholder="Any special notes or requirements">
                                 </div>
                             </div>
                         </div>
@@ -292,7 +267,7 @@ require_once 'connection/connection.php';
                                     <span class="model-span3">Review the charges before confirming your appointment.</span>
                                 </div>
 
-                                <hr class="model-hr">
+                                <hr>
                                 <div class="model-div20">
                                     <div class="model-div17">
                                         <div class="model-div18"><span class="model-span3">eChannelling fee</span></div>
@@ -305,7 +280,7 @@ require_once 'connection/connection.php';
                                     </div>
                                 </div>
 
-                                <hr class="model-hr">
+                                <hr>
 
                                 <div class="model-div17">
                                     <div class="model-div18"><span class="model-span5">Total fee</span></div>
@@ -313,18 +288,17 @@ require_once 'connection/connection.php';
                                 </div>
                             </div>
                             <div class="model-div21">
-                                <button class="model-btn1" type="button">Pay Now</button>
+                                <button class="model-btn1" type="button"><i class="fas fa-credit-card"></i>&nbsp;&nbsp;Pay Now</button>
                                 <button class="model-btn2" type="button">Cancel Process</button>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
 
         </div>
     </section>
+    <!-- Appointment Section End -->
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
@@ -335,23 +309,14 @@ require_once 'connection/connection.php';
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Erundeniya Ayurveda Hospital</h4>
-                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>A/55 Wedagedara , Erundeniya ,
-                        Amithirigala , North</p>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>A/55 Wedagedara, Erundeniya, Amithirigala, North</p>
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>+94 71 291 9408</p>
-
                     <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@erundeniyaayurveda.lk</p>
-
                     <div class="d-flex pt-3">
-
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i
-                                class="fab fa-instagram"></i></a>
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i
-                                class="fab fa-youtube"></i></a>
-                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://api.whatsapp.com/send?phone=94712919408"><i
-                                class="fab fa-whatsapp"></i></a>
-
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.instagram.com/erundeniya_ayurveda_hospital_/"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.youtube.com/@erundeniyaayurvedahospital7737"><i class="fab fa-youtube"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://api.whatsapp.com/send?phone=94712919408"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -365,60 +330,40 @@ require_once 'connection/connection.php';
                     <a class="btn btn-link" href="privacy.php#privacypg">Privacy & Policy</a>
                     <a class="btn btn-link" href="privacy.php#termspg">Terms & Condition</a>
                     <a class="btn btn-link" href="privacy.php#refundpg">Refund Policy</a>
-
-
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-primary mb-4">Business Hours</h4>
-                    <p class="mb-1">Monday</p>
-                    <h6 class="text-light">Treatment only</h6>
-
-                    <p class="mb-1">Tuesday</p>
-                    <h6 class="text-light">Treatment only</h6>
-
+                    <p class="mb-1">Monday - Saturday</p>
+                    <h6 class="text-light">Treatment only</h6>
                     <p class="mb-1">Wednesday</p>
-                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
-
-                    <p class="mb-1">Thursday</p>
-                    <h6 class="text-light">Treatment only</h6>
-
+                    <h6 class="text-light">09:00 AM - 8:00 PM</h6>
+                    <p class="mb-1">Sunday</p>
+                    <h6 class="text-light">09:00 AM - 8:00 PM</h6>
                     <p class="mb-1">Friday</p>
                     <h6 class="text-light">Closed</h6>
-
-                    <p class="mb-1">Saturday</p>
-                    <h6 class="text-light">Treatment only</h6>
-
-                    <p class="mb-1">Sunday</p>
-                    <h6 class="text-light">09:00 am - 6:00 pm</h6>
-
                 </div>
             </div>
         </div>
     </div>
     <!-- Footer End -->
 
-
     <!-- Copyright Start -->
     <div class="container-fluid copyright py-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    &copy; <a class="fw-medium" href="#">erundeniyaayurveda.lk</a> , All Right Reserved.
+                    &copy; <a class="fw-medium" href="#">erundeniyaayurveda.lk</a>, All Right Reserved.
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                    Designed and Developed By <a class="fw-medium" href="https://www.evotechsoftwaresolutions.com/" target="_blank" rel="noopener">Evon Technologies
-                        Software Solutions</a>
+                    Designed and Developed By <a class="fw-medium" href="https://www.evotechsoftwaresolutions.com/" target="_blank" rel="noopener">Evon Technologies Software Solutions</a>
                 </div>
             </div>
         </div>
     </div>
     <!-- Copyright End -->
 
-
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-lg-square rounded-circle back-to-top"><i class="bi bi-arrow-up"></i></a>
-
 
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -430,6 +375,8 @@ require_once 'connection/connection.php';
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    
+    <!-- Appointment System Javascript -->
     <script src="appointment/appointment.js"></script>
 
 </body>

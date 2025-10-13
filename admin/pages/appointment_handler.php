@@ -1,6 +1,6 @@
 <?php
 // appointment_handler.php
-require_once 'connection.php';
+require_once '../../connection/connection.php';
 
 class AppointmentManager
 {
@@ -487,3 +487,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
     }
 }
+
+?>
