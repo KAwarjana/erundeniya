@@ -23,7 +23,7 @@ $data = json_decode($rawData, true);
 // Log request for debugging
 error_log("Search request received: " . $rawData);
 
-if (!$data || !isset($data['search'])) {
+if (!$data) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid request data']);
     exit;
@@ -37,7 +37,7 @@ try {
     }
     
     // Sanitize input
-    $searchTerm = Database::$connection->real_escape_string(trim($data['search']));
+    $searchTerm = isset($data['search']) ? Database::$connection->real_escape_string(trim($data['search'])) : '';
     $statusFilter = isset($data['status']) && $data['status'] !== 'all' 
         ? Database::$connection->real_escape_string($data['status']) 
         : '';
@@ -45,7 +45,46 @@ try {
         ? Database::$connection->real_escape_string($data['date']) 
         : '';
     
-    // Build the search query
+    // Pagination parameters
+    $recordsPerPage = 10;
+    $currentPage = isset($data['page']) ? (int)$data['page'] : 1;
+    $currentPage = max(1, $currentPage); // Ensure page is at least 1
+    $offset = ($currentPage - 1) * $recordsPerPage;
+    
+    // Build the base query conditions
+    $baseConditions = " WHERE 1=1";
+    
+    // Add search term if provided
+    if ($searchTerm) {
+        $baseConditions .= " AND (
+            a.appointment_number LIKE '%$searchTerm%' 
+            OR p.name LIKE '%$searchTerm%' 
+            OR p.mobile LIKE '%$searchTerm%'
+        )";
+    }
+    
+    // Add status filter if provided
+    if ($statusFilter) {
+        $baseConditions .= " AND a.status = '$statusFilter'";
+    }
+    
+    // Add date filter if provided
+    if ($dateFilter) {
+        $baseConditions .= " AND ts.slot_date = '$dateFilter'";
+    }
+    
+    // First, get total count for pagination
+    $countQuery = "SELECT COUNT(*) as total 
+        FROM appointment a
+        LEFT JOIN patient p ON a.patient_id = p.id
+        LEFT JOIN time_slots ts ON a.slot_id = ts.id" . $baseConditions;
+    
+    $countResult = Database::search($countQuery);
+    $countRow = $countResult->fetch_assoc();
+    $totalRecords = $countRow['total'] ?? 0;
+    $totalPages = ceil($totalRecords / $recordsPerPage);
+    
+    // Build the main search query with pagination
     $query = "SELECT 
         a.*, 
         p.title as patient_title, 
@@ -57,24 +96,10 @@ try {
         ts.day_of_week
         FROM appointment a
         LEFT JOIN patient p ON a.patient_id = p.id
-        LEFT JOIN time_slots ts ON a.slot_id = ts.id
-        WHERE (
-            a.appointment_number LIKE '%$searchTerm%' 
-            OR p.name LIKE '%$searchTerm%' 
-            OR p.mobile LIKE '%$searchTerm%'
-        )";
+        LEFT JOIN time_slots ts ON a.slot_id = ts.id" . $baseConditions;
     
-    // Add status filter if provided
-    if ($statusFilter) {
-        $query .= " AND a.status = '$statusFilter'";
-    }
-    
-    // Add date filter if provided
-    if ($dateFilter) {
-        $query .= " AND ts.slot_date = '$dateFilter'";
-    }
-    
-    $query .= " ORDER BY ts.slot_date DESC, ts.slot_time DESC LIMIT 100";
+    $query .= " ORDER BY ts.slot_date DESC, ts.slot_time DESC";
+    $query .= " LIMIT $recordsPerPage OFFSET $offset";
     
     // Execute query
     $result = Database::search($query);
@@ -89,7 +114,7 @@ try {
         $appointments[] = $row;
     }
     
-    // Get statistics
+    // Get statistics for the filtered results
     $today = date('Y-m-d');
     
     $statsQuery = "SELECT 
@@ -100,20 +125,7 @@ try {
         COUNT(CASE WHEN a.status = 'Booked' THEN 1 END) as pending_count
         FROM appointment a
         LEFT JOIN patient p ON a.patient_id = p.id
-        LEFT JOIN time_slots ts ON a.slot_id = ts.id
-        WHERE (
-            a.appointment_number LIKE '%$searchTerm%' 
-            OR p.name LIKE '%$searchTerm%' 
-            OR p.mobile LIKE '%$searchTerm%'
-        )";
-    
-    if ($statusFilter) {
-        $statsQuery .= " AND a.status = '$statusFilter'";
-    }
-    
-    if ($dateFilter) {
-        $statsQuery .= " AND ts.slot_date = '$dateFilter'";
-    }
+        LEFT JOIN time_slots ts ON a.slot_id = ts.id" . $baseConditions;
     
     $statsResult = Database::search($statsQuery);
     $statsRow = $statsResult ? $statsResult->fetch_assoc() : [];
@@ -129,8 +141,16 @@ try {
             'no_show_count' => $statsRow['no_show_count'] ?? 0,
             'pending_count' => $statsRow['pending_count'] ?? 0
         ],
-        'search_term' => $data['search'],
-        'result_count' => count($appointments)
+        'pagination' => [
+            'current_page' => $currentPage,
+            'total_pages' => $totalPages,
+            'total_records' => $totalRecords,
+            'records_per_page' => $recordsPerPage,
+            'offset' => $offset
+        ],
+        'search_term' => $searchTerm,
+        'result_count' => count($appointments),
+        'total_records' => $totalRecords
     ];
     
     echo json_encode($response);

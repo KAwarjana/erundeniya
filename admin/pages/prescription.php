@@ -979,60 +979,82 @@ $attendedAppointments = getAttendedAppointments();
                                     </thead>
                                     <tbody id="prescriptionsTableBody">
                                         <?php
-                                        // Updated query to get all prescriptions
-                                        $prescriptionsQuery = "SELECT p.*, 
-      pt.title, pt.name, pt.mobile, pt.registration_number,
-      a.appointment_number, a.appointment_date, a.appointment_time
-      FROM prescriptions p 
-      INNER JOIN patient pt ON p.patient_id = pt.id 
-      LEFT JOIN appointment a ON p.appointment_id = a.id 
-      ORDER BY p.created_at DESC";
+                                        /* ----------  pagination  ---------- */
+                                        $recordsPerPage = 10;  
+                                        $page           = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+                                        $offset         = ($page - 1) * $recordsPerPage;
+
+                                        /* ----------  base query (no LIMIT yet – we need the total) ---------- */
+                                        $base = "FROM prescriptions p
+         INNER JOIN patient pt ON p.patient_id = pt.id
+         LEFT  JOIN appointment a ON p.appointment_id = a.id";
+
+                                        /* ----------  total rows ---------- */
+                                        $totalRes  = Database::search("SELECT COUNT(*) AS total $base");
+                                        $totalRows = (int) $totalRes->fetch_assoc()['total'];
+                                        $totalPages = ceil($totalRows / $recordsPerPage);
+
+                                        /* ----------  now pull only 4 rows ---------- */
+                                        $prescriptionsQuery = "SELECT p.*,
+                              pt.title, pt.name, pt.mobile, pt.registration_number,
+                              a.appointment_number, a.appointment_date, a.appointment_time
+                       $base
+                       ORDER BY p.created_at DESC
+                       LIMIT $recordsPerPage OFFSET $offset";
 
                                         $prescriptions = Database::search($prescriptionsQuery);
 
-                                        if ($prescriptions && $prescriptions->num_rows > 0):
-                                        ?>
-                                            <?php while ($row = $prescriptions->fetch_assoc()): ?>
+                                        /* ----------  render rows ---------- */
+                                        if ($prescriptions && $prescriptions->num_rows):
+                                            while ($row = $prescriptions->fetch_assoc()): ?>
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex flex-column">
-                                                            <h6 class="mb-0 text-sm font-weight-bold">PRES<?php echo str_pad($row['id'], 3, '0', STR_PAD_LEFT); ?></h6>
+                                                            <h6 class="mb-0 text-sm font-weight-bold">
+                                                                PRES<?= str_pad($row['id'], 3, '0', STR_PAD_LEFT) ?>
+                                                            </h6>
                                                             <p class="text-xs text-secondary mb-0">
-                                                                <?php
-                                                                if ($row['appointment_number']) {
-                                                                    echo '<i class="material-symbols-rounded" style="font-size: 12px; vertical-align: middle;">calendar_today</i> ' . $row['appointment_number'];
-                                                                } else {
-                                                                    echo '<i class="material-symbols-rounded" style="font-size: 12px; vertical-align: middle;">person</i> Walk-in Patient';
-                                                                }
-                                                                ?>
+                                                                <?php if ($row['appointment_number']): ?>
+                                                                    <i class="material-symbols-rounded" style="font-size:12px;vertical-align:middle;">
+                                                                        calendar_today
+                                                                    </i> <?= htmlspecialchars($row['appointment_number']) ?>
+                                                                <?php else: ?>
+                                                                    <i class="material-symbols-rounded" style="font-size:12px;vertical-align:middle;">
+                                                                        person
+                                                                    </i> Walk-in Patient
+                                                                <?php endif; ?>
                                                             </p>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex flex-column">
-                                                            <span class="text-sm font-weight-bold"><?php echo $row['title'] . ' ' . $row['name']; ?></span>
+                                                            <span class="text-sm font-weight-bold">
+                                                                <?= htmlspecialchars($row['title'] . ' ' . $row['name']) ?>
+                                                            </span>
                                                             <span class="text-xs text-secondary">
-                                                                <?php echo $row['registration_number']; ?> | <?php echo $row['mobile']; ?>
+                                                                <?= htmlspecialchars($row['registration_number']) ?>
+                                                                | <?= htmlspecialchars($row['mobile']) ?>
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="text-sm"><?php echo date('Y-m-d', strtotime($row['created_at'])); ?></span>
+                                                        <span class="text-sm"><?= date('Y-m-d', strtotime($row['created_at'])) ?></span>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex gap-1">
-                                                            <button class="btn btn-sm btn-outline-success" onclick="viewPrescription(<?php echo $row['id']; ?>)">View</button>
-                                                            <button class="btn btn-sm btn-outline-primary" onclick="editPrescription(<?php echo $row['id']; ?>)">Edit</button>
-                                                            <button class="print-btn btn-sm" onclick="printPrescription(<?php echo $row['id']; ?>)">Print</button>
+                                                            <button class="btn btn-sm btn-outline-success"
+                                                                onclick="viewPrescription(<?= $row['id'] ?>)">View</button>
+                                                            <button class="btn btn-sm btn-outline-primary"
+                                                                onclick="editPrescription(<?= $row['id'] ?>)">Edit</button>
+                                                            <button class="print-btn btn-sm"
+                                                                onclick="printPrescription(<?= $row['id'] ?>)">Print</button>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            <?php endwhile; ?>
-                                        <?php else: ?>
+                                            <?php endwhile;
+                                        else: ?>
                                             <tr>
-                                                <td colspan="4" class="text-center">
-                                                    <p class="text-muted">No prescriptions found</p>
-                                                </td>
+                                                <td colspan="4" class="text-center text-muted">No prescriptions found</td>
                                             </tr>
                                         <?php endif; ?>
                                     </tbody>
@@ -1040,6 +1062,39 @@ $attendedAppointments = getAttendedAppointments();
                             </div>
                         </div>
                     </div>
+                    <!--  pagination  -->
+                    <?php if ($totalPages > 1): ?>
+                        <nav aria-label="Prescriptions pagination" class="mt-3">
+                            <ul class="pagination justify-content-center flex-wrap">
+                                <!-- Prev -->
+                                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?>">
+                                        <i class="material-symbols-rounded">chevron_left</i>
+                                    </a>
+                                </li>
+
+                                <?php
+                                // page numbers
+                                $start = max(1, $page - 2);
+                                $end   = min($totalPages, $start + 4);
+                                for ($i = $start; $i <= $end; $i++): ?>
+                                    <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <!-- Next -->
+                                <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?>">
+                                        <i class="material-symbols-rounded">chevron_right</i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <p class="text-muted text-sm text-center mb-0 mt-2">
+                            Showing <?= min($offset + 1, $totalRows) ?> to <?= min($offset + $recordsPerPage, $totalRows) ?> of <?= $totalRows ?> prescriptions
+                        </p>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Create Prescription Panel -->
@@ -2253,6 +2308,14 @@ Next visit: After 2 weeks with BP chart`
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             return text.replace(regex, '<mark>$1</mark>');
         }
+
+        // keep search & date when paginating
+        document.addEventListener('DOMContentLoaded', () => {
+            const search = new URLSearchParams(location.search).get('search') || '';
+            const date = new URLSearchParams(location.search).get('date') || '';
+            if (search) document.getElementById('prescriptionSearch').value = search;
+            if (date) document.getElementById('dateFilter').value = date;
+        });
     </script>
 </body>
 

@@ -541,7 +541,7 @@ try {
         }
 
         .btn-warning {
-            background: #ffc107;
+            background: linear-gradient(45deg, #ffc107, #ffb300);
             color: #212529;
             padding: 6px 12px;
             border: none;
@@ -552,6 +552,15 @@ try {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #ffb300, #ffa000);
+            color: #212529;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+            transform: translateY(-1px);
         }
 
         .print-btn {
@@ -788,116 +797,157 @@ try {
             color: #212529 !important;
         }
 
-        /* Discount section styles */
-        /* Replace the existing discount section styles */
+        /* Enhanced Discount section styles */
         .discount-section {
             background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            border: 1px solid #a5d6a7;
-            border-radius: 8px;
-            padding: 15px;
+            border: 2px solid #81c784;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(129, 199, 132, 0.15);
         }
 
         .discount-row {
             display: flex;
             gap: 15px;
             align-items: end;
+            margin-bottom: 15px;
         }
 
         .discount-col {
             flex: 1;
         }
 
+        .discount-col label {
+            color: #1b5e20;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .discount-col label i {
+            font-size: 16px;
+        }
+
         .discount-display {
-            background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
-            border: 1px solid #81c784;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
+            background: linear-gradient(135deg, #ffffff, #f1f8e9);
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .discount-badge,
+        .final-amount-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .discount-badge {
+            background: linear-gradient(135deg, #ffeb3b, #ffc107);
+            color: #795548;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
+        .discount-badge i {
+            font-size: 20px;
+        }
+
+        .final-amount-badge {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        }
+
+        .final-amount-badge i {
+            font-size: 20px;
+        }
+
+        .discount-arrow {
+            color: #4caf50;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
         }
 
         /* Enhanced input fields for discount section */
-        .discount-section .form-group input,
-        .discount-section .form-group select {
+        .discount-section input {
             background: white;
             border: 2px solid #a5d6a7;
             border-radius: 8px;
             padding: 10px 12px;
             font-size: 14px;
             transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .discount-section .form-group input:focus,
-        .discount-section .form-group select:focus {
+        .discount-section input:focus {
             outline: none;
             border-color: #4caf50;
             box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+            background: #ffffff;
         }
 
-        .discount-section .form-group label {
-            color: #2e7d32;
+        .discount-section input:hover {
+            border-color: #66bb6a;
+        }
+
+        /* Specific styling for discount inputs */
+        #discountPercentage,
+        #discountAmountInput {
             font-weight: 600;
+            color: #2e7d32;
         }
 
-        /* Edit button styling to match prescription.php */
-        .btn-warning {
-            background: linear-gradient(45deg, #ffc107, #ffb300);
-            color: #212529;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            min-height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        #discountReason {
+            color: #424242;
         }
 
-        .btn-warning:hover {
-            background: linear-gradient(45deg, #ffb300, #ffa000);
-            color: #212529;
-            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
-            transform: translateY(-1px);
-        }
-
-        /* Additional enhanced styling for consistency */
+        /* Section heading */
         .discount-section h6 {
-            color: #2e7d32;
-            font-weight: 600;
+            color: #1b5e20;
+            font-weight: 700;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
         }
 
         .discount-section h6 i {
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-
-        /* Update the discount percentage input specifically */
-        #discountPercentage {
-            background: white;
-            border: 2px solid #a5d6a7;
-            color: #2e7d32;
-            font-weight: 500;
-        }
-
-        #discountPercentage:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
-        }
-
-        /* Discount reason input */
-        #discountReason {
-            background: white;
-            border: 2px solid #a5d6a7;
-            transition: all 0.3s ease;
-        }
-
-        #discountReason:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+            font-size: 20px;
         }
 
         /* Responsive adjustments */
@@ -964,6 +1014,12 @@ try {
         .sidenav-footer .nav-link:hover .nav-link-text {
             color: #dc3545 !important;
             opacity: 1 !important;
+        }
+
+        .date-input-wrapper-opd{
+         border: 1px solid #d1d1d1ff;
+         padding: 0 10px;
+         border-radius: 5px;
         }
     </style>
 </head>
@@ -1204,7 +1260,7 @@ try {
                                         </div>
                                         <div class="discount-col">
                                             <label><i class="material-symbols-rounded text-sm">description</i> Discount Reason</label>
-                                            <input type="text" id="discountReason" placeholder="Enter discount reason" class="width-100">
+                                            <input type="text" id="discountReason" placeholder="Enter discount reason">
                                         </div>
                                     </div>
                                     <div class="discount-display" id="discountDisplay" style="display: none;">
@@ -1282,12 +1338,23 @@ try {
                     <div class="card">
                         <div class="card-header pb-0">
                             <div class="row align-items-center">
-                                <div class="col-md-8">
+                                <div class="col-md-6">
                                     <h6 class="mb-0">Treatment Bills</h6>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="input-group input-group-outline">
-                                        <input type="text" class="form-control" placeholder="Search bills..." id="billSearch" onkeyup="searchBills()">
+                                <div class="col-md-3">
+                                    <div class="input-group input-group-outline" style="position: relative;">
+                                        <input type="text" class="form-control" placeholder="Search bills..." id="billSearch" style="padding-right: 35px;">
+                                        <button type="button" onclick="clearBillSearch()" class="search-clear-btn-opd" style="position: absolute; right: 8px; top: 60%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; z-index: 10; display: none; padding: 4px;">
+                                            <i class="material-symbols-rounded" style="font-size: 20px; color: #66666681;">close</i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="date-input-wrapper-opd" style="position: relative; display: inline-block; width: 100%;">
+                                        <input type="date" class="form-control" id="dateFilterOPD" onchange="filterByDateOPD()" placeholder="Filter by date">
+                                        <button type="button" onclick="clearDateFilterOPD()" class="date-clear-btn-opd" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; cursor: pointer; z-index: 5; display: none; width: 20px; height: 20px; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                                            <i class="material-symbols-rounded" style="font-size: 14px; color: #666;">close</i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1408,79 +1475,6 @@ try {
                     <div class="patient-info">
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Patient:</strong> <span id="billPatientName">-</span><br>
-                                <strong>Mobile:</strong> <span id="billPatientMobile">-</span>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <strong>Date:</strong> <span id="billDate">-</span><br>
-                                <strong>Bill No:</strong> <span id="billNumber">-</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="treatment-list" id="billTreatmentList">
-                        <h6>Treatments:</h6>
-                        <div id="billTreatments">
-                            Treatment details will appear here...
-                        </div>
-                    </div>
-
-                    <div id="billDiscountSection" style="margin-bottom: 20px; display: none;">
-                        <h6>Discount Details:</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Discount:</strong> <span id="billDiscountPercentage">0%</span>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Discount Amount:</strong> <span id="billDiscountAmount">Rs. 0.00</span>
-                            </div>
-                        </div>
-                        <div id="billDiscountReason" style="margin-top: 5px;"></div>
-                    </div>
-
-                    <div id="billNotesSection" style="margin-bottom: 20px; display: none;">
-                        <h6>Notes:</h6>
-                        <p id="billNotes"></p>
-                    </div>
-
-                    <div class="total-section">
-                        <div>Total Amount: Rs. <span id="billTotalAmount">0.00</span></div>
-                        <div style="color: #28a745; font-size: 16px;">Final Amount: Rs. <span id="billFinalAmount">0.00</span></div>
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <button class="btn-primary w-100" onclick="printBillModal()">
-                            <i class="material-symbols-rounded">print</i> Print Bill
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn-secondary w-100" onclick="closeBillModal()">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bill Preview Modal -->
-    <div id="previewModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4><i class="material-symbols-rounded">preview</i> Treatment Bill Preview</h4>
-                <span class="close" onclick="closePreviewModal()">&times;</span>
-            </div>
-            <div class="modal-body" style="padding: 25px;">
-                <div class="bill-preview" id="treatmentBillPreview">
-                    <div class="bill-header">
-                        <h2>Dr. Erundeniya Medical Center</h2>
-                        <p>OPD Treatment Bill</p>
-                        <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
-                    </div>
-
-                    <div class="patient-info">
-                        <div class="row">
-                            <div class="col-md-6">
                                 <strong>Patient:</strong> <span id="previewPatientName">-</span><br>
                                 <strong>Mobile:</strong> <span id="previewPatientMobile">-</span>
                             </div>
@@ -1561,24 +1555,24 @@ try {
             treatmentRow.id = `treatment-row-${treatmentRowCounter}`;
 
             treatmentRow.innerHTML = `
-                <div class="treatment-dropdown">
-                    <select onchange="updatePrice(${treatmentRowCounter})">
-                        <option value="">Select Treatment</option>
-                        ${treatments.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="price-input">
-                    <input type="number" step="0.01" min="0" placeholder="0.00" readonly 
-                           onchange="calculateTotal()" id="price-${treatmentRowCounter}">
-                </div>
-                <div class="quantity-treatment-input">
-                    <input type="number" min="1" value="1" 
-                           onchange="calculateTotal()" id="quantity-${treatmentRowCounter}">
-                </div>
-                <button type="button" class="remove-btn" onclick="removeTreatmentRow(${treatmentRowCounter})">
-                    <i class="material-symbols-rounded mt-2">delete</i>
-                </button>
-            `;
+            <div class="treatment-dropdown">
+                <select onchange="updatePrice(${treatmentRowCounter})">
+                    <option value="">Select Treatment</option>
+                    ${treatments.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                </select>
+            </div>
+            <div class="price-input">
+                <input type="number" step="0.01" min="0" placeholder="0.00" readonly 
+                       onchange="calculateTotal()" id="price-${treatmentRowCounter}">
+            </div>
+            <div class="quantity-treatment-input">
+                <input type="number" min="1" value="1" 
+                       onchange="calculateTotal()" id="quantity-${treatmentRowCounter}">
+            </div>
+            <button type="button" class="remove-btn" onclick="removeTreatmentRow(${treatmentRowCounter})">
+                <i class="material-symbols-rounded mt-2">delete</i>
+            </button>
+        `;
 
             treatmentSelection.appendChild(treatmentRow);
         }
@@ -1644,12 +1638,66 @@ try {
             const finalAmount = total - discountAmount;
 
             document.getElementById('totalAmount').textContent = `Rs. ${total.toFixed(2)}`;
-            document.getElementById('discountAmount').textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
+            document.getElementById('discountAmountDisplay').textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            document.getElementById('finalAmount').textContent = `Rs. ${finalAmount.toFixed(2)}`;
+
+            // Show/hide discount display
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountPercentage > 0 || discountAmount > 0) {
+                discountDisplay.style.display = 'block';
+            } else {
+                discountDisplay.style.display = 'none';
+            }
+        }
+
+        // Calculate discount from percentage
+        function calculateFromPercentage() {
+            const total = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', '')) || 0;
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+
+            if (discountPercentage > 100) {
+                document.getElementById('discountPercentage').value = 100;
+                return;
+            }
+
+            const discountAmount = (total * discountPercentage) / 100;
+            const finalAmount = total - discountAmount;
+
+            document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
+            document.getElementById('discountAmountDisplay').textContent = `Rs. ${discountAmount.toFixed(2)}`;
             document.getElementById('finalAmount').textContent = `Rs. ${finalAmount.toFixed(2)}`;
 
             // Show/hide discount display
             const discountDisplay = document.getElementById('discountDisplay');
             if (discountPercentage > 0) {
+                discountDisplay.style.display = 'block';
+            } else {
+                discountDisplay.style.display = 'none';
+            }
+        }
+
+        // Calculate discount from amount
+        function calculateFromAmount() {
+            const total = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', '')) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
+
+            if (discountAmount > total) {
+                alert('Discount amount cannot exceed total amount');
+                document.getElementById('discountAmountInput').value = total.toFixed(2);
+                return;
+            }
+
+            const discountPercentage = total > 0 ? (discountAmount / total) * 100 : 0;
+            const finalAmount = total - discountAmount;
+
+            document.getElementById('discountPercentage').value = discountPercentage.toFixed(2);
+            document.getElementById('discountAmountDisplay').textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            document.getElementById('finalAmount').textContent = `Rs. ${finalAmount.toFixed(2)}`;
+
+            // Show/hide discount display
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountAmount > 0) {
                 discountDisplay.style.display = 'block';
             } else {
                 discountDisplay.style.display = 'none';
@@ -1708,6 +1756,11 @@ try {
                 return;
             }
 
+            // Get discount values
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
+            const totalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
+
             // Send data to server
             fetch('', {
                     method: 'POST',
@@ -1721,8 +1774,8 @@ try {
                         patient_mobile: patientMobile,
                         treatments: JSON.stringify(selectedTreatments),
                         notes: notes,
-                        total_amount: parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', '')),
-                        discount_percentage: document.getElementById('discountPercentage').value,
+                        total_amount: totalAmount,
+                        discount_percentage: discountPercentage,
                         discount_reason: document.getElementById('discountReason').value
                     })
                 })
@@ -1785,6 +1838,11 @@ try {
                 return;
             }
 
+            // Get discount values
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
+            const totalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
+
             // Send data to server
             fetch('', {
                     method: 'POST',
@@ -1799,8 +1857,8 @@ try {
                         patient_mobile: patientMobile,
                         treatments: JSON.stringify(selectedTreatments),
                         notes: notes,
-                        total_amount: parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', '')),
-                        discount_percentage: document.getElementById('discountPercentage').value,
+                        total_amount: totalAmount,
+                        discount_percentage: discountPercentage,
                         discount_reason: document.getElementById('discountReason').value
                     })
                 })
@@ -1829,6 +1887,7 @@ try {
             document.getElementById('totalAmount').textContent = 'Rs. 0.00';
             document.getElementById('discountDisplay').style.display = 'none';
             document.getElementById('discountPercentage').value = '0';
+            document.getElementById('discountAmountInput').value = '0';
             document.getElementById('discountReason').value = '';
             document.getElementById('billId').value = '';
             document.getElementById('saveBtn').style.display = 'flex';
@@ -1851,10 +1910,16 @@ try {
                         document.getElementById('patientName').value = bill.patient_name;
                         document.getElementById('patientMobile').value = bill.patient_mobile;
                         document.getElementById('treatmentNotes').value = bill.notes || '';
+
+                        // Populate discount fields
                         document.getElementById('discountPercentage').value = bill.discount_percentage || 0;
                         document.getElementById('discountReason').value = bill.discount_reason || '';
                         document.getElementById('paymentStatus').value = bill.payment_status || 'Pending';
                         document.getElementById('billId').value = bill.id;
+
+                        // Calculate and set discount amount
+                        const discountAmt = parseFloat(bill.discount_amount) || 0;
+                        document.getElementById('discountAmountInput').value = discountAmt.toFixed(2);
 
                         // Set patient selection if patient_id exists
                         if (bill.patient_id) {
@@ -1944,6 +2009,11 @@ try {
                 return;
             }
 
+            // Get discount values
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
+            const totalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
+
             // Send data to server
             fetch('', {
                     method: 'POST',
@@ -1957,8 +2027,8 @@ try {
                         patient_mobile: patientMobile,
                         treatments: JSON.stringify(selectedTreatments),
                         notes: document.getElementById('treatmentNotes').value,
-                        total_amount: parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', '')),
-                        discount_percentage: document.getElementById('discountPercentage').value,
+                        total_amount: totalAmount,
+                        discount_percentage: discountPercentage,
                         discount_reason: document.getElementById('discountReason').value
                     })
                 })
@@ -2021,7 +2091,10 @@ try {
             document.getElementById('previewDate').textContent = new Date().toISOString().split('T')[0];
 
             const currentTotal = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
-            const currentFinal = parseFloat(document.getElementById('finalAmount').textContent.replace('Rs. ', ''));
+            const previewDiscountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            const previewDiscountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
+            const currentFinal = currentTotal - previewDiscountAmount;
+
             document.getElementById('previewTotalAmount').textContent = currentTotal.toFixed(2);
             document.getElementById('previewFinalAmount').textContent = currentFinal.toFixed(2);
 
@@ -2031,29 +2104,27 @@ try {
 
             selectedTreatments.forEach(treatment => {
                 treatmentListHtml += `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 8px;">${treatment.name}</td>
-                    <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
-                    <td style="text-align: right; padding: 8px;">Rs. ${treatment.price.toFixed(2)}</td>
-                    <td style="text-align: right; padding: 8px;">Rs. ${(treatment.price * treatment.quantity).toFixed(2)}</td>
-                </tr>
-            `;
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">${treatment.name}</td>
+                <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
+                <td style="text-align: right; padding: 8px;">Rs. ${treatment.price.toFixed(2)}</td>
+                <td style="text-align: right; padding: 8px;">Rs. ${(treatment.price * treatment.quantity).toFixed(2)}</td>
+            </tr>
+        `;
             });
             treatmentListHtml += '</table>';
 
             document.getElementById('previewTreatmentList').innerHTML = treatmentListHtml;
 
             // Show/hide discount section
-            const discountPercentage = document.getElementById('discountPercentage').value;
-            if (discountPercentage > 0) {
+            if (previewDiscountPercentage > 0 || previewDiscountAmount > 0) {
                 document.getElementById('previewDiscountSection').style.display = 'block';
-                document.getElementById('previewDiscountPercentage').textContent = discountPercentage + '%';
-                const discountAmount = (currentTotal * discountPercentage) / 100;
-                document.getElementById('previewDiscountAmount').textContent = 'Rs. ' + discountAmount.toFixed(2);
+                document.getElementById('previewDiscountPercentage').textContent = previewDiscountPercentage + '%';
+                document.getElementById('previewDiscountAmount').textContent = 'Rs. ' + previewDiscountAmount.toFixed(2);
 
-                const discountReason = document.getElementById('discountReason').value;
-                if (discountReason) {
-                    document.getElementById('previewDiscountReason').innerHTML = '<small><strong>Reason:</strong> ' + discountReason + '</small>';
+                const previewDiscountReason = document.getElementById('discountReason').value;
+                if (previewDiscountReason) {
+                    document.getElementById('previewDiscountReason').innerHTML = '<small><strong>Reason:</strong> ' + previewDiscountReason + '</small>';
                 } else {
                     document.getElementById('previewDiscountReason').innerHTML = '';
                 }
@@ -2094,13 +2165,13 @@ try {
 
                         bill.treatments_data.forEach(treatment => {
                             treatmentListHtml += `
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 8px;">${treatment.name}</td>
-                                <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
-                                <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
-                                <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
-                            </tr>
-                        `;
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 8px;">${treatment.name}</td>
+                            <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
+                            <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
+                            <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
+                        </tr>
+                    `;
                         });
                         treatmentListHtml += '</table>';
 
@@ -2189,70 +2260,70 @@ try {
 
             bill.treatments_data.forEach(treatment => {
                 treatmentListHtml += `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 8px;">${treatment.name}</td>
-                    <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
-                    <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
-                    <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
-                </tr>
-            `;
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">${treatment.name}</td>
+                <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
+                <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
+                <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
+            </tr>
+        `;
             });
             treatmentListHtml += '</table>';
 
             let discountSection = '';
             if (bill.discount_percentage > 0) {
                 discountSection = `
-                <div style="margin-bottom: 20px;">
-                    <h6>Discount Details:</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>Discount:</strong> ${bill.discount_percentage}%
-                        </div>
-                        <div class="col-md-6">
-                            <strong>Discount Amount:</strong> Rs. ${parseFloat(bill.discount_amount).toFixed(2)}
-                        </div>
+            <div style="margin-bottom: 20px;">
+                <h6>Discount Details:</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Discount:</strong> ${bill.discount_percentage}%
                     </div>
-                    ${bill.discount_reason ? `<div style="margin-top: 5px;"><small><strong>Reason:</strong> ${bill.discount_reason}</small></div>` : ''}
+                    <div class="col-md-6">
+                        <strong>Discount Amount:</strong> Rs. ${parseFloat(bill.discount_amount).toFixed(2)}
+                    </div>
                 </div>
-            `;
+                ${bill.discount_reason ? `<div style="margin-top: 5px;"><small><strong>Reason:</strong> ${bill.discount_reason}</small></div>` : ''}
+            </div>
+        `;
             }
 
             const billHtml = `
-            <div class="bill-preview">
-                <div class="bill-header">
-                    <h2>Dr. Erundeniya Medical Center</h2>
-                    <p>OPD Treatment Bill</p>
-                    <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
-                </div>
+        <div class="bill-preview">
+            <div class="bill-header">
+                <h2>Dr. Erundeniya Medical Center</h2>
+                <p>OPD Treatment Bill</p>
+                <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+            </div>
 
-                <div class="patient-info">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>Patient:</strong> ${bill.patient_name}<br>
-                            <strong>Mobile:</strong> ${bill.patient_mobile}
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <strong>Date:</strong> ${bill.created_at.split(' ')[0]}<br>
-                            <strong>Bill No:</strong> ${bill.bill_number}
-                        </div>
+            <div class="patient-info">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Patient:</strong> ${bill.patient_name}<br>
+                        <strong>Mobile:</strong> ${bill.patient_mobile}
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <strong>Date:</strong> ${bill.created_at.split(' ')[0]}<br>
+                        <strong>Bill No:</strong> ${bill.bill_number}
                     </div>
                 </div>
-
-                <div class="treatment-list">
-                    <h6>Treatments:</h6>
-                    <div>${treatmentListHtml}</div>
-                </div>
-
-                ${discountSection}
-
-                ${bill.notes ? `<div style="margin-bottom: 20px;"><h6>Notes:</h6><p>${bill.notes}</p></div>` : ''}
-
-                <div class="total-section">
-                    <div>Total Amount: Rs. ${parseFloat(bill.total_amount).toFixed(2)}</div>
-                    <div style="color: #28a745; font-size: 16px;">Final Amount: Rs. ${parseFloat(bill.final_amount).toFixed(2)}</div>
-                </div>
             </div>
-        `;
+
+            <div class="treatment-list">
+                <h6>Treatments:</h6>
+                <div>${treatmentListHtml}</div>
+            </div>
+
+            ${discountSection}
+
+            ${bill.notes ? `<div style="margin-bottom: 20px;"><h6>Notes:</h6><p>${bill.notes}</p></div>` : ''}
+
+            <div class="total-section">
+                <div>Total Amount: Rs. ${parseFloat(bill.total_amount).toFixed(2)}</div>
+                <div style="color: #28a745; font-size: 16px;">Final Amount: Rs. ${parseFloat(bill.final_amount).toFixed(2)}</div>
+            </div>
+        </div>
+    `;
 
             printContent(billHtml);
         }
@@ -2260,24 +2331,28 @@ try {
         function printContent(content) {
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write(`
-            <html>
-            <head>
-                <title>Print Treatment Bill</title>
-                <style>
-                    body { font-family: 'Times New Roman', serif; margin: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    @media print {
-                        body { margin: 0; }
-                    }
-                </style>
-            </head>
-            <body>
-                ${content}
-            </body>
-            </html>
-        `);
+        <html>
+        <head>
+            <title>Print Treatment Bill</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; margin: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .bill-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+                .patient-info { margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+                .treatment-list { min-height: 200px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                .total-section { text-align: right; border-top: 2px solid #333; padding-top: 15px; margin-top: 20px; font-weight: bold; font-size: 18px; }
+                @media print {
+                    body { margin: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>
+    `);
             printWindow.document.close();
             printWindow.print();
         }
@@ -2297,11 +2372,11 @@ try {
             notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
             notification.style.zIndex = '9999';
             notification.innerHTML = `
-            <div class="d-flex align-items-center">
-                <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
-                ${message}
-            </div>
-        `;
+        <div class="d-flex align-items-center">
+            <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
+            ${message}
+        </div>
+    `;
 
             document.body.appendChild(notification);
 
@@ -2350,7 +2425,125 @@ try {
         document.addEventListener('DOMContentLoaded', function() {
             // Add one treatment row by default
             addTreatmentRow();
-            console.log('OPD Treatments page loaded with enhanced features');
+            console.log('OPD Treatments page loaded with enhanced discount features');
+        });
+
+        // Enhanced search and date filter for OPD bills
+        function searchBillsEnhanced() {
+            applyCombinedFilters();
+        }
+
+        function filterByDateOPD() {
+            applyCombinedFilters();
+        }
+
+        function clearDateFilterOPD() {
+            const dateFilter = document.getElementById('dateFilterOPD');
+            const wrapper = dateFilter.parentElement;
+            const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
+
+            dateFilter.value = '';
+            wrapper.classList.remove('has-date');
+            clearBtn.style.display = 'none';
+
+            applyCombinedFilters();
+            dateFilter.focus();
+        }
+
+        // Combined filter - searches both text and date
+        function applyCombinedFilters() {
+            const searchTerm = document.getElementById('billSearch').value.toLowerCase();
+            const selectedDate = document.getElementById('dateFilterOPD').value;
+            const rows = document.querySelectorAll('#billsTableBody tr');
+
+            rows.forEach(row => {
+                const billNumber = row.querySelector('td:nth-child(1) h6')?.textContent.toLowerCase() || '';
+                const patientName = row.querySelector('td:nth-child(2) span:first-child')?.textContent.toLowerCase() || '';
+                const patientMobile = row.querySelector('td:nth-child(2) span:last-child')?.textContent.toLowerCase() || '';
+                const billDate = row.querySelector('td:nth-child(1) p')?.textContent.toLowerCase() || '';
+
+                // Extract just the date part (YYYY-MM-DD format)
+                const dateCell = row.querySelector('td:nth-child(1) p')?.textContent.trim() || '';
+
+                // Text search logic
+                const matchesSearch = billNumber.includes(searchTerm) ||
+                    patientName.includes(searchTerm) ||
+                    patientMobile.includes(searchTerm) ||
+                    billDate.includes(searchTerm);
+
+                // Date filter logic
+                const matchesDate = !selectedDate || dateCell === selectedDate;
+
+                // Show row only if both conditions are met (AND logic)
+                row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
+            });
+        }
+
+        // Show/hide clear button for search input
+        function toggleSearchClearButton() {
+            const searchInput = document.getElementById('billSearch');
+            const clearBtn = searchInput.parentElement.querySelector('.search-clear-btn-opd');
+
+            if (searchInput.value.length > 0) {
+                if (clearBtn) {
+                    clearBtn.style.display = 'block';
+                }
+            } else {
+                if (clearBtn) {
+                    clearBtn.style.display = 'none';
+                }
+            }
+        }
+
+        // Clear search and reapply date filter
+        function clearBillSearch() {
+            const searchInput = document.getElementById('billSearch');
+            searchInput.value = '';
+
+            const clearBtn = searchInput.parentElement.querySelector('.search-clear-btn-opd');
+            if (clearBtn) {
+                clearBtn.style.display = 'none';
+            }
+
+            applyCombinedFilters();
+            searchInput.focus();
+        }
+
+        // Enhanced date filter with clear button visibility
+        document.getElementById('dateFilterOPD')?.addEventListener('change', function() {
+            const wrapper = this.parentElement;
+            const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
+
+            if (this.value) {
+                wrapper.classList.add('has-date');
+                if (clearBtn) {
+                    clearBtn.style.display = 'flex';
+                    clearBtn.style.alignItems = 'center';
+                    clearBtn.style.justifyContent = 'center';
+                }
+            } else {
+                wrapper.classList.remove('has-date');
+                if (clearBtn) {
+                    clearBtn.style.display = 'none';
+                }
+            }
+
+            applyCombinedFilters();
+        });
+
+        // Add event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add search input listener
+            const billSearchInput = document.getElementById('billSearch');
+            if (billSearchInput) {
+                billSearchInput.addEventListener('input', function() {
+                    searchBillsEnhanced();
+                    toggleSearchClearButton();
+                });
+                toggleSearchClearButton();
+            }
+
+            console.log('OPD search and date filter functionality initialized');
         });
     </script>
 

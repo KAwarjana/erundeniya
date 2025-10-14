@@ -73,6 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'get_bill_details':
                 getBillDetails();
                 break;
+            case 'update_bill':
+                updateBill();
+                break;
             default:
                 echo json_encode(['success' => false, 'message' => 'Invalid action']);
         }
@@ -126,6 +129,44 @@ function createBill()
         'success' => true,
         'message' => 'Bill created successfully with Paid status',
         'bill_number' => $billNumber
+    ]);
+}
+
+function updateBill()
+{
+    global $currentUser;
+
+    $billId = $_POST['bill_id'] ?? '';
+    $doctorFee = $_POST['doctor_fee'] ?? 0;
+    $medicineCost = $_POST['medicine_cost'] ?? 0;
+    $otherCharges = $_POST['other_charges'] ?? 0;
+    $discountAmount = $_POST['discount_amount'] ?? 0;
+    $discountPercentage = $_POST['discount_percentage'] ?? 0;
+    $discountReason = $_POST['discount_reason'] ?? '';
+    $totalAmount = $_POST['total_amount'] ?? 0;
+
+    if (empty($billId)) {
+        echo json_encode(['success' => false, 'message' => 'Bill ID is required']);
+        return;
+    }
+
+    // Update bill
+    $updateQuery = "UPDATE bills SET 
+                    doctor_fee = '$doctorFee',
+                    medicine_cost = '$medicineCost',
+                    other_charges = '$otherCharges',
+                    discount_amount = '$discountAmount',
+                    discount_percentage = '$discountPercentage',
+                    discount_reason = '$discountReason',
+                    total_amount = '$totalAmount',
+                    updated_at = NOW()
+                    WHERE id = '$billId'";
+
+    Database::iud($updateQuery);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Bill updated successfully'
     ]);
 }
 
@@ -197,8 +238,12 @@ function getAllBills()
 {
     $searchTerm = $_POST['search'] ?? '';
     $statusFilter = $_POST['status'] ?? '';
+    $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+    $recordsPerPage = 5;
+    $offset = ($page - 1) * $recordsPerPage;
 
-    $query = "SELECT 
+    // Base query
+    $query = "SELECT SQL_CALC_FOUND_ROWS
                 b.id,
                 b.bill_number,
                 b.doctor_fee,
@@ -231,9 +276,7 @@ function getAllBills()
             p.mobile LIKE '%$searchTerm%' OR 
             p.name LIKE '%$searchTerm%' OR 
             p.email LIKE '%$searchTerm%' OR 
-            CONCAT(p.title, ' ', p.name) LIKE '%$searchTerm%' OR
-            REPLACE(p.mobile, '-', '') LIKE '%$searchTerm%' OR
-            REPLACE(p.mobile, ' ', '') LIKE '%$searchTerm%'
+            CONCAT(p.title, ' ', p.name) LIKE '%$searchTerm%'
         )";
     }
 
@@ -242,16 +285,25 @@ function getAllBills()
         $query .= " AND b.payment_status = '$statusFilter'";
     }
 
-    $query .= " ORDER BY b.created_at DESC";
+    $query .= " ORDER BY b.created_at DESC LIMIT $recordsPerPage OFFSET $offset";
 
     $result = Database::search($query);
     $bills = [];
-
     while ($row = $result->fetch_assoc()) {
         $bills[] = $row;
     }
 
-    echo json_encode(['success' => true, 'data' => $bills]);
+    // Get total count
+    $totalResult = Database::search("SELECT FOUND_ROWS() as total");
+    $totalRows = $totalResult->fetch_assoc()['total'];
+    $totalPages = ceil($totalRows / $recordsPerPage);
+
+    echo json_encode([
+        'success' => true,
+        'data' => $bills,
+        'total_pages' => $totalPages,
+        'current_page' => $page
+    ]);
 }
 
 function getBillDetails()
@@ -343,6 +395,8 @@ try {
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
+
+    <!-- Flatpickr CSS for Calendar -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
@@ -352,32 +406,39 @@ try {
             font-size: 11px;
             font-weight: 500;
         }
+
         .status-paid {
             background: #e8f5e8;
             color: #4CAF50;
         }
+
         .status-pending {
             background: #fff3e0;
             color: #f57c00;
         }
+
         .status-partial {
             background: #e3f2fd;
             color: #1976d2;
         }
+
         .bill-amount {
             font-weight: 700;
             color: #2e7d32;
         }
+
         .create-bill-card {
             border-radius: 8px;
             background: linear-gradient(45deg, #a7a7a7ff, #fffe0a00);
         }
+
         .create-bill-header {
             background: linear-gradient(45deg, #000000ff, #252525ff);
             color: white;
             padding: 15px;
             border-radius: 8px 8px 0 0;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -389,6 +450,7 @@ try {
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 2% auto;
@@ -401,6 +463,7 @@ try {
             max-height: 90vh;
             overflow-y: auto;
         }
+
         .modal-header {
             background: linear-gradient(45deg, #3a3a3aff, #000000ff);
             color: white;
@@ -413,21 +476,25 @@ try {
             top: 0;
             z-index: 10;
         }
+
         .close {
             color: white;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
         }
+
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -438,10 +505,12 @@ try {
             font-size: 14px;
             transition: border-color 0.3s;
         }
+
         .form-group input:focus {
             outline: none;
             border-color: #2196F3;
         }
+
         .btn-primary {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
@@ -453,9 +522,11 @@ try {
             font-weight: 600;
             transition: all 0.3s;
         }
+
         .btn-primary:hover {
             opacity: 0.9;
         }
+
         .btn-secondary {
             background: #6c757d;
             color: white;
@@ -464,6 +535,7 @@ try {
             border-radius: 8px;
             cursor: pointer;
         }
+
         .print-btn {
             background: #000000ff;
             color: white;
@@ -479,6 +551,7 @@ try {
             vertical-align: top;
             margin: 0;
         }
+
         .print-btn1 {
             background: #000000ff;
             color: white;
@@ -487,6 +560,7 @@ try {
             border-radius: 5px;
             cursor: pointer;
         }
+
         .btn-outline-success {
             height: 32px;
             display: inline-flex;
@@ -495,9 +569,11 @@ try {
             vertical-align: baseline;
             margin-bottom: 0;
         }
+
         .card--header--text {
             color: white;
         }
+
         .notification-badge {
             position: relative;
             background: #f44336;
@@ -510,14 +586,37 @@ try {
             display: flex;
             flex-direction: row;
         }
+
         mark {
             background-color: #ffeb3b;
             color: #000;
             padding: 0 2px;
             border-radius: 2px;
         }
+
         .modal-body {
             padding: 25px;
+        }
+
+        .bill-edit-form {
+            background: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 4px;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -696,6 +795,7 @@ try {
                             </div>
                         </div>
                     </div>
+                    <div id="billPagination" class="mt-3"></div>
                 </div>
 
                 <div class="col-lg-6">
@@ -818,7 +918,7 @@ try {
                             © <script>
                                 document.write(new Date().getFullYear())
                             </script>
-                                design and develop by
+                            design and develop by
                             <a href="#" class="font-weight-bold">Evon Technologies Software Solution (PVT) Ltd.</a>
                             All rights reserved.
                         </div>
@@ -828,14 +928,36 @@ try {
         </footer>
     </main>
 
+    <!-- View Bill Modal -->
     <div id="viewBillModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="card--header--text"><i class="material-symbols-rounded">receipt</i> Bill Details</h4>
+                <h4 class="card--header--text"><i class="material-symbols-rounded">receipt</i> View Bill</h4>
                 <span class="close" onclick="closeViewBillModal()">&times;</span>
             </div>
             <div class="modal-body">
                 <div id="billContent">
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <button class="print-btn1 w-100" onclick="printBillModal()">
+                            <i class="material-symbols-rounded">print</i> Print Bill
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Bill Modal -->
+    <div id="editBillModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="card--header--text"><i class="material-symbols-rounded">edit</i> Edit Bill</h4>
+                <span class="close" onclick="closeEditBillModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="editBillContent">
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -844,9 +966,7 @@ try {
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <button class="print-btn1 w-100" onclick="printBillModal()">
-                            <i class="material-symbols-rounded">print</i> Print Bill
-                        </button>
+                        <button class="btn-secondary w-100" onclick="closeEditBillModal()">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -868,11 +988,11 @@ try {
             const medicineCost = parseFloat(document.getElementById('medicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
             const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
-            
+
             const subtotal = doctorFee + medicineCost + otherCharges;
             const discountAmount = (subtotal * discountPercentage) / 100;
             document.getElementById('discountAmount').value = discountAmount.toFixed(2);
-            
+
             const total = subtotal - discountAmount;
             document.getElementById('totalAmount').value = 'Rs. ' + total.toFixed(2);
         }
@@ -989,19 +1109,22 @@ try {
         }
 
         // Load all bills with search
-        function loadAllBills(searchTerm) {
+        function loadAllBills(searchTerm, page = 1) {
             searchTerm = searchTerm || '';
             fetch('create_bill.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'action=get_all_bills&search=' + encodeURIComponent(searchTerm)
+                    body: 'action=get_all_bills&search=' + encodeURIComponent(searchTerm) + '&page=' + page
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        displayBills(data.data, searchTerm);
+                        displayBills(data.data, searchTerm, {
+                            current_page: data.current_page,
+                            total_pages: data.total_pages
+                        });
                     }
                 })
                 .catch(error => {
@@ -1018,12 +1141,13 @@ try {
         }
 
         // Display bills in table
-        function displayBills(bills, searchTerm) {
+        function displayBills(bills, searchTerm, pagination) {
             const tbody = document.getElementById('billsTableBody');
             tbody.innerHTML = '';
 
             if (bills.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center">No bills found' + (searchTerm ? ' for "' + searchTerm + '"' : '') + '</td></tr>';
+                document.getElementById('billPagination').innerHTML = '';
                 return;
             }
 
@@ -1034,8 +1158,8 @@ try {
                 const highlightedPatientName = highlightSearchTerm(bill.title + ' ' + bill.patient_name, searchTerm);
                 const highlightedRegNumber = highlightSearchTerm(bill.patient_reg_number || 'N/A', searchTerm);
 
-                const discountInfo = bill.discount_amount > 0 ? 
-                    '<span class="text-sm text-success">Discount: Rs. ' + parseFloat(bill.discount_amount).toFixed(2) + 
+                const discountInfo = bill.discount_amount > 0 ?
+                    '<span class="text-sm text-success">Discount: Rs. ' + parseFloat(bill.discount_amount).toFixed(2) +
                     ' (' + bill.discount_percentage + '%)</span><br>' : '';
 
                 const statusBadge = '<span class="status-badge status-paid">Paid</span>';
@@ -1057,13 +1181,49 @@ try {
                     '</div>' +
                     '</td>' +
                     '<td>' +
-                    '<div class="d-flex gap-1">' +
-                    '<button class="btn btn-sm btn-outline-success" onclick="viewBill(' + bill.id + ')">View & Edit</button>' +
+                    '<div class="action-buttons">' +
+                    '<button class="btn btn-sm btn-outline-success" onclick="viewBill(' + bill.id + ')">View</button>' +
+                    '<button class="btn btn-sm btn-outline-primary mt-3" onclick="editBill(' + bill.id + ')">Edit</button>' +
                     '<button class="print-btn btn-sm" onclick="printBill(' + bill.id + ')">Print</button>' +
                     '</div>' +
                     '</td>';
                 tbody.appendChild(row);
             });
+
+            // Render pagination
+            let paginationHtml = '';
+            const currentPage = parseInt(pagination.current_page);
+            const totalPages = parseInt(pagination.total_pages);
+
+            if (totalPages > 1) {
+                paginationHtml += '<nav aria-label="Bill pagination"><ul class="pagination justify-content-center flex-wrap">';
+
+                // Prev
+                paginationHtml += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAllBills('', ${currentPage - 1}); return false;">
+                <i class="material-symbols-rounded">chevron_left</i>
+            </a>
+        </li>`;
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="loadAllBills('', ${i}); return false;">${i}</a>
+            </li>`;
+                }
+
+                // Next
+                paginationHtml += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAllBills('', ${currentPage + 1}); return false;">
+                <i class="material-symbols-rounded">chevron_right</i>
+            </a>
+        </li>`;
+
+                paginationHtml += '</ul></nav>';
+            }
+
+            document.getElementById('billPagination').innerHTML = paginationHtml;
+
         }
 
         // Handle form submission
@@ -1089,14 +1249,14 @@ try {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'action=create_bill&appointment_id=' + appointmentId + 
-                          '&doctor_fee=' + doctorFee + 
-                          '&medicine_cost=' + medicineCost + 
-                          '&other_charges=' + otherCharges +
-                          '&discount_amount=' + discountAmount +
-                          '&discount_percentage=' + discountPercentage +
-                          '&discount_reason=' + encodeURIComponent(discountReason) +
-                          '&total_amount=' + totalAmount
+                    body: 'action=create_bill&appointment_id=' + appointmentId +
+                        '&doctor_fee=' + doctorFee +
+                        '&medicine_cost=' + medicineCost +
+                        '&other_charges=' + otherCharges +
+                        '&discount_amount=' + discountAmount +
+                        '&discount_percentage=' + discountPercentage +
+                        '&discount_reason=' + encodeURIComponent(discountReason) +
+                        '&total_amount=' + totalAmount
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1135,14 +1295,14 @@ try {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: 'action=create_bill&appointment_id=' + appointmentId + 
-                              '&doctor_fee=' + doctorFee + 
-                              '&medicine_cost=' + medicineCost + 
-                              '&other_charges=' + otherCharges +
-                              '&discount_amount=' + discountAmount +
-                              '&discount_percentage=' + discountPercentage +
-                              '&discount_reason=' + encodeURIComponent(discountReason) +
-                              '&total_amount=' + totalAmount
+                        body: 'action=create_bill&appointment_id=' + appointmentId +
+                            '&doctor_fee=' + doctorFee +
+                            '&medicine_cost=' + medicineCost +
+                            '&other_charges=' + otherCharges +
+                            '&discount_amount=' + discountAmount +
+                            '&discount_percentage=' + discountPercentage +
+                            '&discount_reason=' + encodeURIComponent(discountReason) +
+                            '&total_amount=' + totalAmount
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -1182,8 +1342,31 @@ try {
             }
         }
 
-        // View bill for editing
+        // View bill
         function viewBill(billId) {
+            fetch('create_bill.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=get_bill_details&bill_id=' + billId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayBillModalForView(data.data);
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error loading bill details', 'error');
+                });
+        }
+
+        // Edit bill
+        function editBill(billId) {
             fetch('create_bill.php', {
                     method: 'POST',
                     headers: {
@@ -1206,13 +1389,104 @@ try {
                 });
         }
 
-        // Display bill modal with edit capability
-        function displayBillModalForEdit(bill) {
+        // Display bill modal for viewing (read-only)
+        function displayBillModalForView(bill) {
             const emailSection = bill.patient_email ? '<p class="mb-1">' + bill.patient_email + '</p>' : '';
             const regSection = bill.patient_reg_number ? '<p class="mb-1">Reg: ' + bill.patient_reg_number + '</p>' : '';
 
             const billContent = document.getElementById('billContent');
-            
+
+            billContent.innerHTML = `
+                <div class="bill-view-form">
+                    <div class="text-center mb-4">
+                        <h4>Erundeniya Medical Center</h4>
+                        <p class="mb-1">Medical Bill</p>
+                        <h5>${bill.bill_number}</h5>
+                        <p class="mb-0 text-success font-weight-bold">PAID</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Patient Information:</strong>
+                            <div>
+                                <p class="mb-1">${bill.title} ${bill.patient_name}</p>
+                                <p class="mb-1">${bill.patient_mobile}</p>
+                                ${regSection}
+                                ${emailSection}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Bill Information:</strong>
+                            <div>
+                                <p class="mb-1">Date: ${bill.created_at}</p>
+                                <p class="mb-1">Appointment: ${bill.appointment_number}</p>
+                                <p class="mb-1">Status: <span class="status-badge status-paid">PAID</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Doctor Consultation Fee</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.doctor_fee).toFixed(2)}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Medicine Cost</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.medicine_cost).toFixed(2)}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Other Charges</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.other_charges).toFixed(2)}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Discount Percentage (%)</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.discount_percentage).toFixed(2)}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Discount Amount</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.discount_amount).toFixed(2)}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Total Amount</label>
+                                <input type="number" class="form-control" value="${parseFloat(bill.total_amount).toFixed(2)}" readonly style="background: #f5f5f5; font-weight: bold; color: #2e7d32; font-size: 16px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Discount Reason</label>
+                                <input type="text" class="form-control" value="${bill.discount_reason || ''}" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('viewBillModal').style.display = 'block';
+        }
+
+        // Display bill modal for editing
+        function displayBillModalForEdit(bill) {
+            const emailSection = bill.patient_email ? '<p class="mb-1">' + bill.patient_email + '</p>' : '';
+            const regSection = bill.patient_reg_number ? '<p class="mb-1">Reg: ' + bill.patient_reg_number + '</p>' : '';
+
+            const billContent = document.getElementById('editBillContent');
+
             billContent.innerHTML = `
                 <div class="bill-edit-form">
                     <div class="text-center mb-4">
@@ -1294,7 +1568,7 @@ try {
                 </div>
             `;
 
-            document.getElementById('viewBillModal').style.display = 'block';
+            document.getElementById('editBillModal').style.display = 'block';
         }
 
         // Calculate total in edit mode
@@ -1330,7 +1604,7 @@ try {
                 total_amount: document.getElementById('editTotalAmount').value
             };
 
-            fetch('update_bill.php', {
+            fetch('create_bill.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1341,7 +1615,7 @@ try {
                 .then(data => {
                     if (data.success) {
                         showNotification('Bill updated successfully!', 'success');
-                        closeViewBillModal();
+                        closeEditBillModal();
                         loadAllBills();
                         currentEditingBillId = null;
                     } else {
@@ -1379,7 +1653,7 @@ try {
             const printWindow = window.open('', '', 'height=600,width=800');
             const emailSection = bill.patient_email ? '<p>' + bill.patient_email + '</p>' : '';
             const regSection = bill.patient_reg_number ? '<p>Reg: ' + bill.patient_reg_number + '</p>' : '';
-            const discountSection = bill.discount_amount > 0 ? 
+            const discountSection = bill.discount_amount > 0 ?
                 '<div class="d-flex">' +
                 '<span>Discount (' + bill.discount_percentage + '%)</span>' +
                 '<span>- Rs. ' + parseFloat(bill.discount_amount).toFixed(2) + '</span>' +
@@ -1473,7 +1747,6 @@ try {
                 '<title>Print Bill</title>' +
                 '<style>' +
                 'body { font-family: Arial, sans-serif; padding: 20px; }' +
-                '.bill-summary { max-width: 600px; margin: 0 auto; }' +
                 '.d-flex { display: flex; justify-content: space-between; }' +
                 '@media print { body { padding: 0; } }' +
                 '</style>' +
@@ -1492,16 +1765,24 @@ try {
             printWindow.document.close();
         }
 
-        // Close bill modal
+        // Close bill modals
         function closeViewBillModal() {
             document.getElementById('viewBillModal').style.display = 'none';
         }
 
+        function closeEditBillModal() {
+            document.getElementById('editBillModal').style.display = 'none';
+        }
+
         // Modal click outside to close
         window.addEventListener('click', function(event) {
-            const modal = document.getElementById('viewBillModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
+            const viewModal = document.getElementById('viewBillModal');
+            const editModal = document.getElementById('editBillModal');
+            if (event.target === viewModal) {
+                viewModal.style.display = 'none';
+            }
+            if (event.target === editModal) {
+                editModal.style.display = 'none';
             }
         });
 

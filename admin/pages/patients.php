@@ -1268,58 +1268,60 @@ $sriLankaLocations = [
             document.getElementById('patientModal').style.display = 'block';
         }
 
-        // View patient
-        function viewPatient(patientId) {
-            fetch('get_patient.php?id=' + patientId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const patient = data.patient;
-                        const registerNumber = 'REG' + String(patient.id).padStart(5, '0');
-                        
-                        document.getElementById('viewRegisterNumber').textContent = registerNumber;
-                        document.getElementById('viewName').textContent = patient.title + ' ' + patient.name;
-                        document.getElementById('viewGender').textContent = patient.gender || 'N/A';
-                        document.getElementById('viewAge').textContent = patient.age || 'N/A';
-                        document.getElementById('viewRegDate').textContent = new Date(patient.created_at).toLocaleDateString();
-                        document.getElementById('viewMobile').textContent = patient.mobile;
-                        document.getElementById('viewEmail').textContent = patient.email || 'N/A';
-                        document.getElementById('viewAddress').textContent = patient.address || 'N/A';
-                        document.getElementById('viewDistrict').textContent = patient.district || 'N/A';
-                        document.getElementById('viewProvince').textContent = patient.province || 'N/A';
-                        
-                        // Display illnesses
-                        const illnessesDiv = document.getElementById('viewIllnesses');
-                        illnessesDiv.innerHTML = '';
-                        if (patient.illnesses) {
-                            const illnessList = patient.illnesses.split(',');
-                            illnessList.forEach(illness => {
-                                const tag = document.createElement('span');
-                                tag.className = 'illness-tag';
-                                tag.textContent = illness.trim();
-                                illnessesDiv.appendChild(tag);
-                            });
-                        } else {
-                            illnessesDiv.innerHTML = '<span class="text-muted">None recorded</span>';
-                        }
-                        
-                        document.getElementById('viewMedicalNotes').textContent = patient.medical_notes || 'No additional notes';
-                        document.getElementById('viewTotalVisits').textContent = patient.total_visits || '0';
-                        document.getElementById('viewLastVisit').textContent = patient.last_visit || 'No visits yet';
-                        
-                        // Store patient ID for edit function
-                        document.getElementById('viewPatientModal').setAttribute('data-patient-id', patientId);
-                        
-                        document.getElementById('viewPatientModal').style.display = 'block';
-                    } else {
-                        showNotification('Error loading patient details', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('Error loading patient details', 'error');
-                });
+         function viewPatient(patientId) {
+            window.location.href = `patient_view.php?id=${patientId}`;
         }
+
+        // View patient
+        // function viewPatient(patientId) {
+        //     fetch('get_patient.php?id=' + patientId)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 const patient = data.patient;
+        //                 const registerNumber = 'REG' + String(patient.id).padStart(5, '0');
+                        
+        //                 document.getElementById('viewRegisterNumber').textContent = registerNumber;
+        //                 document.getElementById('viewName').textContent = patient.title + ' ' + patient.name;
+        //                 document.getElementById('viewGender').textContent = patient.gender || 'N/A';
+        //                 document.getElementById('viewAge').textContent = patient.age || 'N/A';
+        //                 document.getElementById('viewRegDate').textContent = new Date(patient.created_at).toLocaleDateString();
+        //                 document.getElementById('viewMobile').textContent = patient.mobile;
+        //                 document.getElementById('viewEmail').textContent = patient.email || 'N/A';
+        //                 document.getElementById('viewAddress').textContent = patient.address || 'N/A';
+        //                 document.getElementById('viewDistrict').textContent = patient.district || 'N/A';
+        //                 document.getElementById('viewProvince').textContent = patient.province || 'N/A';
+                        
+        //                 const illnessesDiv = document.getElementById('viewIllnesses');
+        //                 illnessesDiv.innerHTML = '';
+        //                 if (patient.illnesses) {
+        //                     const illnessList = patient.illnesses.split(',');
+        //                     illnessList.forEach(illness => {
+        //                         const tag = document.createElement('span');
+        //                         tag.className = 'illness-tag';
+        //                         tag.textContent = illness.trim();
+        //                         illnessesDiv.appendChild(tag);
+        //                     });
+        //                 } else {
+        //                     illnessesDiv.innerHTML = '<span class="text-muted">None recorded</span>';
+        //                 }
+                        
+        //                 document.getElementById('viewMedicalNotes').textContent = patient.medical_notes || 'No additional notes';
+        //                 document.getElementById('viewTotalVisits').textContent = patient.total_visits || '0';
+        //                 document.getElementById('viewLastVisit').textContent = patient.last_visit || 'No visits yet';
+                        
+        //                 document.getElementById('viewPatientModal').setAttribute('data-patient-id', patientId);
+                        
+        //                 document.getElementById('viewPatientModal').style.display = 'block';
+        //             } else {
+        //                 showNotification('Error loading patient details', 'error');
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             showNotification('Error loading patient details', 'error');
+        //         });
+        // }
 
         // Edit patient
         function editPatient(patientId) {

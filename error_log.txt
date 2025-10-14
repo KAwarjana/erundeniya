@@ -37,3 +37,21 @@
 [12-Oct-2025 20:28:10 Europe/Berlin] Request: {"time":"2025-10-12 20:28:10","method":"POST","action":"get_time_slots","ip":"::1"}
 [12-Oct-2025 20:28:10 Europe/Berlin] Processing action: get_time_slots
 [12-Oct-2025 20:28:10 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 11:44:28 Europe/Berlin] Request: {"time":"2025-10-14 11:44:28","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 11:44:28 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 11:44:28 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 11:44:50 Europe/Berlin] Request: {"time":"2025-10-14 11:44:50","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 11:44:50 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 11:44:50 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 12:19:36 Europe/Berlin] Request: {"time":"2025-10-14 12:19:36","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 12:19:36 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 12:19:36 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 16:53:22 Europe/Berlin] Request: {"time":"2025-10-14 16:53:22","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 16:53:22 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 16:53:22 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 23:08:32 Europe/Berlin] Request: {"time":"2025-10-14 23:08:32","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 23:08:32 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 23:08:32 Europe/Berlin] Database connection established successfully
+[14-Oct-2025 23:09:46 Europe/Berlin] Request: {"time":"2025-10-14 23:09:46","method":"POST","action":"get_time_slots","ip":"::1"}
+[14-Oct-2025 23:09:46 Europe/Berlin] Processing action: get_time_slots
+[14-Oct-2025 23:09:46 Europe/Berlin] Database connection established successfully

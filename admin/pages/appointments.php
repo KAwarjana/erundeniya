@@ -121,6 +121,46 @@ try {
     $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
     $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 
+    // Pagination parameters
+    $recordsPerPage = 10;
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $currentPage = max(1, $currentPage); // Ensure page is at least 1
+    $offset = ($currentPage - 1) * $recordsPerPage;
+
+    // Get total appointments count for display (regardless of filters)
+    $totalAppointmentsQuery = "SELECT COUNT(*) as total FROM appointment";
+    $totalAppointmentsResult = Database::search($totalAppointmentsQuery);
+    $totalAppointmentsRow = $totalAppointmentsResult->fetch_assoc();
+    $totalAppointmentsCount = $totalAppointmentsRow['total'] ?? 0;
+
+    // Base query with joins (for counting total records)
+    $countQuery = "SELECT COUNT(*) as total FROM appointment a
+        LEFT JOIN patient p ON a.patient_id = p.id
+        LEFT JOIN time_slots ts ON a.slot_id = ts.id
+        WHERE 1=1";
+
+    // Apply filters to count query
+    if ($statusFilter !== 'all') {
+        $escapedStatus = Database::$connection->real_escape_string($statusFilter);
+        $countQuery .= " AND a.status = '$escapedStatus'";
+    }
+
+    if ($dateFilter) {
+        $escapedDate = Database::$connection->real_escape_string($dateFilter);
+        $countQuery .= " AND a.appointment_date = '$escapedDate'";
+    }
+
+    if ($searchTerm) {
+        $escapedSearch = Database::$connection->real_escape_string($searchTerm);
+        $countQuery .= " AND (a.appointment_number LIKE '%$escapedSearch%' OR p.name LIKE '%$escapedSearch%' OR p.mobile LIKE '%$escapedSearch%')";
+    }
+
+    // Get total records
+    $countResult = Database::search($countQuery);
+    $countRow = $countResult->fetch_assoc();
+    $totalRecords = $countRow['total'] ?? 0;
+    $totalPages = ceil($totalRecords / $recordsPerPage);
+
     // Base query with joins
     $baseQuery = "SELECT 
         a.*, 
@@ -153,6 +193,7 @@ try {
     }
 
     $baseQuery .= " ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+    $baseQuery .= " LIMIT $recordsPerPage OFFSET $offset";
 
     // Execute main query
     $appointmentsResult = Database::search($baseQuery);
@@ -196,6 +237,9 @@ try {
     $attendedCount = 0;
     $noShowCount = 0;
     $pendingCount = 0;
+    $totalRecords = 0;
+    $totalPages = 1;
+    $currentPage = 1;
 }
 
 // Helper functions
@@ -236,6 +280,14 @@ function getPaymentStatusColor($status)
         default:
             return 'text-secondary';
     }
+}
+
+// Helper function to generate pagination URLs
+function getPageUrl($page)
+{
+    $params = $_GET;
+    $params['page'] = $page;
+    return '?' . http_build_query($params);
 }
 ?>
 
@@ -854,7 +906,7 @@ function getPaymentStatusColor($status)
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header pb-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                            <h6 class="mb-2 mb-md-0">All Appointments (<?php echo count($appointments); ?>)</h6>
+                            <h6 class="mb-2 mb-md-0">All Appointments (<?php echo $totalAppointmentsCount; ?>)</h6>
                             <a href="book_appointments.php" class="btn bg-gradient-success">
                                 <i class="material-symbols-rounded">add</i> <span class="d-none d-sm-inline">New Appointment</span>
                             </a>
@@ -1003,6 +1055,78 @@ function getPaymentStatusColor($status)
                     </div>
                 </div>
             </div>
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav aria-label="Appointments pagination">
+                            <ul class="pagination justify-content-center flex-wrap">
+                                <!-- Previous button -->
+                                <li class="page-item <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="<?php echo getPageUrl($currentPage - 1); ?>" tabindex="-1">
+                                        <i class="material-symbols-rounded">chevron_left</i>
+                                    </a>
+                                </li>
+
+                                <?php
+                                // Calculate page range to display
+                                $maxPagesToShow = 5;
+                                $startPage = max(1, $currentPage - floor($maxPagesToShow / 2));
+                                $endPage = min($totalPages, $startPage + $maxPagesToShow - 1);
+                                $startPage = max(1, $endPage - $maxPagesToShow + 1);
+
+                                // Show first page and ellipsis if needed
+                                if ($startPage > 1): ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="<?php echo getPageUrl(1); ?>">1</a>
+                                    </li>
+                                    <?php if ($startPage > 2): ?>
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+
+                                <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                                    <li class="page-item <?php echo $i === $currentPage ? 'active' : ''; ?>">
+                                        <a class="page-link" href="<?php echo getPageUrl($i); ?>">
+                                            <?php echo $i; ?>
+                                        </a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <?php if ($endPage < $totalPages): ?>
+                                    <?php if ($endPage < $totalPages - 1): ?>
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    <?php endif; ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="<?php echo getPageUrl($totalPages); ?>">
+                                            <?php echo $totalPages; ?>
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <!-- Next button -->
+                                <li class="page-item <?php echo $currentPage >= $totalPages ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="<?php echo getPageUrl($currentPage + 1); ?>">
+                                        <i class="material-symbols-rounded">chevron_right</i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <p class="text-muted text-sm mt-2">
+                            Showing <?php echo min($offset + 1, $totalRecords); ?> to <?php echo min($offset + $recordsPerPage, $totalRecords); ?> of <?php echo $totalRecords; ?> appointments
+                        </p>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Footer -->
@@ -1119,10 +1243,12 @@ function getPaymentStatusColor($status)
         }
 
         // Perform real-time search via AJAX
+        // Perform real-time search via AJAX
         function performRealTimeSearch(searchTerm) {
             const currentUrl = new URL(window.location.href);
             const status = currentUrl.searchParams.get('status') || 'all';
             const date = currentUrl.searchParams.get('date') || '';
+            const page = currentUrl.searchParams.get('page') || '1';
 
             // Show loading indicator
             showLoading();
@@ -1136,7 +1262,8 @@ function getPaymentStatusColor($status)
                     body: JSON.stringify({
                         search: searchTerm,
                         status: status,
-                        date: date
+                        date: date,
+                        page: page
                     })
                 })
                 .then(response => response.json())
@@ -1144,7 +1271,8 @@ function getPaymentStatusColor($status)
                     if (data.success) {
                         updateAppointmentsTable(data.appointments);
                         updateStatistics(data.statistics);
-                        showNotification(`Found ${data.appointments.length} appointment(s)`, 'success');
+                        updatePagination(data.pagination);
+                        showNotification(`Found ${data.total_records} appointment(s)`, 'success');
                     } else {
                         showNotification('Search failed: ' + data.message, 'error');
                         displayNoResults();
@@ -1602,6 +1730,82 @@ function getPaymentStatusColor($status)
 
         // Export button
         document.getElementById('btnExportExcel').addEventListener('click', exportAppointments);
+
+        // Update pagination
+        function updatePagination(pagination) {
+            if (!pagination || pagination.total_pages <= 1) {
+                document.querySelector('.pagination').parentElement.parentElement.style.display = 'none';
+                return;
+            }
+
+            document.querySelector('.pagination').parentElement.parentElement.style.display = 'block';
+
+            let paginationHtml = '';
+            const currentPage = parseInt(pagination.current_page);
+            const totalPages = parseInt(pagination.total_pages);
+
+            // Previous button
+            paginationHtml += `
+        <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+            <a class="page-link" href="${getPageUrl(currentPage - 1)}" tabindex="-1">
+                <i class="material-symbols-rounded">chevron_left</i>
+            </a>
+        </li>
+    `;
+
+            // Calculate page range
+            const maxPagesToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+
+            // First page and ellipsis
+            if (startPage > 1) {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="${getPageUrl(1)}">1</a></li>`;
+                if (startPage > 2) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="${getPageUrl(i)}">${i}</a>
+            </li>
+        `;
+            }
+
+            // Last page and ellipsis
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                paginationHtml += `<li class="page-item"><a class="page-link" href="${getPageUrl(totalPages)}">${totalPages}</a></li>`;
+            }
+
+            // Next button
+            paginationHtml += `
+        <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="${getPageUrl(currentPage + 1)}">
+                <i class="material-symbols-rounded">chevron_right</i>
+            </a>
+        </li>
+    `;
+
+            document.querySelector('.pagination').innerHTML = paginationHtml;
+
+            // Update showing text
+            const showingText = `Showing ${Math.min(pagination.offset + 1, pagination.total_records)} to ${Math.min(pagination.offset + pagination.records_per_page, pagination.total_records)} of ${pagination.total_records} appointments`;
+            document.querySelector('.text-muted.text-sm').textContent = showingText;
+        }
+
+        // Helper function to generate page URLs
+        function getPageUrl(page) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('page', page);
+            return currentUrl.toString();
+        }
     </script>
 
 </body>
