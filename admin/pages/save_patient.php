@@ -9,18 +9,19 @@ if (!AuthManager::isLoggedIn()) {
     exit;
 }
 
-// Set JSON header
 header('Content-Type: application/json');
 
 try {
-    // Get JSON input
+    Database::setUpConnection();
+    $conn = Database::$connection;
+
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
-    
+
     if (!$data) {
         throw new Exception('Invalid JSON data');
     }
-    
+
     // Validate required fields
     $requiredFields = ['title', 'name', 'mobile'];
     foreach ($requiredFields as $field) {
@@ -28,93 +29,93 @@ try {
             throw new Exception("Missing required field: $field");
         }
     }
-    
+
     // Sanitize inputs
-    $title = Database::$connection->real_escape_string(trim($data['title']));
-    $name = Database::$connection->real_escape_string(trim($data['name']));
-    $mobile = Database::$connection->real_escape_string(trim($data['mobile']));
-    
+    $title   = $conn->real_escape_string(trim($data['title']));
+    $name    = $conn->real_escape_string(trim($data['name']));
+    $mobile  = $conn->real_escape_string(trim($data['mobile']));
+
     // Validate mobile number format
     if (!preg_match('/^[0-9]{10}$/', $mobile)) {
         throw new Exception('Invalid mobile number format. Must be 10 digits');
     }
-    
-    // Check if mobile number already exists
-    Database::setUpConnection();
-    $checkQuery = "SELECT id FROM patient WHERE mobile = '$mobile'";
-    $checkResult = Database::search($checkQuery);
-    
-    if ($checkResult->num_rows > 0) {
-        throw new Exception('A patient with this mobile number already exists');
-    }
-    
-    // Optional fields
-    $gender = !empty($data['gender']) ? Database::$connection->real_escape_string($data['gender']) : NULL;
-    $age = !empty($data['age']) ? intval($data['age']) : NULL;
-    $email = !empty($data['email']) ? Database::$connection->real_escape_string(trim($data['email'])) : NULL;
-    $address = !empty($data['address']) ? Database::$connection->real_escape_string(trim($data['address'])) : NULL;
-    $province = !empty($data['province']) ? Database::$connection->real_escape_string(trim($data['province'])) : NULL;
-    $district = !empty($data['district']) ? Database::$connection->real_escape_string(trim($data['district'])) : NULL;
-    $illnesses = !empty($data['illnesses']) ? Database::$connection->real_escape_string(trim($data['illnesses'])) : NULL;
-    $medical_notes = !empty($data['medical_notes']) ? Database::$connection->real_escape_string(trim($data['medical_notes'])) : NULL;
-    
-    // Validate email if provided
-    if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Invalid email format');
-    }
-    
-    // Build insert query
-    $query = "INSERT INTO patient (
-        title, 
-        name, 
-        gender, 
-        age, 
-        mobile, 
-        email, 
-        address, 
-        province, 
-        district, 
-        medical_notes,
-        created_at
-    ) VALUES (
-        '$title',
-        '$name',
-        " . ($gender ? "'$gender'" : "NULL") . ",
-        " . ($age ? $age : "NULL") . ",
-        '$mobile',
-        " . ($email ? "'$email'" : "NULL") . ",
-        " . ($address ? "'$address'" : "NULL") . ",
-        " . ($province ? "'$province'" : "NULL") . ",
-        " . ($district ? "'$district'" : "NULL") . ",
-        " . ($medical_notes ? "'$medical_notes'" : "NULL") . ",
-        NOW()
-    )";
-    
-    // Execute query
-    $result = Database::iud($query);
-    
-    if ($result) {
-        $patientId = Database::$connection->insert_id;
-        
-        // Store illnesses if provided (you can create a separate table for this)
-        // For now, we'll store it in medical_notes or create a field
-        if ($illnesses) {
-            $updateIllness = "UPDATE patient SET medical_notes = CONCAT(
-                IFNULL(medical_notes, ''),
-                '\nMedical Conditions: $illnesses'
-            ) WHERE id = $patientId";
-            Database::iud($updateIllness);
+
+    // Check if mobile already exists (only for new patients)
+    if (empty($data['id'])) {
+        $checkQuery = "SELECT id FROM patient WHERE mobile = '$mobile'";
+        $checkResult = Database::search($checkQuery);
+        if ($checkResult->num_rows > 0) {
+            throw new Exception('A patient with this mobile number already exists');
         }
-        
+    }
+
+    // Optional fields
+    $gender   = !empty($data['gender'])  ? "'" . $conn->real_escape_string($data['gender']) . "'"  : "NULL";
+    $age      = !empty($data['age'])     ? intval($data['age'])                                     : "NULL";
+    $email    = !empty($data['email'])   ? "'" . $conn->real_escape_string(trim($data['email'])) . "'" : "NULL";
+    $address  = !empty($data['address']) ? "'" . $conn->real_escape_string(trim($data['address'])) . "'" : "NULL";
+    $province = !empty($data['province'])? "'" . $conn->real_escape_string(trim($data['province'])) . "'" : "NULL";
+    $district = !empty($data['district'])? "'" . $conn->real_escape_string(trim($data['district'])) . "'" : "NULL";
+
+    // Illnesses and medical notes
+    $illnesses = !empty($data['illnesses']) ? $conn->real_escape_string(trim($data['illnesses'])) : "";
+    $medical_notes = !empty($data['medical_notes']) ? $conn->real_escape_string(trim($data['medical_notes'])) : "";
+
+    $fullMedicalNotes = "";
+    if ($illnesses) {
+        $fullMedicalNotes = "Medical Conditions: $illnesses";
+    }
+    if ($medical_notes) {
+        $fullMedicalNotes .= ($fullMedicalNotes ? "\n\n" : "") . $medical_notes;
+    }
+    $fullMedicalNotes = $fullMedicalNotes ? "'" . $conn->real_escape_string($fullMedicalNotes) . "'" : "NULL";
+
+    if (!empty($data['id'])) {
+        // UPDATE existing patient
+        $patientId = intval($data['id']);
+        $query = "UPDATE patient SET
+            title = '$title',
+            name = '$name',
+            gender = $gender,
+            age = $age,
+            mobile = '$mobile',
+            email = $email,
+            address = $address,
+            province = $province,
+            district = $district,
+            medical_notes = $fullMedicalNotes
+            WHERE id = $patientId";
+        Database::iud($query);
+        $regNumber = 'REG' . str_pad($patientId, 5, '0', STR_PAD_LEFT);
         echo json_encode([
             'success' => true,
-            'message' => 'Patient registered successfully',
-            'patient_id' => $patientId
+            'message' => 'Patient updated successfully',
+            'patient_id' => $patientId,
+            'registration_number' => $regNumber
         ]);
     } else {
-        throw new Exception('Failed to register patient');
+        // INSERT new patient
+        $query = "INSERT INTO patient (
+            title, name, gender, age, mobile, email, address, province, district, medical_notes, created_at
+        ) VALUES (
+            '$title', '$name', $gender, $age, '$mobile', $email, $address, $province, $district, $fullMedicalNotes, NOW()
+        )";
+        if (Database::iud($query)) {
+            $patientId = $conn->insert_id;
+            $regNumber = 'REG' . str_pad($patientId, 5, '0', STR_PAD_LEFT);
+            $updateQuery = "UPDATE patient SET registration_number = '$regNumber' WHERE id = $patientId";
+            Database::iud($updateQuery);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Patient registered successfully',
+                'patient_id' => $patientId,
+                'registration_number' => $regNumber
+            ]);
+        } else {
+            throw new Exception('Failed to register patient: ' . $conn->error);
+        }
     }
-    
+
 } catch (Exception $e) {
     error_log("Error in save_patient.php: " . $e->getMessage());
     http_response_code(400);

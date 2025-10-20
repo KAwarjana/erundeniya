@@ -110,6 +110,99 @@ function renderSidebarMenu($menuItems, $currentPage)
 // Database connection
 require_once '../../connection/connection.php';
 
+// Handle AJAX requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    header('Content-Type: application/json');
+    
+    try {
+        $action = $_POST['action'];
+        
+        switch ($action) {
+            case 'get_all_patients':
+                getAllPatientsAjax();
+                break;
+            default:
+                echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        }
+        exit();
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit();
+    }
+}
+
+// Function to get all patients with pagination via AJAX
+function getAllPatientsAjax() {
+    $searchTerm = $_POST['search'] ?? '';
+    $provinceFilter = $_POST['province'] ?? '';
+    $typeFilter = $_POST['type'] ?? '';
+    $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+    $recordsPerPage = 6;
+    $offset = ($page - 1) * $recordsPerPage;
+
+    try {
+        Database::setUpConnection();
+        
+        // Base query
+        $query = "SELECT SQL_CALC_FOUND_ROWS p.*, 
+                  (SELECT COUNT(*) FROM appointment WHERE patient_id = p.id) as total_visits,
+                  (SELECT MAX(appointment_date) FROM appointment WHERE patient_id = p.id) as last_visit
+                  FROM patient p 
+                  WHERE 1=1";
+
+        // Search filter
+        if (!empty($searchTerm)) {
+            $searchTerm = Database::$connection->real_escape_string($searchTerm);
+            $query .= " AND (
+                p.name LIKE '%$searchTerm%' OR 
+                p.mobile LIKE '%$searchTerm%' OR 
+                p.email LIKE '%$searchTerm%' OR 
+                CONCAT(p.title, ' ', p.name) LIKE '%$searchTerm%' OR
+                CONCAT('REG', LPAD(p.id, 5, '0')) LIKE '%$searchTerm%'
+            )";
+        }
+
+        // Province filter
+        if (!empty($provinceFilter)) {
+            $provinceFilter = Database::$connection->real_escape_string($provinceFilter);
+            $query .= " AND p.province = '$provinceFilter'";
+        }
+
+        // Type filter (new/old patients)
+        if (!empty($typeFilter)) {
+            if ($typeFilter === 'new') {
+                $query .= " AND p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            } elseif ($typeFilter === 'old') {
+                $query .= " AND p.created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            }
+        }
+
+        $query .= " ORDER BY p.created_at DESC LIMIT $recordsPerPage OFFSET $offset";
+
+        $result = Database::search($query);
+        $patients = [];
+        while ($row = $result->fetch_assoc()) {
+            $patients[] = $row;
+        }
+
+        // Get total count
+        $totalResult = Database::search("SELECT FOUND_ROWS() as total");
+        $totalRows = $totalResult->fetch_assoc()['total'];
+        $totalPages = ceil($totalRows / $recordsPerPage);
+
+        echo json_encode([
+            'success' => true,
+            'data' => $patients,
+            'total_pages' => $totalPages,
+            'current_page' => $page,
+            'total_records' => $totalRows
+        ]);
+    } catch (Exception $e) {
+        error_log("Error getting patients: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
 // Function to get patient statistics
 function getPatientStats() {
     try {
@@ -146,25 +239,6 @@ function getPatientStats() {
     }
 }
 
-// Function to get all patients with details
-function getAllPatients() {
-    try {
-        Database::setUpConnection();
-        
-        $query = "SELECT p.*, 
-                  (SELECT COUNT(*) FROM appointment WHERE patient_id = p.id) as total_visits,
-                  (SELECT MAX(appointment_date) FROM appointment WHERE patient_id = p.id) as last_visit
-                  FROM patient p 
-                  ORDER BY p.created_at DESC";
-        
-        $result = Database::search($query);
-        return $result;
-    } catch (Exception $e) {
-        error_log("Error getting patients: " . $e->getMessage());
-        return false;
-    }
-}
-
 // Function to get illnesses from database
 function getAllIllnesses() {
     try {
@@ -181,9 +255,8 @@ function getAllIllnesses() {
     }
 }
 
-// Get statistics and patients
+// Get statistics and illnesses
 $stats = getPatientStats();
-$patients = getAllPatients();
 $illnesses = getAllIllnesses();
 
 // Sri Lankan Districts by Province
@@ -208,7 +281,7 @@ $sriLankaLocations = [
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="../../img/logof1.png">
-    <title>Patient Management - Erundeniya Medical Center</title>
+    <title>Patient Management - Erundeniya Ayurveda Hospital</title>
 
     <!-- Fonts and icons -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -221,7 +294,7 @@ $sriLankaLocations = [
     <style>
         .patient-card {
             border-radius: 15px;
-            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            background-color: #eafff3ff;
             box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
         }
 
@@ -575,6 +648,56 @@ $sriLankaLocations = [
             flex-direction: row;
         }
 
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            color: #2e7d32;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+
+        .page-link:hover {
+            background-color: #e8f5e9;
+            border-color: #2e7d32;
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            color: white;
+            border-color: #2e7d32;
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #f8f9fa;
+        }
+
+        mark {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .modal-content {
@@ -648,9 +771,9 @@ $sriLankaLocations = [
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search by name, mobile, register number..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item dropdown pe-3 d-flex align-items-center">
@@ -780,78 +903,13 @@ $sriLankaLocations = [
                                         </tr>
                                     </thead>
                                     <tbody id="patientsTableBody">
-                                        <?php if ($patients && $patients->num_rows > 0): ?>
-                                            <?php while ($row = $patients->fetch_assoc()): 
-                                                $isNewPatient = (strtotime($row['created_at']) > strtotime('-30 days'));
-                                                $registerNumber = 'REG' . str_pad($row['id'], 5, '0', STR_PAD_LEFT);
-                                            ?>
-                                                <tr data-province="<?php echo htmlspecialchars($row['province'] ?? ''); ?>" 
-                                                    data-type="<?php echo $isNewPatient ? 'new' : 'old'; ?>"
-                                                    data-search="<?php echo strtolower(htmlspecialchars($row['name'] . ' ' . $row['mobile'] . ' ' . $registerNumber)); ?>">
-                                                    <td>
-                                                        <div class="d-flex flex-column px-3">
-                                                            <h6 class="mb-0 text-sm font-weight-bold">
-                                                                <?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>
-                                                            </h6>
-                                                            <p class="text-xs text-secondary mb-0">
-                                                                <?php echo $registerNumber; ?> | 
-                                                                Age: <?php echo htmlspecialchars($row['age'] ?? 'N/A'); ?>
-                                                            </p>
-                                                            <p class="text-xs text-secondary mb-0">
-                                                                Gender: <?php echo htmlspecialchars($row['gender'] ?? 'N/A'); ?>
-                                                            </p>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex flex-column">
-                                                            <span class="text-sm"><?php echo htmlspecialchars($row['mobile']); ?></span>
-                                                            <span class="text-xs text-secondary">
-                                                                <?php echo htmlspecialchars($row['email'] ?? 'N/A'); ?>
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex flex-column">
-                                                            <span class="text-sm">
-                                                                <?php echo htmlspecialchars($row['district'] ?? 'N/A'); ?>
-                                                            </span>
-                                                            <span class="text-xs text-secondary">
-                                                                <?php echo htmlspecialchars($row['province'] ?? 'N/A'); ?>
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="patient-type-badge <?php echo $isNewPatient ? 'new-patient' : 'old-patient'; ?>">
-                                                            <?php echo $isNewPatient ? 'New' : 'Regular'; ?>
-                                                        </span>
-                                                        <br>
-                                                        <span class="text-xs text-secondary"><?php echo $row['total_visits']; ?> visits</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex gap-1">
-                                                            <button class="btn btn-sm btn-outline-success" onclick="viewPatient(<?php echo $row['id']; ?>)" title="View">
-                                                                <i class="material-symbols-rounded text-sm">visibility</i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline-primary" onclick="editPatient(<?php echo $row['id']; ?>)" title="Edit">
-                                                                <i class="material-symbols-rounded text-sm">edit</i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="5" class="text-center py-4">
-                                                    <i class="material-symbols-rounded text-secondary" style="font-size: 48px;">person_off</i>
-                                                    <p class="text-muted mt-2">No patients found</p>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
+                                        <!-- Content loaded via AJAX -->
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+                    <div id="patientPagination" class="mt-3"></div>
                 </div>
 
                 <!-- Quick Add Patient Panel -->
@@ -869,10 +927,10 @@ $sriLankaLocations = [
                                 <div class="form-group">
                                     <label>Title *</label>
                                     <select id="quickTitle" required>
+                                        <option value="Rev.">Rev.</option>
                                         <option value="Mr.">Mr.</option>
                                         <option value="Mrs.">Mrs.</option>
-                                        <option value="Miss">Miss</option>
-                                        <option value="Rev.">Rev.</option>
+                                        <option value="Miss.">Miss.</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -948,10 +1006,10 @@ $sriLankaLocations = [
                             <div class="form-group">
                                 <label>Title *</label>
                                 <select id="patientTitle" required>
+                                    <option value="Rev.">Rev.</option>
                                     <option value="Mr.">Mr.</option>
                                     <option value="Mrs.">Mrs.</option>
-                                    <option value="Miss">Miss</option>
-                                    <option value="Rev.">Rev.</option>
+                                    <option value="Miss.">Miss.</option>
                                 </select>
                             </div>
                         </div>
@@ -1143,6 +1201,179 @@ $sriLankaLocations = [
         // Sri Lanka locations data
         const sriLankaLocations = <?php echo json_encode($sriLankaLocations); ?>;
 
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllPatients();
+
+            // Search functionality
+            document.getElementById('patientSearch').addEventListener('input', function() {
+                loadAllPatients(this.value);
+            });
+
+            document.getElementById('globalSearch').addEventListener('input', function() {
+                const searchTerm = this.value;
+                document.getElementById('patientSearch').value = searchTerm;
+                loadAllPatients(searchTerm);
+            });
+
+            document.getElementById('provinceFilter').addEventListener('change', function() {
+                loadAllPatients();
+            });
+
+            document.getElementById('typeFilter').addEventListener('change', function() {
+                loadAllPatients();
+            });
+        });
+
+        // Load all patients with pagination
+        function loadAllPatients(searchTerm = '', page = 1) {
+            searchTerm = searchTerm || document.getElementById('patientSearch').value;
+            const provinceFilter = document.getElementById('provinceFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            fetch('patients.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=get_all_patients&search=' + encodeURIComponent(searchTerm) + 
+                          '&province=' + encodeURIComponent(provinceFilter) + 
+                          '&type=' + encodeURIComponent(typeFilter) + 
+                          '&page=' + page
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayPatients(data.data, searchTerm, {
+                            current_page: data.current_page,
+                            total_pages: data.total_pages,
+                            total_records: data.total_records
+                        });
+                    } else {
+                        showNotification(data.message || 'Error loading patients', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error loading patients', 'error');
+                });
+        }
+
+        // Highlight search term
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm || !text) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
+
+        // Display patients in table
+        function displayPatients(patients, searchTerm, pagination) {
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
+
+            if (patients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">
+                    <i class="material-symbols-rounded text-secondary" style="font-size: 48px;">person_off</i>
+                    <p class="text-muted mt-2">No patients found${searchTerm ? ' for "' + searchTerm + '"' : ''}</p>
+                </td></tr>`;
+                document.getElementById('patientPagination').innerHTML = '';
+                return;
+            }
+
+            patients.forEach(function(patient) {
+                const row = document.createElement('tr');
+                const isNewPatient = new Date(patient.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                const registerNumber = 'REG' + String(patient.id).padStart(5, '0');
+
+                const highlightedName = highlightSearchTerm(patient.title + ' ' + patient.name, searchTerm);
+                const highlightedRegNumber = highlightSearchTerm(registerNumber, searchTerm);
+                const highlightedMobile = highlightSearchTerm(patient.mobile, searchTerm);
+                const highlightedEmail = patient.email ? highlightSearchTerm(patient.email, searchTerm) : 'N/A';
+
+                row.innerHTML = `<td>
+                    <div class="d-flex flex-column px-3">
+                        <h6 class="mb-0 text-sm font-weight-bold">${highlightedName}</h6>
+                        <p class="text-xs text-secondary mb-0">
+                            ${highlightedRegNumber} | Age: ${patient.age || 'N/A'}
+                        </p>
+                        <p class="text-xs text-secondary mb-0">
+                            Gender: ${patient.gender || 'N/A'}
+                        </p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <span class="text-sm">${highlightedMobile}</span>
+                        <span class="text-xs text-secondary">${highlightedEmail}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <span class="text-sm">${patient.district || 'N/A'}</span>
+                        <span class="text-xs text-secondary">${patient.province || 'N/A'}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="patient-type-badge ${isNewPatient ? 'new-patient' : 'old-patient'}">
+                        ${isNewPatient ? 'New' : 'Regular'}
+                    </span>
+                    <br>
+                    <span class="text-xs text-secondary">${patient.total_visits || '0'} visits</span>
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-outline-success" onclick="viewPatient(${patient.id})" title="View">
+                            <i class="material-symbols-rounded text-sm">visibility</i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="editPatient(${patient.id})" title="Edit">
+                            <i class="material-symbols-rounded text-sm">edit</i>
+                        </button>
+                    </div>
+                </td>`;
+                
+                tbody.appendChild(row);
+            });
+
+            // Render pagination
+            renderPagination(pagination);
+        }
+
+        // Render pagination
+        function renderPagination(pagination) {
+            let paginationHtml = '';
+            const currentPage = parseInt(pagination.current_page);
+            const totalPages = parseInt(pagination.total_pages);
+
+            if (totalPages > 1) {
+                paginationHtml += '<nav aria-label="Patient pagination"><ul class="pagination justify-content-center flex-wrap">';
+
+                // Previous button
+                paginationHtml += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadAllPatients('', ${currentPage - 1}); return false;">
+                        <i class="material-symbols-rounded">chevron_left</i>
+                    </a>
+                </li>`;
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadAllPatients('', ${i}); return false;">${i}</a>
+                    </li>`;
+                }
+
+                // Next button
+                paginationHtml += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadAllPatients('', ${currentPage + 1}); return false;">
+                        <i class="material-symbols-rounded">chevron_right</i>
+                    </a>
+                </li>`;
+
+                paginationHtml += '</ul></nav>';
+            }
+
+            document.getElementById('patientPagination').innerHTML = paginationHtml;
+        }
+
         // Update districts based on province selection
         function updateDistricts() {
             const province = document.getElementById('patientProvince').value;
@@ -1190,7 +1421,7 @@ $sriLankaLocations = [
                 if (data.success) {
                     showNotification('Patient registered successfully!', 'success');
                     document.getElementById('quickPatientForm').reset();
-                    setTimeout(() => location.reload(), 1500);
+                    setTimeout(() => loadAllPatients(), 1500);
                 } else {
                     showNotification('Error: ' + (data.message || 'Failed to register patient'), 'error');
                 }
@@ -1211,7 +1442,7 @@ $sriLankaLocations = [
             });
 
             const patientData = {
-                id: document.getElementById('patientId').value,
+                id: document.getElementById('patientId')?.value || null,
                 title: document.getElementById('patientTitle').value,
                 name: document.getElementById('patientName').value,
                 gender: document.getElementById('patientGender').value,
@@ -1248,7 +1479,7 @@ $sriLankaLocations = [
                         'success'
                     );
                     closePatientModal();
-                    setTimeout(() => location.reload(), 1500);
+                    setTimeout(() => loadAllPatients(), 1500);
                 } else {
                     showNotification('Error: ' + (data.message || 'Failed to save patient'), 'error');
                 }
@@ -1268,60 +1499,9 @@ $sriLankaLocations = [
             document.getElementById('patientModal').style.display = 'block';
         }
 
-         function viewPatient(patientId) {
+        function viewPatient(patientId) {
             window.location.href = `patient_view.php?id=${patientId}`;
         }
-
-        // View patient
-        // function viewPatient(patientId) {
-        //     fetch('get_patient.php?id=' + patientId)
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 const patient = data.patient;
-        //                 const registerNumber = 'REG' + String(patient.id).padStart(5, '0');
-                        
-        //                 document.getElementById('viewRegisterNumber').textContent = registerNumber;
-        //                 document.getElementById('viewName').textContent = patient.title + ' ' + patient.name;
-        //                 document.getElementById('viewGender').textContent = patient.gender || 'N/A';
-        //                 document.getElementById('viewAge').textContent = patient.age || 'N/A';
-        //                 document.getElementById('viewRegDate').textContent = new Date(patient.created_at).toLocaleDateString();
-        //                 document.getElementById('viewMobile').textContent = patient.mobile;
-        //                 document.getElementById('viewEmail').textContent = patient.email || 'N/A';
-        //                 document.getElementById('viewAddress').textContent = patient.address || 'N/A';
-        //                 document.getElementById('viewDistrict').textContent = patient.district || 'N/A';
-        //                 document.getElementById('viewProvince').textContent = patient.province || 'N/A';
-                        
-        //                 const illnessesDiv = document.getElementById('viewIllnesses');
-        //                 illnessesDiv.innerHTML = '';
-        //                 if (patient.illnesses) {
-        //                     const illnessList = patient.illnesses.split(',');
-        //                     illnessList.forEach(illness => {
-        //                         const tag = document.createElement('span');
-        //                         tag.className = 'illness-tag';
-        //                         tag.textContent = illness.trim();
-        //                         illnessesDiv.appendChild(tag);
-        //                     });
-        //                 } else {
-        //                     illnessesDiv.innerHTML = '<span class="text-muted">None recorded</span>';
-        //                 }
-                        
-        //                 document.getElementById('viewMedicalNotes').textContent = patient.medical_notes || 'No additional notes';
-        //                 document.getElementById('viewTotalVisits').textContent = patient.total_visits || '0';
-        //                 document.getElementById('viewLastVisit').textContent = patient.last_visit || 'No visits yet';
-                        
-        //                 document.getElementById('viewPatientModal').setAttribute('data-patient-id', patientId);
-                        
-        //                 document.getElementById('viewPatientModal').style.display = 'block';
-        //             } else {
-        //                 showNotification('Error loading patient details', 'error');
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //             showNotification('Error loading patient details', 'error');
-        //         });
-        // }
 
         // Edit patient
         function editPatient(patientId) {
@@ -1385,48 +1565,6 @@ $sriLankaLocations = [
 
         function closeViewPatientModal() {
             document.getElementById('viewPatientModal').style.display = 'none';
-        }
-
-        // Search and filter functions
-        document.getElementById('patientSearch').addEventListener('input', function() {
-            filterTable();
-        });
-
-        document.getElementById('globalSearch').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            document.getElementById('patientSearch').value = searchTerm;
-            filterTable();
-        });
-
-        document.getElementById('provinceFilter').addEventListener('change', function() {
-            filterTable();
-        });
-
-        document.getElementById('typeFilter').addEventListener('change', function() {
-            filterTable();
-        });
-
-        function filterTable() {
-            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
-            const provinceFilter = document.getElementById('provinceFilter').value;
-            const typeFilter = document.getElementById('typeFilter').value;
-            const rows = document.querySelectorAll('#patientsTableBody tr');
-
-            rows.forEach(row => {
-                const searchData = row.getAttribute('data-search') || '';
-                const province = row.getAttribute('data-province') || '';
-                const type = row.getAttribute('data-type') || '';
-                
-                const matchesSearch = searchData.includes(searchTerm);
-                const matchesProvince = !provinceFilter || province === provinceFilter;
-                const matchesType = !typeFilter || type === typeFilter;
-
-                if (matchesSearch && matchesProvince && matchesType) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
         }
 
         // Utility function

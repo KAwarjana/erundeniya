@@ -222,12 +222,10 @@ require_once 'connection/connection.php';
                                         <div class="model-div10">
                                             <label for="title" class="model-label">Title</label>
                                             <select name="title" id="title" required class="model-input1">
+                                                <option value="Rev.">Rev.</option>
                                                 <option value="Mr.">Mr.</option>
                                                 <option value="Mrs.">Mrs.</option>
                                                 <option value="Miss">Miss.</option>
-                                                <option value="Ms.">Ms.</option>
-                                                <option value="Dr.">Dr.</option>
-                                                <option value="Prof.">Prof.</option>
                                             </select>
                                         </div>
                                         <div class="model-div11">

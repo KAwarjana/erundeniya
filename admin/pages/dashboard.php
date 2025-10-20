@@ -42,7 +42,7 @@ try {
                                FROM appointment a 
                                JOIN patient p ON a.patient_id = p.id 
                                ORDER BY a.created_at DESC 
-                               LIMIT 10";
+                               LIMIT 4";
   $recentAppointmentsResult = Database::search($recentAppointmentsQuery);
 
   // Weekly appointment data for charts
@@ -223,7 +223,7 @@ function renderSidebarMenu($menuItems, $currentPage)
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../../img/logof1.png">
   <title>
-    Dashboard - Erundeniya Medical Center
+    Dashboard - Erundeniya Ayurveda Hospital
   </title>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -389,9 +389,9 @@ function renderSidebarMenu($menuItems, $currentPage)
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-            <div class="input-group input-group-outline">
+            <!-- <div class="input-group input-group-outline">
               <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-            </div>
+            </div> -->
           </div>
           <ul class="navbar-nav d-flex align-items-center  justify-content-end">
             <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">

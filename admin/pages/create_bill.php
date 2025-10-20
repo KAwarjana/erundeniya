@@ -152,15 +152,14 @@ function updateBill()
 
     // Update bill
     $updateQuery = "UPDATE bills SET 
-                    doctor_fee = '$doctorFee',
-                    medicine_cost = '$medicineCost',
-                    other_charges = '$otherCharges',
-                    discount_amount = '$discountAmount',
-                    discount_percentage = '$discountPercentage',
-                    discount_reason = '$discountReason',
-                    total_amount = '$totalAmount',
-                    updated_at = NOW()
-                    WHERE id = '$billId'";
+                doctor_fee = '$doctorFee',
+                medicine_cost = '$medicineCost',
+                other_charges = '$otherCharges',
+                discount_amount = '$discountAmount',
+                discount_percentage = '$discountPercentage',
+                discount_reason = '$discountReason',
+                total_amount = '$totalAmount'
+                WHERE id = '$billId'";
 
     Database::iud($updateQuery);
 
@@ -387,7 +386,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="../../img/logof1.png">
-    <title>Bills Management - Erundeniya Medical Center</title>
+    <title>Bills Management - Erundeniya Ayurveda Hospital</title>
 
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
     <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
@@ -618,6 +617,20 @@ try {
             align-items: center;
             justify-content: center;
         }
+
+        /* Logout hover effect */
+        .sidenav-footer .nav-link:hover {
+            background-color: #ff001910 !important;
+            color: #dc3545 !important;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidenav-footer .nav-link:hover .material-symbols-rounded,
+        .sidenav-footer .nav-link:hover .nav-link-text {
+            color: #dc3545 !important;
+            opacity: 1 !important;
+        }
     </style>
 </head>
 
@@ -659,9 +672,9 @@ try {
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search bills..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -1183,7 +1196,7 @@ try {
                     '<td>' +
                     '<div class="action-buttons">' +
                     '<button class="btn btn-sm btn-outline-success" onclick="viewBill(' + bill.id + ')">View</button>' +
-                    '<button class="btn btn-sm btn-outline-primary mt-3" onclick="editBill(' + bill.id + ')">Edit</button>' +
+                    '<button class="btn btn-sm btn-outline-danger mt-3" onclick="editBill(' + bill.id + ')">Edit</button>' +
                     '<button class="print-btn btn-sm" onclick="printBill(' + bill.id + ')">Print</button>' +
                     '</div>' +
                     '</td>';
@@ -1399,7 +1412,7 @@ try {
             billContent.innerHTML = `
                 <div class="bill-view-form">
                     <div class="text-center mb-4">
-                        <h4>Erundeniya Medical Center</h4>
+                        <h4>Erundeniya Ayurveda Hospital</h4>
                         <p class="mb-1">Medical Bill</p>
                         <h5>${bill.bill_number}</h5>
                         <p class="mb-0 text-success font-weight-bold">PAID</p>
@@ -1490,7 +1503,7 @@ try {
             billContent.innerHTML = `
                 <div class="bill-edit-form">
                     <div class="text-center mb-4">
-                        <h4>Erundeniya Medical Center</h4>
+                        <h4>Erundeniya Ayurveda Hospital</h4>
                         <p class="mb-1">Medical Bill</p>
                         <h5>${bill.bill_number}</h5>
                         <p class="mb-0 text-success font-weight-bold">PAID</p>
@@ -1587,29 +1600,36 @@ try {
         }
 
         // Save edited bill
+        // Save edited bill
         function saveEditedBill() {
             if (!currentEditingBillId) {
                 showNotification('Error: No bill selected for editing', 'error');
                 return;
             }
 
-            const billData = {
-                bill_id: currentEditingBillId,
-                doctor_fee: document.getElementById('editDoctorFee').value,
-                medicine_cost: document.getElementById('editMedicineCost').value,
-                other_charges: document.getElementById('editOtherCharges').value,
-                discount_amount: document.getElementById('editDiscountAmount').value,
-                discount_percentage: document.getElementById('editDiscountPercentage').value,
-                discount_reason: document.getElementById('editDiscountReason').value,
-                total_amount: document.getElementById('editTotalAmount').value
-            };
+            const doctorFee = document.getElementById('editDoctorFee').value;
+            const medicineCost = document.getElementById('editMedicineCost').value;
+            const otherCharges = document.getElementById('editOtherCharges').value;
+            const discountAmount = document.getElementById('editDiscountAmount').value;
+            const discountPercentage = document.getElementById('editDiscountPercentage').value;
+            const discountReason = document.getElementById('editDiscountReason').value;
+            const totalAmount = document.getElementById('editTotalAmount').value;
 
+            // Send as form data, not JSON
             fetch('create_bill.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify(billData)
+                    body: 'action=update_bill' +
+                        '&bill_id=' + currentEditingBillId +
+                        '&doctor_fee=' + doctorFee +
+                        '&medicine_cost=' + medicineCost +
+                        '&other_charges=' + otherCharges +
+                        '&discount_amount=' + discountAmount +
+                        '&discount_percentage=' + discountPercentage +
+                        '&discount_reason=' + encodeURIComponent(discountReason) +
+                        '&total_amount=' + totalAmount
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1619,7 +1639,7 @@ try {
                         loadAllBills();
                         currentEditingBillId = null;
                     } else {
-                        showNotification(data.message, 'error');
+                        showNotification(data.message || 'Error updating bill', 'error');
                     }
                 })
                 .catch(error => {
@@ -1680,7 +1700,7 @@ try {
                 '<body>' +
                 '<div class="bill-summary">' +
                 '<div class="text-center mb-4">' +
-                '<h2>Erundeniya Medical Center</h2>' +
+                '<h2>Erundeniya Ayurveda Hospital</h2>' +
                 '<p>Medical Bill</p>' +
                 '<h3>' + bill.bill_number + '</h3>' +
                 '<p class="paid-status">PAID</p>' +
@@ -1739,20 +1759,97 @@ try {
 
         // Print bill modal
         function printBillModal() {
-            const billContent = document.getElementById('billContent').innerHTML;
+            // Get the bill content from the modal
+            const billViewForm = document.querySelector('#billContent .bill-view-form');
+            if (!billViewForm) return;
+
+            // Extract bill data from the modal
+            const billNumber = billViewForm.querySelector('h5').textContent;
+            const patientInfo = billViewForm.querySelectorAll('.row')[0].querySelectorAll('.col-md-6')[0].querySelectorAll('p');
+            const billInfo = billViewForm.querySelectorAll('.row')[0].querySelectorAll('.col-md-6')[1].querySelectorAll('p');
+            
+            const doctorFee = billViewForm.querySelectorAll('.row')[1].querySelectorAll('input')[0].value;
+            const medicineCost = billViewForm.querySelectorAll('.row')[1].querySelectorAll('input')[1].value;
+            const otherCharges = billViewForm.querySelectorAll('.row')[2].querySelectorAll('input')[0].value;
+            const discountPercentage = billViewForm.querySelectorAll('.row')[2].querySelectorAll('input')[1].value;
+            const discountAmount = billViewForm.querySelectorAll('.row')[3].querySelectorAll('input')[0].value;
+            const totalAmount = billViewForm.querySelectorAll('.row')[3].querySelectorAll('input')[1].value;
+            const discountReason = billViewForm.querySelectorAll('.row')[4].querySelectorAll('input')[0].value;
+
             const printWindow = window.open('', '', 'height=600,width=800');
+            
+            const discountSection = parseFloat(discountAmount) > 0 ?
+                '<div class="d-flex">' +
+                '<span>Discount (' + parseFloat(discountPercentage).toFixed(2) + '%)</span>' +
+                '<span>- Rs. ' + parseFloat(discountAmount).toFixed(2) + '</span>' +
+                '</div>' : '';
+
             printWindow.document.write(
                 '<html>' +
                 '<head>' +
-                '<title>Print Bill</title>' +
+                '<title>Print Bill - ' + billNumber + '</title>' +
                 '<style>' +
                 'body { font-family: Arial, sans-serif; padding: 20px; }' +
-                '.d-flex { display: flex; justify-content: space-between; }' +
+                '.bill-summary { max-width: 600px; margin: 0 auto; }' +
+                '.text-center { text-align: center; }' +
+                '.mb-4 { margin-bottom: 1.5rem; }' +
+                '.row { display: flex; margin-bottom: 20px; }' +
+                '.col-md-6 { flex: 0 0 50%; max-width: 50%; }' +
+                'hr { border: 1px solid #eee; margin: 20px 0; }' +
+                '.d-flex { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }' +
+                '.bill-total { border-top: 2px solid #333 !important; font-weight: bold; font-size: 18px; color: #2e7d32; margin-top: 10px; padding-top: 10px !important; }' +
+                '.paid-status { color: #4CAF50; font-weight: bold; font-size: 16px; }' +
                 '@media print { body { padding: 0; } }' +
                 '</style>' +
                 '</head>' +
                 '<body>' +
-                billContent +
+                '<div class="bill-summary">' +
+                '<div class="text-center mb-4">' +
+                '<h2>Erundeniya Ayurveda Hospital</h2>' +
+                '<p>Medical Bill</p>' +
+                '<h3>' + billNumber + '</h3>' +
+                '<p class="paid-status">PAID</p>' +
+                '</div>' +
+                '<div class="row">' +
+                '<div class="col-md-6">' +
+                '<strong>Patient Information:</strong>' +
+                '<div>' +
+                patientInfo[0].outerHTML +
+                patientInfo[1].outerHTML +
+                (patientInfo[2] ? patientInfo[2].outerHTML : '') +
+                (patientInfo[3] ? patientInfo[3].outerHTML : '') +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<strong>Bill Information:</strong>' +
+                '<div>' +
+                billInfo[0].outerHTML +
+                billInfo[1].outerHTML +
+                billInfo[2].outerHTML +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<hr>' +
+                '<div>' +
+                '<div class="d-flex">' +
+                '<span>Doctor Consultation Fee</span>' +
+                '<span>Rs. ' + parseFloat(doctorFee).toFixed(2) + '</span>' +
+                '</div>' +
+                '<div class="d-flex">' +
+                '<span>Medicine Cost</span>' +
+                '<span>Rs. ' + parseFloat(medicineCost).toFixed(2) + '</span>' +
+                '</div>' +
+                '<div class="d-flex">' +
+                '<span>Other Charges</span>' +
+                '<span>Rs. ' + parseFloat(otherCharges).toFixed(2) + '</span>' +
+                '</div>' +
+                discountSection +
+                '<div class="d-flex bill-total">' +
+                '<span>Total Amount</span>' +
+                '<span>Rs. ' + parseFloat(totalAmount).toFixed(2) + '</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '<script>' +
                 'window.onload = function() {' +
                 'window.print();' +

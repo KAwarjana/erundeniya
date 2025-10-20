@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Email Sender Class for Appointment Notifications
  * Uses PHPMailer for reliable SMTP email delivery
@@ -12,26 +13,28 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-class EmailSender {
-    
+class EmailSender
+{
+
     // Hospital email configuration
     const HOSPITAL_EMAIL = "info@erundeniyaayurveda.lk";
     const HOSPITAL_NAME = "Erundeniya Ayurveda Hospital";
     const OWNER_EMAIL = "kawarjanagunasekara@gmail.com";
-    
+
     // SMTP Configuration - UPDATE THESE WITH YOUR ACTUAL SMTP SETTINGS
     const SMTP_HOST = 'smtp.gmail.com'; // or your hosting provider's SMTP
     const SMTP_PORT = 465; // 587 for TLS, 465 for SSL
     const SMTP_USERNAME = 'et.website.message@gmail.com'; // Your sending email
     const SMTP_PASSWORD = 'glalywegifqhgjhf'; // App password, NOT your Gmail password
     const SMTP_ENCRYPTION = 'tls'; // 'tls' or 'ssl'
-    
+
     /**
      * Create and configure PHPMailer instance
      */
-    private static function getMailer() {
+    private static function getMailer()
+    {
         $mail = new PHPMailer(true);
-        
+
         try {
             // Server settings
             $mail->SMTPDebug = 0; // Set to 2 for debugging
@@ -42,48 +45,49 @@ class EmailSender {
             $mail->Password = self::SMTP_PASSWORD;
             $mail->SMTPSecure = self::SMTP_ENCRYPTION;
             $mail->Port = self::SMTP_PORT;
-            
+
             // Set default sender
             $mail->setFrom(self::HOSPITAL_EMAIL, self::HOSPITAL_NAME);
             $mail->addReplyTo(self::HOSPITAL_EMAIL, self::HOSPITAL_NAME);
-            
+
             // Email format
             $mail->isHTML(true);
             $mail->CharSet = 'UTF-8';
-            
+
             return $mail;
         } catch (Exception $e) {
             error_log("PHPMailer setup error: " . $e->getMessage());
             return null;
         }
     }
-    
+
     /**
      * Send confirmation email to patient
      */
-    public static function sendPatientConfirmation($patientEmail, $patientName, $appointmentNumber, $date, $time, $paymentId) {
+    public static function sendPatientConfirmation($patientEmail, $patientName, $appointmentNumber, $date, $time, $paymentId)
+    {
         // Don't send if email is empty
         if (empty($patientEmail)) {
             error_log("Email not sent: Patient email is empty");
             return false;
         }
-        
+
         $mail = self::getMailer();
         if (!$mail) {
             return false;
         }
-        
+
         try {
             // Recipient
             $mail->addAddress($patientEmail, $patientName);
-            
+
             // Subject
             $mail->Subject = "Appointment Confirmation - " . $appointmentNumber;
-            
+
             // Format date and time
             $displayDate = date('l, j F Y', strtotime($date));
             $displayTime = date('h:i A', strtotime($time));
-            
+
             // Email body
             $mail->Body = self::getPatientEmailTemplate(
                 $patientName,
@@ -92,7 +96,7 @@ class EmailSender {
                 $displayTime,
                 $paymentId
             );
-            
+
             // Alternative plain text body
             $mail->AltBody = self::getPlainTextPatientEmail(
                 $patientName,
@@ -101,37 +105,37 @@ class EmailSender {
                 $displayTime,
                 $paymentId
             );
-            
+
             $mail->send();
             error_log("Patient confirmation email sent successfully to: $patientEmail");
             return true;
-            
         } catch (Exception $e) {
             error_log("Email send failed for $patientEmail: " . $mail->ErrorInfo);
             return false;
         }
     }
-    
+
     /**
      * Send notification email to hospital owner
      */
-    public static function sendOwnerNotification($patientName, $appointmentNumber, $date, $time, $mobile, $email) {
+    public static function sendOwnerNotification($patientName, $appointmentNumber, $date, $time, $mobile, $email)
+    {
         $mail = self::getMailer();
         if (!$mail) {
             return false;
         }
-        
+
         try {
             // Recipient
             $mail->addAddress(self::OWNER_EMAIL);
-            
+
             // Subject
             $mail->Subject = "New Online Appointment - " . $appointmentNumber;
-            
+
             // Format date and time
             $displayDate = date('l, j F Y', strtotime($date));
             $displayTime = date('h:i A', strtotime($time));
-            
+
             // Email body
             $mail->Body = self::getOwnerEmailTemplate(
                 $patientName,
@@ -141,7 +145,7 @@ class EmailSender {
                 $mobile,
                 $email ?? 'Not provided'
             );
-            
+
             // Alternative plain text body
             $mail->AltBody = self::getPlainTextOwnerEmail(
                 $patientName,
@@ -151,66 +155,68 @@ class EmailSender {
                 $mobile,
                 $email ?? 'Not provided'
             );
-            
+
             $mail->send();
             error_log("Owner notification email sent successfully");
             return true;
-            
         } catch (Exception $e) {
             error_log("Owner email send failed: " . $mail->ErrorInfo);
             return false;
         }
     }
-    
+
     /**
      * Plain text version of patient email
      */
-    private static function getPlainTextPatientEmail($name, $appointmentNumber, $date, $time, $paymentId) {
+    private static function getPlainTextPatientEmail($name, $appointmentNumber, $date, $time, $paymentId)
+    {
         return "Dear $name,\n\n" .
-               "Thank you for booking your appointment with Erundeniya Ayurveda Hospital.\n\n" .
-               "APPOINTMENT DETAILS:\n" .
-               "Appointment Number: $appointmentNumber\n" .
-               "Date: $date\n" .
-               "Time: $time\n" .
-               "Payment ID: $paymentId\n" .
-               "Amount Paid: Rs. 200.00\n\n" .
-               "IMPORTANT INFORMATION:\n" .
-               "- Please arrive 10 minutes before your scheduled time\n" .
-               "- Bring this confirmation email or note your appointment number\n" .
-               "- If you need to reschedule, please contact us at least 24 hours in advance\n\n" .
-               "CONTACT INFORMATION:\n" .
-               "Phone: +94 71 291 9408\n" .
-               "Email: info@erundeniyaayurveda.lk\n" .
-               "Address: A/55 Wedagedara, Erundeniya, Amithirigala\n\n" .
-               "Thank you for choosing Erundeniya Ayurveda Hospital";
+            "Thank you for booking your appointment with Erundeniya Ayurveda Hospital.\n\n" .
+            "APPOINTMENT DETAILS:\n" .
+            "Appointment Number: $appointmentNumber\n" .
+            "Date: $date\n" .
+            "Time: $time\n" .
+            "Payment ID: $paymentId\n" .
+            "Amount Paid: Rs. 200.00\n\n" .
+            "IMPORTANT INFORMATION:\n" .
+            "- Please arrive 10 minutes before your scheduled time\n" .
+            "- Bring this confirmation email or note your appointment number\n" .
+            "- If you need to reschedule, please contact us at least 24 hours in advance\n\n" .
+            "CONTACT INFORMATION:\n" .
+            "Phone: +94 71 291 9408\n" .
+            "Email: info@erundeniyaayurveda.lk\n" .
+            "Address: A/55 Wedagedara, Erundeniya, Amithirigala\n\n" .
+            "Thank you for choosing Erundeniya Ayurveda Hospital";
     }
-    
+
     /**
      * Plain text version of owner email
      */
-    private static function getPlainTextOwnerEmail($patientName, $appointmentNumber, $date, $time, $mobile, $email) {
+    private static function getPlainTextOwnerEmail($patientName, $appointmentNumber, $date, $time, $mobile, $email)
+    {
         return "NEW ONLINE APPOINTMENT\n\n" .
-               "APPOINTMENT DETAILS:\n" .
-               "Appointment Number: $appointmentNumber\n" .
-               "Patient Name: $patientName\n" .
-               "Mobile: $mobile\n" .
-               "Email: $email\n" .
-               "Date: $date\n" .
-               "Time: $time\n" .
-               "Payment Status: PAID\n\n" .
-               "Action Required: Please check the admin panel for more details.";
+            "APPOINTMENT DETAILS:\n" .
+            "Appointment Number: $appointmentNumber\n" .
+            "Patient Name: $patientName\n" .
+            "Mobile: $mobile\n" .
+            "Email: $email\n" .
+            "Date: $date\n" .
+            "Time: $time\n" .
+            "Payment Status: PAID\n\n" .
+            "Action Required: Please check the admin panel for more details.";
     }
-    
+
     /**
      * Patient email template (HTML version - same as before)
      */
-    private static function getPatientEmailTemplate($name, $appointmentNumber, $date, $time, $paymentId) {
+    private static function getPatientEmailTemplate($name, $appointmentNumber, $date, $time, $paymentId)
+    {
         $name = htmlspecialchars($name ?? 'Valued Patient');
         $appointmentNumber = htmlspecialchars($appointmentNumber ?? '');
         $date = htmlspecialchars($date ?? '');
         $time = htmlspecialchars($time ?? '');
         $paymentId = htmlspecialchars($paymentId ?? 'N/A');
-        
+
         return '
 <!DOCTYPE html>
 <html>
@@ -323,18 +329,19 @@ class EmailSender {
 </html>
         ';
     }
-    
+
     /**
      * Owner email template (HTML version - same as before)
      */
-    private static function getOwnerEmailTemplate($patientName, $appointmentNumber, $date, $time, $mobile, $email) {
+    private static function getOwnerEmailTemplate($patientName, $appointmentNumber, $date, $time, $mobile, $email)
+    {
         $patientName = htmlspecialchars($patientName ?? 'Unknown');
         $appointmentNumber = htmlspecialchars($appointmentNumber ?? '');
         $date = htmlspecialchars($date ?? '');
         $time = htmlspecialchars($time ?? '');
         $mobile = htmlspecialchars($mobile ?? 'Not provided');
         $email = htmlspecialchars($email ?? 'Not provided');
-        
+
         return '
 <!DOCTYPE html>
 <html>
@@ -446,4 +453,3 @@ class EmailSender {
         ';
     }
 }
-?>

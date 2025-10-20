@@ -50,7 +50,7 @@ try {
     $aptNum = $_GET['appointment'] ?? '';
     if (!$aptNum) throw new Exception('Appointment number required');
 
-   $sql = "SELECT a.*,
+    $sql = "SELECT a.*,
                CONCAT(p.title, '. ', p.name) AS patient_name,
                p.registration_number, p.mobile, p.email, p.address,
                TIMESTAMPDIFF(MONTH, p.created_at, CURDATE()) AS reg_months,
@@ -114,7 +114,7 @@ function statusCls($s)
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Appointment Details - Erundeniya Medical Center</title>
+    <title>Appointment Details - Erundeniya Ayurveda Hospital</title>
     <link rel="icon" type="image/png" href="../../img/logof1.png">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
     <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
@@ -652,9 +652,9 @@ function statusCls($s)
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center  justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -825,7 +825,7 @@ function statusCls($s)
                             <div class="action-buttons">
                                 <button class="btn btn-primary" onclick="markAttended()"><i class="material-symbols-rounded">check</i> Mark Attended</button>
                                 <button class="btn btn-warning" onclick="markNoShow()"><i class="material-symbols-rounded">close</i> Mark No Show</button>
-                                <button class="btn btn-secondary" onclick="sendReminder()"><i class="material-symbols-rounded">sms</i> Send Reminder</button>
+                                <button class="btn btn-secondary" onclick="sendEmail()"><i class="material-symbols-rounded">sms</i> Send Reminder</button>
                                 <button class="btn btn-danger" onclick="cancelAppointment()"><i class="material-symbols-rounded">cancel</i> Cancel</button>
                             </div>
                         </div>
@@ -969,21 +969,28 @@ function statusCls($s)
                     }).catch(() => alert('Error'));
             }
 
-            function sendReminder() {
-                if (!confirm('Send SMS reminder to patient?')) return;
-                fetch('send_reminder.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            appointment_number: '<?= $apt['appointment_number'] ?>',
-                            mobile: '<?= addslashes($apt['mobile']) ?>'
-                        })
-                    })
-                    .then(r => r.json()).then(d => {
-                        alert(d.message || 'Reminder sent');
-                    }).catch(() => alert('Error'));
+            function sendEmail() {
+                const patientEmail = '<?= addslashes($apt['email'] ?? '') ?>';
+                const patientName = '<?= addslashes($apt['patient_name']) ?>';
+                const appDate = '<?= date('Y-m-d', strtotime($apt['appointment_date'])) ?>';
+                const appTime = '<?= date('h:i A', strtotime($apt['appointment_time'])) ?>';
+
+                if (!patientEmail || patientEmail === 'N/A') {
+                    alert('No email address found for this patient. Please update patient information.');
+                    return;
+                }
+
+                // subject & body
+                const subject = encodeURIComponent('Appointment Reminder – ' + patientName);
+                const body = encodeURIComponent(
+                    `Dear ${patientName},\n\n` +
+                    `This is a gentle reminder of your appointment scheduled on ${appDate} at ${appTime}.\n\n` +
+                    `Please arrive 15 minutes early.\n\n` +
+                    `Best regards,\nErundeniya Ayurveda Hospital`
+                );
+
+                // open default mail client
+                window.location.href = `mailto:${patientEmail}?subject=${subject}&body=${body}`;
             }
 
             function cancelAppointment() {

@@ -405,7 +405,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="../../img/logof1.png">
-    <title>OPD Treatments Management - Erundeniya Medical Center</title>
+    <title>OPD Treatments Management - Erundeniya Ayurveda Hospital</title>
 
     <!-- Fonts and icons -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -1016,10 +1016,26 @@ try {
             opacity: 1 !important;
         }
 
-        .date-input-wrapper-opd{
-         border: 1px solid #d1d1d1ff;
-         padding: 0 10px;
-         border-radius: 5px;
+        .date-input-wrapper-opd {
+            border: 1px solid #d1d1d1ff;
+            padding: 0 10px;
+            border-radius: 5px;
+        }
+
+        /* ---------- OPD status-badge colours ---------- */
+        .badge-success {
+            background-color: #4CAF50 !important;
+            color: #fff !important;
+        }
+
+        .badge-warning {
+            background-color: #FFC107 !important;
+            color: #212529 !important;
+        }
+
+        .badge-secondary {
+            background-color: #6c757d !important;
+            color: #fff !important;
         }
     </style>
 </head>
@@ -1065,9 +1081,9 @@ try {
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item dropdown pe-3 d-flex align-items-center">
@@ -1467,9 +1483,9 @@ try {
             <div class="modal-body" style="padding: 25px;">
                 <div class="bill-preview" id="billPreview">
                     <div class="bill-header">
-                        <h2>Dr. Erundeniya Medical Center</h2>
+                        <h2>Erundeniya Ayurveda Hospital</h2>
                         <p>OPD Treatment Bill</p>
-                        <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+                        <p>Contact: +94 71 291 9408 | Email: info@erundeniyaayurveda.lk</p>
                     </div>
 
                     <div class="patient-info">
@@ -1518,12 +1534,12 @@ try {
 
                 <div class="row mt-4">
                     <div class="col-md-6">
-                        <button class="btn-primary w-100" onclick="printPreview()">
+                        <button class="btn-primary w-100" onclick="printBillModal()">
                             <i class="material-symbols-rounded">print</i> Print Bill
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn-secondary w-100" onclick="closePreviewModal()">Close</button>
+                        <button class="btn-secondary w-100" onclick="closeBillModal()">Close</button>
                     </div>
                 </div>
             </div>
@@ -1804,20 +1820,21 @@ try {
                 return;
             }
 
-            const patientName = document.getElementById('patientName').value;
-            const patientMobile = document.getElementById('patientMobile').value;
-            const notes = document.getElementById('treatmentNotes').value;
+            // Get form values
+            const patientName = document.getElementById('patientName').value.trim();
+            const patientMobile = document.getElementById('patientMobile').value.trim();
+            const paymentStatus = document.getElementById('paymentStatus').value;
+
+            console.log('Payment Status from form:', paymentStatus); // DEBUG
 
             if (!patientName || !patientMobile) {
                 alert('Please enter patient name and mobile number');
                 return;
             }
 
-            // Collect selected treatments
+            // Collect treatments
             const selectedTreatments = [];
-            const treatmentRows = document.querySelectorAll('.treatment-row');
-
-            treatmentRows.forEach(row => {
+            document.querySelectorAll('.treatment-row').forEach(row => {
                 const select = row.querySelector('select');
                 const priceInput = row.querySelector('input[type="number"][step]');
                 const quantityInput = row.querySelector('input[type="number"][min="1"]');
@@ -1838,29 +1855,30 @@ try {
                 return;
             }
 
-            // Get discount values
             const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
-            const discountAmount = parseFloat(document.getElementById('discountAmountInput').value) || 0;
             const totalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
 
-            // Send data to server
-            fetch('', {
+            const params = new URLSearchParams({
+                bill_id: currentEditingBill,
+                patient_id: document.getElementById('patientSelect').value || '',
+                patient_name: patientName,
+                patient_mobile: patientMobile,
+                treatments: JSON.stringify(selectedTreatments),
+                notes: document.getElementById('treatmentNotes').value,
+                total_amount: totalAmount,
+                discount_percentage: discountPercentage,
+                discount_reason: document.getElementById('discountReason').value,
+                payment_status: paymentStatus
+            });
+
+            console.log('Sending data:', Object.fromEntries(params));
+
+            fetch('update_treatment_bill.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: new URLSearchParams({
-                        action: 'update_bill',
-                        bill_id: currentEditingBill,
-                        patient_id: document.getElementById('patientSelect').value,
-                        patient_name: patientName,
-                        patient_mobile: patientMobile,
-                        treatments: JSON.stringify(selectedTreatments),
-                        notes: notes,
-                        total_amount: totalAmount,
-                        discount_percentage: discountPercentage,
-                        discount_reason: document.getElementById('discountReason').value
-                    })
+                    body: params
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1868,15 +1886,14 @@ try {
                         alert('Treatment bill updated successfully!');
                         resetForm();
                         showNotification(data.message, 'success');
-                        // Reload page to update statistics and bills list
                         setTimeout(() => location.reload(), 1500);
                     } else {
-                        alert(data.message);
+                        alert('Update failed: ' + data.message);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error updating bill. Please try again.');
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Error updating bill: ' + err.message);
                 });
         }
 
@@ -2035,10 +2052,26 @@ try {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert(`Treatment bill ${data.bill_number} saved and printing...`);
-                        resetForm();
-                        showNotification('Treatment bill saved and sent to printer!', 'success');
-                        setTimeout(() => location.reload(), 1500);
+                        showNotification('Treatment bill saved successfully! Opening print preview...', 'success');
+                        
+                        // Fetch the saved bill and print it
+                        fetch(`get_bill_details.php?bill_number=${data.bill_number}`)
+                            .then(response => response.json())
+                            .then(billData => {
+                                if (billData.success) {
+                                    printBillContent(billData.bill);
+                                    resetForm();
+                                    setTimeout(() => location.reload(), 2000);
+                                } else {
+                                    alert('Bill saved but error loading for print: ' + billData.message);
+                                    setTimeout(() => location.reload(), 1500);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error loading bill for print:', error);
+                                alert('Bill saved but error opening print preview');
+                                setTimeout(() => location.reload(), 1500);
+                            });
                     } else {
                         alert(data.message);
                     }
@@ -2085,10 +2118,14 @@ try {
                 return;
             }
 
-            // Update preview modal
+            // Update modal title for preview
+            document.getElementById('modalTitle').textContent = 'Preview Treatment Bill';
+
+            // Update preview modal content
             document.getElementById('previewPatientName').textContent = patientName;
             document.getElementById('previewPatientMobile').textContent = patientMobile;
             document.getElementById('previewDate').textContent = new Date().toISOString().split('T')[0];
+            document.getElementById('previewBillNo').textContent = 'PREVIEW';
 
             const currentTotal = parseFloat(document.getElementById('totalAmount').textContent.replace('Rs. ', ''));
             const previewDiscountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
@@ -2140,73 +2177,98 @@ try {
                 document.getElementById('previewNotesSection').style.display = 'none';
             }
 
-            document.getElementById('previewModal').style.display = 'block';
+            // Show the modal
+            document.getElementById('billModal').style.display = 'block';
         }
 
         // View bill details
-        function viewBill(billId) {
-            // Fetch bill details from server
-            fetch(`?action=get_bill&bill_number=${billId}`)
-                .then(response => response.json())
+        function viewBill(billNumber) {
+            console.log('Viewing bill:', billNumber);
+
+            // Show loading state
+            document.getElementById('modalTitle').textContent = 'Loading...';
+            document.getElementById('billModal').style.display = 'block';
+
+            // Fetch bill details
+            fetch(`get_bill_details.php?bill_number=${encodeURIComponent(billNumber)}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Response data:', data);
+
                     if (data.success) {
                         const bill = data.bill;
 
-                        document.getElementById('billPatientName').textContent = bill.patient_name;
-                        document.getElementById('billPatientMobile').textContent = bill.patient_mobile;
-                        document.getElementById('billDate').textContent = bill.created_at.split(' ')[0];
-                        document.getElementById('billNumber').textContent = bill.bill_number;
-                        document.getElementById('billTotalAmount').textContent = parseFloat(bill.total_amount).toFixed(2);
-                        document.getElementById('billFinalAmount').textContent = parseFloat(bill.final_amount).toFixed(2);
+                        // Update modal title
+                        document.getElementById('modalTitle').textContent = 'View Treatment Bill';
 
-                        // Build treatment list
+                        // Update patient info
+                        document.getElementById('previewPatientName').textContent = bill.patient_name;
+                        document.getElementById('previewPatientMobile').textContent = bill.patient_mobile;
+                        document.getElementById('previewDate').textContent = bill.created_at.split(' ')[0];
+                        document.getElementById('previewBillNo').textContent = bill.bill_number;
+
+                        // Build treatment list table
                         let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
                         treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
 
                         bill.treatments_data.forEach(treatment => {
+                            const price = parseFloat(treatment.price);
+                            const quantity = parseInt(treatment.quantity);
+                            const total = price * quantity;
+
                             treatmentListHtml += `
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 8px;">${treatment.name}</td>
-                            <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
-                            <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
-                            <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
+                            <td style="text-align: center; padding: 8px;">${quantity}</td>
+                            <td style="text-align: right; padding: 8px;">Rs. ${price.toFixed(2)}</td>
+                            <td style="text-align: right; padding: 8px;">Rs. ${total.toFixed(2)}</td>
                         </tr>
                     `;
                         });
                         treatmentListHtml += '</table>';
 
-                        document.getElementById('billTreatments').innerHTML = treatmentListHtml;
+                        document.getElementById('previewTreatmentList').innerHTML = treatmentListHtml;
+
+                        // Update amounts
+                        document.getElementById('previewTotalAmount').textContent = parseFloat(bill.total_amount).toFixed(2);
+                        document.getElementById('previewFinalAmount').textContent = parseFloat(bill.final_amount).toFixed(2);
 
                         // Show/hide discount section
-                        if (bill.discount_percentage > 0) {
-                            document.getElementById('billDiscountSection').style.display = 'block';
-                            document.getElementById('billDiscountPercentage').textContent = bill.discount_percentage + '%';
-                            document.getElementById('billDiscountAmount').textContent = 'Rs. ' + parseFloat(bill.discount_amount).toFixed(2);
+                        const discountSection = document.getElementById('previewDiscountSection');
+                        if (bill.discount_percentage > 0 || bill.discount_amount > 0) {
+                            discountSection.style.display = 'block';
+                            document.getElementById('previewDiscountPercentage').textContent = bill.discount_percentage + '%';
+                            document.getElementById('previewDiscountAmount').textContent = 'Rs. ' + parseFloat(bill.discount_amount).toFixed(2);
 
-                            if (bill.discount_reason) {
-                                document.getElementById('billDiscountReason').innerHTML = '<small><strong>Reason:</strong> ' + bill.discount_reason + '</small>';
+                            if (bill.discount_reason && bill.discount_reason.trim()) {
+                                document.getElementById('previewDiscountReason').innerHTML = '<small><strong>Reason:</strong> ' + bill.discount_reason + '</small>';
                             } else {
-                                document.getElementById('billDiscountReason').innerHTML = '';
+                                document.getElementById('previewDiscountReason').innerHTML = '';
                             }
                         } else {
-                            document.getElementById('billDiscountSection').style.display = 'none';
+                            discountSection.style.display = 'none';
                         }
 
                         // Show/hide notes section
+                        const notesSection = document.getElementById('previewNotesSection');
                         if (bill.notes && bill.notes.trim()) {
-                            document.getElementById('billNotesSection').style.display = 'block';
-                            document.getElementById('billNotes').textContent = bill.notes;
+                            notesSection.style.display = 'block';
+                            document.getElementById('previewNotes').textContent = bill.notes;
                         } else {
-                            document.getElementById('billNotesSection').style.display = 'none';
+                            notesSection.style.display = 'none';
                         }
 
-                        document.getElementById('billModal').style.display = 'block';
                     } else {
+                        closeBillModal();
                         alert('Error loading bill details: ' + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Fetch error:', error);
+                    closeBillModal();
                     alert('Error loading bill details. Please try again.');
                 });
         }
@@ -2291,9 +2353,9 @@ try {
             const billHtml = `
         <div class="bill-preview">
             <div class="bill-header">
-                <h2>Dr. Erundeniya Medical Center</h2>
+                <h2>Erundeniya Ayurveda Hospital</h2>
                 <p>OPD Treatment Bill</p>
-                <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+                <p>Contact: +94 71 291 9408 | Email: info@erundeniyaarurveda.lk</p>
             </div>
 
             <div class="patient-info">
@@ -2335,7 +2397,7 @@ try {
         <head>
             <title>Print Treatment Bill</title>
             <style>
-                body { font-family: 'Times New Roman', serif; margin: 20px; }
+                body { font-family: 'Times New Roman', serif; margin: 20px; max-width: 600px; margin: 0 auto;}
                 table { width: 100%; border-collapse: collapse; }
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; }

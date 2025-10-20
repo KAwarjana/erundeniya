@@ -89,9 +89,10 @@ $currentUser = AuthManager::getCurrentUser();
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <!-- Flatpickr CSS for Calendar -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css ">
 
     <style>
         .slot-grid {
@@ -351,7 +352,7 @@ $currentUser = AuthManager::getCurrentUser();
         }
 
         .form-group select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 12px center;
             background-repeat: no-repeat;
             background-size: 16px;
@@ -452,6 +453,99 @@ $currentUser = AuthManager::getCurrentUser();
             font-size: 14px;
             transition: border-color 0.3s;
         }
+
+        /* Logout hover effect */
+        .sidenav-footer .nav-link:hover {
+            background-color: #ff001910 !important;
+            color: #dc3545 !important;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidenav-footer .nav-link:hover .material-symbols-rounded,
+        .sidenav-footer .nav-link:hover .nav-link-text {
+            color: #dc3545 !important;
+            opacity: 1 !important;
+        }
+
+        .table-sm th,
+        .table-sm td {
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .badge-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* Holiday Management Styles */
+        .holiday-card {
+            background: linear-gradient(135deg, #66ea78ff 0%, #4ba25eff 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .temp-day-card {
+            background: linear-gradient(135deg, #93fb98ff 0%, #57f564ff 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .flatpickr-day.rescheduled-day {
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            font-weight: 600;
+        }
+
+        .rescheduled-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 8px;
+            color: #667eea;
+        }
+
+        .flatpickr-day.rescheduled-day:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        }
+
+        .rescheduled-notification {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -496,9 +590,9 @@ $currentUser = AuthManager::getCurrentUser();
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center  justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -543,7 +637,7 @@ $currentUser = AuthManager::getCurrentUser();
                         </div>
                         <div class="card-body">
                             <!-- Date Selection -->
-                             <div class="row mb-4">
+                            <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                                         <span class="material-symbols-rounded" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">event</span>
@@ -558,6 +652,142 @@ $currentUser = AuthManager::getCurrentUser();
                                         <span>Reason for Blocking (Optional)</span>
                                     </label>
                                     <input type="text" id="blockReason" class="form-control book--appointment--input" placeholder="e.g., Doctor unavailable">
+                                </div>
+                            </div>
+
+                            <!-- Holiday Management Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <!-- Mobile-first responsive card header -->
+                                        <div class="card-header pb-0">
+                                            <div class="row align-items-center g-2">
+                                                <!-- Title & description -->
+                                                <div class="col-12 col-ms-8 col-lg-9">
+                                                    <h5 class="mb-1">Holiday & Consultation Day Management</h5>
+                                                    <p class="text-sm mb-0">Manage holidays and reschedule consultation days</p>
+                                                </div>
+
+                                                <!-- Action button -->
+                                                <div class="col-12 col-sm-4 col-lg-3 text-sm-end mt-3 mt-sm-3">
+                                                    <button class="btn btn-primary w-100" onclick="openAddHolidayModal()">
+                                                        <i class="fas fa-plus"></i> Add Holiday
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Holidays List -->
+                                            <div class="mb-4">
+                                                <h6>Upcoming Holidays</h6>
+                                                <div id="holidaysList" class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Day</th>
+                                                                <th>Reason</th>
+                                                                <th>Rescheduled To</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="holidaysTableBody">
+                                                            <tr>
+                                                                <td colspan="5" class="text-center">
+                                                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                    Loading holidays...
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <!-- Temporary Consultation Days -->
+                                            <div>
+                                                <h6>Temporary Consultation Days</h6>
+                                                <div id="tempDaysList" class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Day</th>
+                                                                <th>Reason</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="tempDaysTableBody">
+                                                            <tr>
+                                                                <td colspan="3" class="text-center">
+                                                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                    Loading temporary days...
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add Holiday Modal -->
+                            <div id="addHolidayModal" class="modal" style="display: none;">
+                                <div class="modal-content" style="max-width: 500px;">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">
+                                            <i class="material-symbols-rounded">event_busy</i>
+                                            <span>Add Holiday</span>
+                                        </h4>
+                                        <span class="close" onclick="closeAddHolidayModal()">&times;</span>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="addHolidayForm">
+                                            <div class="form-group">
+                                                <label>
+                                                    <i class="material-symbols-rounded">event</i>
+                                                    <span>Holiday Date *</span>
+                                                </label>
+                                                <input type="text" id="holidayDate" class="form-control book--appointment--input"
+                                                    placeholder="Select consultation day" readonly required>
+                                                <small class="text-muted">Only Wednesday or Sunday can be marked as holiday</small>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>
+                                                    <i class="material-symbols-rounded">edit_note</i>
+                                                    <span>Reason *</span>
+                                                </label>
+                                                <textarea id="holidayReason" class="form-control" rows="3"
+                                                    placeholder="e.g., Poya Day, Christmas" required></textarea>
+                                            </div>
+
+                                            <div class="form-group">
+                        <div class="form-check" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                            <input class="form-check-input" type="checkbox" id="rescheduleNextDay" 
+                                   style="width: 20px; height: 20px; margin-top: 0;">
+                            <label class="form-check-label ms-2" for="rescheduleNextDay" style="cursor: pointer;">
+                                <strong style="color: #333;">
+                                    <i class="fas fa-calendar-check text-success"></i> 
+                                    Reschedule to next day
+                                </strong>
+                                <br>
+                                <small class="text-muted" style="display: block; margin-top: 5px; margin-left: 28px;">
+                                    Make the next day (Thursday/Monday) available for consultations
+                                </small>
+                            </label>
+                        </div>
+                    </div>
+
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn-primary btn-with-icon">
+                                                    <i class="material-symbols-rounded">check_circle</i>
+                                                    <span>Add Holiday</span>
+                                                </button>
+                                                <button type="button" class="btn-secondary" onclick="closeAddHolidayModal()">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
@@ -671,11 +901,10 @@ $currentUser = AuthManager::getCurrentUser();
                                     <span>Title *</span>
                                 </label>
                                 <select id="bookingTitle" required>
+                                    <option value="Rev.">Rev.</option>
                                     <option value="Mr.">Mr.</option>
                                     <option value="Mrs.">Mrs.</option>
-                                    <option value="Miss">Miss</option>
-                                    <option value="Dr.">Dr.</option>
-                                    <option value="Rev.">Rev.</option>
+                                    <option value="Miss.">Miss.</option>
                                 </select>
                             </div>
                         </div>
@@ -767,60 +996,263 @@ $currentUser = AuthManager::getCurrentUser();
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
     <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
 
     <!-- Flatpickr JS for Calendar -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr "></script>
 
     <script>
         let selectedSlots = new Set();
         let currentDate = '';
         let slotsData = [];
         let selectedSlotData = null;
+        let availableConsultationDates = []; // Store all available dates including rescheduled ones
 
         // Initialize calendar
         document.addEventListener('DOMContentLoaded', function() {
+            // Load available dates first, then initialize calendar
+            loadAvailableDatesForCalendar();
+
+            // Initialize holiday calendar
+            initializeHolidayCalendar();
+
+            // Load holidays and temporary days
+            loadHolidays();
+            loadTempDays();
+        });
+
+        /**
+         * Load all available consultation dates (regular + rescheduled)
+         * This is used to enable dates in the Flatpickr calendar
+         */
+        async function loadAvailableDatesForCalendar() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_all_available_dates');
+                formData.append('days', '90'); // Load 90 days ahead
+
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                console.log('Raw API Response:', data); // Debug log
+
+                if (data.success && data.dates) {
+                    // Store available dates - keep full objects
+                    availableConsultationDates = data.dates;
+
+                    console.log('Available consultation dates loaded:', availableConsultationDates);
+                    console.log('Total dates:', data.total_dates || availableConsultationDates.length);
+
+                    // Log temporary days specifically
+                    const tempDays = availableConsultationDates.filter(d => d.is_temporary);
+                    console.log('Temporary/Rescheduled days:', tempDays);
+
+                    // Now initialize the main calendar with these dates
+                    initializeMainCalendar();
+                } else {
+                    console.error('Failed to load available dates:', data.message || 'Unknown error');
+                    // Fallback to Wednesday/Sunday only
+                    availableConsultationDates = [];
+                    initializeMainCalendar();
+                }
+            } catch (error) {
+                console.error('Error loading available dates:', error);
+                // Fallback to Wednesday/Sunday only
+                availableConsultationDates = [];
+                initializeMainCalendar();
+            }
+        }
+
+        /**
+         * Initialize the main consultation date picker
+         * This calendar enables regular consultation days + rescheduled days
+         */
+        function initializeMainCalendar() {
+            console.log('Initializing main calendar with dates:', availableConsultationDates);
+
             // Get next consultation date
             const today = new Date();
             let nextDate = new Date(today);
             nextDate.setDate(nextDate.getDate() + 1);
 
-            // Find next Wednesday or Sunday
-            while (nextDate.getDay() !== 0 && nextDate.getDay() !== 3) {
+            // Find next available consultation date
+            let attempts = 0;
+            while (attempts < 90) {
+                const dayOfWeek = nextDate.getDay();
+                const isWeekendConsultation = (dayOfWeek === 0 || dayOfWeek === 3);
+                const isInAvailableList = isDateInAvailableList(nextDate);
+
+                if (isWeekendConsultation || isInAvailableList) {
+                    break;
+                }
+
                 nextDate.setDate(nextDate.getDate() + 1);
+                attempts++;
             }
 
-            flatpickr("#consultationDate", {
+            console.log('Default date selected:', nextDate.toISOString().split('T')[0]);
+
+            // Initialize Flatpickr
+            const consultationDatePicker = flatpickr("#consultationDate", {
                 dateFormat: "Y-m-d",
                 minDate: "today",
                 defaultDate: nextDate,
                 enable: [
                     function(date) {
-                        // Enable only Wednesdays (3) and Sundays (0)
-                        return (date.getDay() === 0 || date.getDay() === 3);
+                        const dayOfWeek = date.getDay();
+                        const dateStr = formatDateForComparison(date);
+
+                        // Check if this date is in available dates list
+                        const foundInList = availableConsultationDates.some(d => {
+                            return d.date === dateStr;
+                        });
+
+                        // Enable if it's Wednesday (3), Sunday (0), OR in available list
+                        const shouldEnable = (dayOfWeek === 0 || dayOfWeek === 3 || foundInList);
+
+                        // Debug log for specific dates
+                        if (dateStr.includes('2025-10-23')) {
+                            console.log('Checking Oct 23:', {
+                                dateStr,
+                                dayOfWeek,
+                                foundInList,
+                                shouldEnable,
+                                availableDates: availableConsultationDates
+                            });
+                        }
+
+                        return shouldEnable;
                     }
                 ],
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const dateStr = formatDateForComparison(dayElem.dateObj);
+
+                    // Find this date in available dates list
+                    const availableDateInfo = availableConsultationDates.find(d => d.date === dateStr);
+
+                    // Check if it's a temporary/rescheduled consultation day
+                    if (availableDateInfo && availableDateInfo.is_temporary) {
+                        // Add special styling for rescheduled days
+                        dayElem.innerHTML += '<span class="rescheduled-badge" title="Rescheduled consultation day">★</span>';
+                        dayElem.classList.add('rescheduled-day');
+
+                        console.log('Added rescheduled badge to:', dateStr);
+                    }
+                },
                 onChange: function(selectedDates, dateStr, instance) {
+                    console.log('Date selected:', dateStr);
                     if (dateStr) {
                         loadSlotsForDate(dateStr);
+                        checkAndShowRescheduledInfo(dateStr);
                     }
                 }
             });
 
             // Load slots for the default date
             const defaultDate = nextDate.toISOString().split('T')[0];
-            document.getElementById('consultationDate')._flatpickr.setDate(defaultDate);
+            consultationDatePicker.setDate(defaultDate);
             loadSlotsForDate(defaultDate);
-        });
+        }
+
+        /**
+         * Check if a date is in the available dates list
+         */
+        function isDateInAvailableList(date) {
+            const dateStr = formatDateForComparison(date);
+            const found = availableConsultationDates.some(d => d.date === dateStr);
+            return found;
+        }
+
+        /**
+         * Format date for comparison
+         */
+        function formatDateForComparison(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        /**
+         * Check and show info if selected date is a rescheduled consultation day
+         */
+        async function checkAndShowRescheduledInfo(dateStr) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_date_info');
+                formData.append('date', dateStr);
+
+                const response = await fetch('../../appointment_handler.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.is_temporary) {
+                    // Show notification that this is a rescheduled day
+                    showRescheduledDayNotification(data.reason);
+                }
+            } catch (error) {
+                console.error('Error checking date info:', error);
+            }
+        }
+
+        /**
+         * Show notification for rescheduled day
+         */
+        function showRescheduledDayNotification(reason) {
+            // Remove existing notification if any
+            const existingNotification = document.querySelector('.rescheduled-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'rescheduled-notification';
+            notification.innerHTML = `
+            <div style="background: linear-gradient(135deg, #66ea66ff 0%, #4ba252ff 100%); color: black; padding: 12px 20px; border-radius: 8px; margin: 15px 0; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                <i class="fas fa-star" style="font-size: 18px;"></i>
+                <div style="flex: 1;">
+                    <strong style="display: block; margin-bottom: 4px;">Special Consultation Day</strong>
+                    <span style="font-size: 13px; opacity: 0.95;">${reason}</span>
+                </div>
+            </div>
+        `;
+
+            // Insert after the date selection
+            const dateContainer = document.querySelector('.row.mb-4');
+            if (dateContainer) {
+                dateContainer.insertAdjacentElement('afterend', notification);
+            }
+        }
+
+        function initializeHolidayCalendar() {
+            holidayPicker = flatpickr("#holidayDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                enable: [
+                    function(date) {
+                        // Enable only Wednesdays (3) and Sundays (0)
+                        return (date.getDay() === 0 || date.getDay() === 3);
+                    }
+                ]
+            });
+        }
 
         async function loadSlotsForDate(date) {
             if (!date) {
                 document.getElementById('slotsGrid').innerHTML = `
-                    <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
-                        <p class="text-muted">Please select a consultation date</p>
-                    </div>
-                `;
+                <div style="text-align: center; padding: 40px; grid-column: 1/-1;">
+                    <p class="text-muted">Please select a consultation date</p>
+                </div>
+            `;
                 hideControls();
                 return;
             }
@@ -867,10 +1299,10 @@ $currentUser = AuthManager::getCurrentUser();
                 card.dataset.status = slot.status;
 
                 card.innerHTML = `
-                    <div class="slot-time">${slot.display_time}</div>
-                    <div class="slot-status">${slot.status}</div>
-                    ${slot.appointment_number ? `<small style="color: #666;">${slot.appointment_number}</small>` : ''}
-                `;
+                <div class="slot-time">${slot.display_time}</div>
+                <div class="slot-status">${slot.status}</div>
+                ${slot.appointment_number ? `<small style="color: #666;">${slot.appointment_number}</small>` : ''}
+            `;
 
                 if (slot.is_available || slot.is_blocked) {
                     card.onclick = () => toggleSlot(slot.time, card);
@@ -1113,6 +1545,227 @@ $currentUser = AuthManager::getCurrentUser();
             const bookingModal = document.getElementById('bookingModal');
             if (event.target === bookingModal) {
                 closeBookingModal();
+            }
+        });
+
+        // Holiday Management Functions
+        function openAddHolidayModal() {
+            document.getElementById('addHolidayModal').style.display = 'block';
+        }
+
+        function closeAddHolidayModal() {
+            document.getElementById('addHolidayModal').style.display = 'none';
+            document.getElementById('addHolidayForm').reset();
+        }
+
+        async function loadHolidays() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_holidays');
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    renderHolidays(data.holidays);
+                } else {
+                    document.getElementById('holidaysTableBody').innerHTML =
+                        '<tr><td colspan="5" class="text-center text-muted">No holidays found</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading holidays:', error);
+                document.getElementById('holidaysTableBody').innerHTML =
+                    '<tr><td colspan="5" class="text-center text-danger">Error loading holidays</td></tr>';
+            }
+        }
+
+        function renderHolidays(holidays) {
+            const tbody = document.getElementById('holidaysTableBody');
+
+            if (holidays.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No holidays scheduled</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = holidays.map(holiday => {
+                const date = new Date(holiday.holiday_date);
+                const nextDay = new Date(date);
+                nextDay.setDate(nextDay.getDate() + 1);
+                const rescheduledTo = nextDay.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                return `
+                    <tr>
+                        <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                        <td><span class="badge badge-warning">${holiday.day_of_week}</span></td>
+                        <td>${holiday.reason}</td>
+                        <td>${rescheduledTo}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="removeHoliday('${holiday.holiday_date}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadTempDays() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_temp_days');
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    renderTempDays(data.days);
+                } else {
+                    document.getElementById('tempDaysTableBody').innerHTML =
+                        '<tr><td colspan="3" class="text-center text-muted">No temporary consultation days</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading temp days:', error);
+                document.getElementById('tempDaysTableBody').innerHTML =
+                    '<tr><td colspan="3" class="text-center text-danger">Error loading data</td></tr>';
+            }
+        }
+
+        function renderTempDays(days) {
+            const tbody = document.getElementById('tempDaysTableBody');
+
+            if (days.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No temporary consultation days</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = days.map(day => {
+                const date = new Date(day.consultation_date);
+                return `
+                    <tr>
+                        <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                        <td><span class="badge badge-info">${day.day_of_week}</span></td>
+                        <td><small>${day.reason}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Add holiday form submission
+        document.getElementById('addHolidayForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const date = document.getElementById('holidayDate').value;
+            const reason = document.getElementById('holidayReason').value;
+            const reschedule = document.getElementById('rescheduleNextDay').checked;
+
+            if (!date || !reason) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add_holiday');
+                formData.append('date', date);
+                formData.append('reason', reason);
+                formData.append('reschedule', reschedule ? 'true' : 'false');
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let message = 'Holiday added successfully!';
+                    if (data.rescheduled_to) {
+                        const reschDate = new Date(data.rescheduled_to);
+                        message += `\n\nConsultation day rescheduled to: ${reschDate.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}`;
+                    }
+                    alert(message);
+                    closeAddHolidayModal();
+                    loadHolidays();
+                    loadTempDays();
+
+                    // Reload slots if viewing a date
+                    if (currentDate) {
+                        await loadSlotsForDate(currentDate);
+                    }
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error adding holiday:', error);
+                alert('Failed to add holiday. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Remove holiday
+        async function removeHoliday(date) {
+            if (!confirm('Are you sure you want to remove this holiday?\n\nThis will unblock all slots for that day (if not already booked).')) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'remove_holiday');
+                formData.append('date', date);
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Holiday removed successfully!');
+                    loadHolidays();
+                    loadTempDays();
+
+                    // Reload slots if viewing that date
+                    if (currentDate === date) {
+                        await loadSlotsForDate(currentDate);
+                    }
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error removing holiday:', error);
+                alert('Failed to remove holiday. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const holidayModal = document.getElementById('addHolidayModal');
+            if (event.target === holidayModal) {
+                closeAddHolidayModal();
             }
         });
     </script>

@@ -1044,7 +1044,7 @@ $attendedAppointments = getAttendedAppointments();
                                                         <div class="d-flex gap-1">
                                                             <button class="btn btn-sm btn-outline-success"
                                                                 onclick="viewPrescription(<?= $row['id'] ?>)">View</button>
-                                                            <button class="btn btn-sm btn-outline-primary"
+                                                            <button class="btn btn-sm btn-outline-danger"
                                                                 onclick="editPrescription(<?= $row['id'] ?>)">Edit</button>
                                                             <button class="print-btn btn-sm"
                                                                 onclick="printPrescription(<?= $row['id'] ?>)">Print</button>

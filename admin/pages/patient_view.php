@@ -9,13 +9,13 @@ $currentPage  = basename($_SERVER['PHP_SELF']);
 
 /* ----------  role-based sidebar  ---------- */
 $menuItems = [
-    ['title' => 'Dashboard',     'url' => 'dashboard.php',      'icon' => 'dashboard',        'allowed_roles' => ['Admin']],
-    ['title' => 'Appointments',  'url' => 'appointments.php',   'icon' => 'calendar_today',   'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'Book Appointment', 'url' => 'book_appointments.php', 'icon' => 'add_circle',   'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'Patients',      'url' => 'patients.php',       'icon' => 'people',           'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'Bills',         'url' => 'create_bill.php',    'icon' => 'receipt',          'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'Prescriptions', 'url' => 'prescription.php',   'icon' => 'medication',       'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'OPD Treatments', 'url' => 'opd.php',            'icon' => 'local_hospital',   'allowed_roles' => ['Admin', 'Receptionist']]
+    ['title' => 'Dashboard',     'url' => 'dashboard.php',     'icon' => 'dashboard',        'allowed_roles' => ['Admin']],
+    ['title' => 'Appointments',  'url' => 'appointments.php',  'icon' => 'calendar_today',   'allowed_roles' => ['Admin', 'Receptionist']],
+    ['title' => 'Book Appointment', 'url' => 'book_appointments.php', 'icon' => 'add_circle', 'allowed_roles' => ['Admin', 'Receptionist']],
+    ['title' => 'Patients',      'url' => 'patients.php',      'icon' => 'people',           'allowed_roles' => ['Admin', 'Receptionist']],
+    ['title' => 'Bills',         'url' => 'create_bill.php',   'icon' => 'receipt',          'allowed_roles' => ['Admin', 'Receptionist']],
+    ['title' => 'Prescriptions', 'url' => 'prescription.php',  'icon' => 'medication',       'allowed_roles' => ['Admin', 'Receptionist']],
+    ['title' => 'OPD Treatments', 'url' => 'opd.php',           'icon' => 'local_hospital',   'allowed_roles' => ['Admin', 'Receptionist']]
 ];
 
 function hasAccessToPage($allowedRoles)
@@ -105,14 +105,8 @@ function payCls($s)
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Patient Details - Erundeniya Medical Center</title>
+    <title>Patient Details - Erundeniya Ayurveda Hospital</title>
     <link rel="icon" type="image/png" href="../../img/logof1.png">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300 ,400,500,600,700,900" />
-    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/42d5adcbca.js " crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz ,wght,FILL,GRAD@24,400,0,0" />
-    <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
     <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -124,7 +118,6 @@ function payCls($s)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
-        /* ------  COPY-PASTE EVERYTHING FROM appointment_single_view.php  ------ */
         .status-badge {
             padding: 8px 16px;
             border-radius: 20px;
@@ -136,26 +129,32 @@ function payCls($s)
             justify-content: center;
             min-width: 100px;
         }
+
         .status-booked {
             background: #e3f2fd;
             color: #1976d2;
         }
+
         .status-confirmed {
             background: #e8f5e8;
             color: #2e7d32;
         }
+
         .status-attended {
             background: #e8f5e8;
             color: #4CAF50;
         }
+
         .status-no-show {
             background: #fff3e0;
             color: #f57c00;
         }
+
         .status-cancelled {
             background: #ffebee;
             color: #f44336;
         }
+
         .info-card {
             background: linear-gradient(45deg, #f8f9fa, #ffffff);
             border: 1px solid #e9ecef;
@@ -164,6 +163,7 @@ function payCls($s)
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
+
         .info-row {
             margin-bottom: 15px;
             padding-bottom: 15px;
@@ -172,17 +172,20 @@ function payCls($s)
             justify-content: space-between;
             align-items: flex-start;
         }
+
         .info-row:last-child {
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
         }
+
         .info-label {
             font-weight: 600;
             color: #495057;
             flex: 0 0 40%;
             margin-bottom: 0;
         }
+
         .info-value {
             font-size: 16px;
             color: #212529;
@@ -190,21 +193,26 @@ function payCls($s)
             text-align: right;
             word-wrap: break-word;
         }
+
         .info-row.full-width {
             display: block;
         }
+
         .info-row.full-width .info-label {
             flex: none;
             margin-bottom: 5px;
         }
+
         .info-row.full-width .info-value {
             text-align: left;
             flex: none;
         }
+
         .timeline {
             position: relative;
             padding-left: 30px;
         }
+
         .timeline::before {
             content: '';
             position: absolute;
@@ -214,6 +222,7 @@ function payCls($s)
             width: 2px;
             background: #dee2e6;
         }
+
         .timeline-item {
             position: relative;
             margin-bottom: 20px;
@@ -222,6 +231,7 @@ function payCls($s)
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -234,12 +244,14 @@ function payCls($s)
             border: 3px solid #fff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr;
             gap: 10px;
             margin-top: 20px;
         }
+
         .btn-primary {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             border: none;
@@ -252,6 +264,7 @@ function payCls($s)
             justify-content: center;
             gap: 8px;
         }
+
         .btn-secondary {
             background: linear-gradient(45deg, #6c757d, #5a6268);
             border: none;
@@ -264,6 +277,7 @@ function payCls($s)
             justify-content: center;
             gap: 8px;
         }
+
         .btn-warning {
             background: linear-gradient(45deg, #ffc107, #e0a800);
             border: none;
@@ -276,6 +290,7 @@ function payCls($s)
             justify-content: center;
             gap: 8px;
         }
+
         .btn-danger {
             background: linear-gradient(45deg, #dc3545, #c82333);
             border: none;
@@ -288,10 +303,12 @@ function payCls($s)
             justify-content: center;
             gap: 8px;
         }
+
         .visit-history {
             text-align: left;
             width: 100%;
         }
+
         .visit-item {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -301,23 +318,28 @@ function payCls($s)
             font-size: 14px;
             transition: all .2s ease;
         }
+
         .visit-item:hover {
             background: #e9ecef;
             border-color: #4CAF50;
         }
+
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
+
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .footer {
             margin-top: auto;
         }
+
         .notification-badge {
             position: relative;
             background: #f44336;
@@ -330,20 +352,24 @@ function payCls($s)
             display: flex;
             flex-direction: row;
         }
+
         .payment-status {
             padding: 2px 18px;
             border-radius: 20px;
             font-weight: 600;
             display: inline-block;
         }
+
         .payment-paid {
             background: #d4edda;
             color: #155724;
         }
+
         .payment-pending {
             background: #fff3cd;
             color: #856404;
         }
+
         .icon-circle {
             width: 60px;
             height: 60px;
@@ -353,14 +379,17 @@ function payCls($s)
             justify-content: center;
             margin-bottom: 15px;
         }
+
         .icon-primary {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
         }
+
         .icon-info {
             background: linear-gradient(45deg, #2196F3, #1976d2);
             color: white;
         }
+
         /* Header alignment improvements */
         .page-header {
             display: flex;
@@ -369,14 +398,17 @@ function payCls($s)
             margin-bottom: 25px;
             padding: 0 15px;
         }
+
         .page-header h3 {
             margin: 0;
             font-weight: 700;
         }
+
         .page-header p {
             margin: 5px 0 0 0;
             color: #6c757d;
         }
+
         /* Date display section */
         .date-info {
             background: linear-gradient(135deg, #4CAF50 0%, #227225ff 100%);
@@ -386,51 +418,62 @@ function payCls($s)
             margin-bottom: 20px;
             text-align: center;
         }
+
         .current-date {
             font-size: 14px;
             margin-bottom: 5px;
             opacity: 0.9;
         }
+
         .appointment-date {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 10px;
         }
+
         .days-until {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
         }
+
         .days-label {
             font-size: 12px;
             opacity: 0.8;
         }
+
         /* Responsive */
         @media (max-width: 576px) {
             .info-card {
                 padding: 15px;
             }
+
             .info-row {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .info-label {
                 flex: none;
                 margin-bottom: 5px;
             }
+
             .info-value {
                 text-align: left;
                 flex: none;
             }
+
             .action-buttons {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
+
             .page-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
+
             .btn-primary,
             .btn-secondary,
             .btn-warning,
@@ -440,67 +483,80 @@ function payCls($s)
                 border-radius: 30px;
             }
         }
+
         @media (min-width: 407px) and (max-width: 650px) {
             .action-buttons {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
         }
+
         @media (min-width: 651px) and (max-width: 795px) {
             .action-buttons {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
         }
+
         @media (min-width: 796px) and (max-width: 991px) {
             .action-buttons {
                 grid-template-columns: 1fr 1fr 1fr 1fr;
                 gap: 8px;
             }
         }
+
         @media (min-width: 992px) and (max-width: 1520px) {
             .action-buttons {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
         }
+
         @media (min-width: 1521px) {
             .action-buttons {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
         }
+
         /* Fixed footer styles */
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
+
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .container-fluid {
             flex: 1;
         }
+
         .footer {
             margin-top: auto;
         }
+
         /* List group improvements */
         .list-group-item {
             border-radius: 10px !important;
             margin-bottom: 8px;
             border: 1px solid #e9ecef;
         }
+
         .list-group-item:hover {
             background-color: #f8f9fa;
         }
+
         /* Visit history styles */
         .visit-history {
             text-align: left;
             width: 100%;
         }
+
         .visit-item {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -510,25 +566,31 @@ function payCls($s)
             font-size: 14px;
             transition: all 0.2s ease;
         }
+
         .visit-item:hover {
             background: #e9ecef;
             border-color: #4CAF50;
         }
+
         .visit-item:last-child {
             margin-bottom: 0;
         }
+
         .visit-item strong {
             color: #495057;
         }
+
         /* Animation for visit history toggle */
         #visitHistoryRow {
             transition: all 0.3s ease;
             overflow: hidden;
         }
+
         #visitHistoryRow.show {
             opacity: 1;
             max-height: 400px;
         }
+
         /* Logout hover effect */
         .sidenav-footer .nav-link:hover {
             background-color: #ff001910 !important;
@@ -536,15 +598,42 @@ function payCls($s)
             border-radius: 10px;
             transition: all 0.3s ease;
         }
+
         .sidenav-footer .nav-link:hover .material-symbols-rounded,
         .sidenav-footer .nav-link:hover .nav-link-text {
             color: #dc3545 !important;
             opacity: 1 !important;
         }
+
         /* =========  collapsible related records  ========= */
-        .rel-section{cursor:pointer}
-        .rel-body{display:none;padding:.5rem 0 0 1.25rem}
-        .rel-body.show{display:block}
+        .rel-section {
+            cursor: pointer
+        }
+
+        .rel-body {
+            display: none;
+            padding: .5rem 0 0 1.25rem
+        }
+
+        .rel-body.show {
+            display: block
+        }
+
+        /* =====  NEW: clickable items  ===== */
+        .visit-item.clickable {
+            cursor: pointer;
+            transition: all .2s ease
+        }
+
+        .visit-item.clickable:hover {
+            background: #f0f8ff;
+            transform: translateX(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1)
+        }
+
+        .visit-item.clickable:active {
+            transform: translateX(0)
+        }
     </style>
 </head>
 
@@ -587,9 +676,9 @@ function payCls($s)
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search patients..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center  justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -748,8 +837,8 @@ function payCls($s)
                                 <button class="btn btn-secondary" onclick="editPatient()">
                                     <i class="material-symbols-rounded">edit</i> Edit Patient
                                 </button>
-                                <button class="btn btn-warning" onclick="sendSMS()">
-                                    <i class="material-symbols-rounded">sms</i> Send SMS
+                                <button class="btn btn-warning" onclick="sendEmail()">
+                                    <i class="material-symbols-rounded">sms</i> Send Email
                                 </button>
                                 <button class="btn btn-danger" onclick="deletePatient()">
                                     <i class="material-symbols-rounded">delete</i> Delete
@@ -760,7 +849,9 @@ function payCls($s)
 
                     <!-- RELATED RECORDS  (collapsible) -->
                     <div class="card mt-4">
-                        <div class="card-header pb-0"><h6>Related Records</h6></div>
+                        <div class="card-header pb-0">
+                            <h6>Related Records</h6>
+                        </div>
 
                         <!-- Appointments -->
                         <div class="card-body rel-section border-bottom py-2" onclick="loadRelated('appointments')">
@@ -828,7 +919,7 @@ function payCls($s)
                         <div class="col-lg-6 mb-lg-0 mb-4">
                             <div class="copyright text-center text-sm text-muted text-lg-start">© <script>
                                     document.write(new Date().getFullYear())
-                                </script>, design & develop by <a href="https://www.creative-tim.com " class="font-weight-bold" target="_blank">Evon Technologies Software Solution (PVT) Ltd.</a> All rights reserved.</div>
+                                </script>, design & develop by <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Evon Technologies Software Solution (PVT) Ltd.</a> All rights reserved.</div>
                         </div>
                     </div>
                 </div>
@@ -858,73 +949,93 @@ function payCls($s)
             function bookAppointment() {
                 window.location.href = 'book_appointments.php?patient=<?= $patient['id'] ?>';
             }
+
             function editPatient() {
                 window.location.href = 'patients.php?edit=<?= $patient['id'] ?>';
             }
-            function sendSMS() {
-                if (!confirm('Send SMS to <?= addslashes($patient['mobile']) ?>?')) return;
-                fetch('send_sms.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mobile: '<?= addslashes($patient['mobile']) ?>', message: 'Reminder from Erundeniya Medical Center.' })
-                })
-                .then(r => r.json()).then(d => alert(d.message || 'SMS sent')).catch(() => alert('Error'));
+
+            function sendEmail() {
+                const patientEmail = '<?= addslashes($patient['email'] ?? '') ?>';
+                const patientName = '<?= addslashes($patient['full_name']) ?>';
+
+                if (!patientEmail || patientEmail === 'N/A') {
+                    alert('No email address found for this patient. Please update patient information.');
+                    return;
+                }
+
+                // Subject & body
+                const subject = encodeURIComponent('Patient Communication – ' + patientName);
+                const body = encodeURIComponent(
+                    `Dear ${patientName},\n\n` +
+                    `Please find the attached information or instructions from Erundeniya Ayurveda Hospital.\n\n` +
+                    `If you have any questions, feel free to contact us.\n\n` +
+                    `Best regards,\nErundeniya Ayurveda Hospital`
+                );
+
+                // Open default mail client
+                window.location.href = `mailto:${patientEmail}?subject=${subject}&body=${body}`;
             }
+
             function deletePatient() {
                 if (!confirm('Delete this patient? This action cannot be undone.')) return;
                 fetch('delete_patient.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: <?= $patient['id'] ?> })
-                })
-                .then(r => r.json()).then(d => {
-                    if (d.success) {
-                        alert('Patient deleted');
-                        window.location.href = 'patients.php';
-                    } else {
-                        alert(d.message || 'Error');
-                    }
-                }).catch(() => alert('Error'));
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: <?= $patient['id'] ?>
+                        })
+                    })
+                    .then(r => r.json()).then(d => {
+                        if (d.success) {
+                            alert('Patient deleted');
+                            window.location.href = 'patients.php';
+                        } else {
+                            alert(d.message || 'Error');
+                        }
+                    }).catch(() => alert('Error'));
             }
 
             /* ----------  collapsible related records  ---------- */
             const PATIENT_ID = <?= (int)$patient['id'] ?>;
 
-            function loadRelated(type){
-                const container = document.getElementById(type+'List');
+            function loadRelated(type) {
+                const container = document.getElementById(type + 'List');
                 const counter = document.getElementById(
-                    type==='appointments' ? 'aptCount' :
-                    type==='prescriptions' ? 'rxCount' : 'billCount'
+                    type === 'appointments' ? 'aptCount' :
+                    type === 'prescriptions' ? 'rxCount' : 'billCount'
                 );
-                if (container.dataset.loaded) {           // toggle only
+                if (container.dataset.loaded) { // toggle only
                     container.classList.toggle('show');
                     return;
                 }
                 fetch(`get_patient_related.php?patient=${PATIENT_ID}&type=${type}`)
-                    .then(r=>r.json())
-                    .then(d=>{
-                        if(!d.success) throw new Error(d.message||'Failed');
-                        let html='';
-                        if(d.data.length===0){
-                            html='<div class="text-muted small">No records</div>';
-                        }else{
-                            d.data.forEach(r=>{
-                                if(type==='appointments'){
-                                    html+=`
-                                      <div class="visit-item">
+                    .then(r => r.json())
+                    .then(d => {
+                        if (!d.success) throw new Error(d.message || 'Failed');
+                        let html = '';
+                        if (d.data.length === 0) {
+                            html = '<div class="text-muted small">No records</div>';
+                        } else {
+                            d.data.forEach(r => {
+                                if (type === 'appointments') {
+                                    html += `
+                                      <div class="visit-item clickable" onclick="window.open('${r.url}', '_blank')">
                                         <strong>${r.appointment_number}</strong> ·
                                         ${new Date(r.appointment_date).toLocaleDateString()} at ${r.appointment_time.slice(0,5)}
                                         <span class="badge ${statusCls(r.status)} ms-1">${r.status}</span>
                                       </div>`;
-                                }else if(type==='prescriptions'){
-                                    html+=`
-                                      <div class="visit-item">
+                                } else if (type === 'prescriptions') {
+                                    html += `
+                                      <div class="visit-item clickable" onclick="window.open('${r.url}', '_blank')">
+                                      <strong>${r.prescription_number}</strong> ·
                                         ${new Date(r.created_at).toLocaleDateString()}
                                         <br><small>${r.prescription_text.substring(0,60)}…</small>
                                       </div>`;
-                                }else{   // bills
-                                    html+=`
-                                      <div class="visit-item">
+                                } else { // bills
+                                    html += `
+                                      <div class="visit-item clickable" onclick="window.open('${r.url}', '_blank')">
                                         <strong>${r.bill_number}</strong> ·
                                         ${new Date(r.created_at).toLocaleDateString()}
                                         <br>Amount: <b>Rs ${parseFloat(r.final_amount||r.total_amount).toFixed(2)}</b>
@@ -933,28 +1044,29 @@ function payCls($s)
                                 }
                             });
                         }
-                        container.innerHTML=html;
-                        container.dataset.loaded='1';
-                        counter.textContent=d.data.length;
+                        container.innerHTML = html;
+                        container.dataset.loaded = '1';
+                        counter.textContent = d.data.length;
                         container.classList.add('show');
                     })
-                    .catch(err=>{
-                        container.innerHTML=`<div class="text-danger small">Error loading ${type}</div>`;
+                    .catch(err => {
+                        container.innerHTML = `<div class="text-danger small">Error loading ${type}</div>`;
                         container.classList.add('show');
                     });
             }
             /* helpers (same colours as appointment_single_view.php) */
-            function statusCls(s){
+            function statusCls(s) {
                 return {
-                    'Booked':'status-booked',
-                    'Confirmed':'status-confirmed',
-                    'Attended':'status-attended',
-                    'No-Show':'status-no-show',
-                    'Cancelled':'status-cancelled'
-                }[s] || 'status-booked';
+                    'Booked': 'status-booked',
+                    'Confirmed': 'status-confirmed',
+                    'Attended': 'status-attended',
+                    'No-Show': 'status-no-show',
+                    'Cancelled': 'status-cancelled'
+                } [s] || 'status-booked';
             }
-            function payCls(s){
-                return s==='Paid' ? 'payment-paid' : 'payment-pending';
+
+            function payCls(s) {
+                return s === 'Paid' ? 'payment-paid' : 'payment-pending';
             }
 
             document.addEventListener('DOMContentLoaded', initDates);

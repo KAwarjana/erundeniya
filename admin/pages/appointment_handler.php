@@ -4,7 +4,6 @@ require_once '../../connection/connection.php';
 
 class AppointmentManager
 {
-
     public static function generateTimeSlots($date, $dayOfWeek)
     {
         try {
@@ -253,9 +252,9 @@ class AppointmentManager
             $totalAmount = $doctorFee + $medicineCost + $otherCharges;
 
             $query = "INSERT INTO bills (bill_number, appointment_id, doctor_fee, 
-                     medicine_cost, other_charges, total_amount, created_by) 
-                     VALUES ('$billNumber', $appointmentId, $doctorFee, $medicineCost, 
-                     $otherCharges, $totalAmount, 1)";
+                 medicine_cost, other_charges, total_amount, created_by) 
+                 VALUES ('$billNumber', $appointmentId, $doctorFee, $medicineCost, 
+                 $otherCharges, $totalAmount, 1)";
 
             Database::iud($query);
             return Database::$connection->insert_id;
@@ -273,7 +272,7 @@ class AppointmentManager
             $prescriptionText = Database::$connection->real_escape_string($prescriptionText);
 
             $query = "INSERT INTO prescriptions (appointment_id, prescription_text, created_by) 
-                     VALUES ($appointmentId, '$prescriptionText', 1)";
+                 VALUES ($appointmentId, '$prescriptionText', 1)";
 
             Database::iud($query);
             return Database::$connection->insert_id;
@@ -283,11 +282,9 @@ class AppointmentManager
         }
     }
 }
-
 // API endpoints
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
-
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
@@ -315,18 +312,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'book_appointment':
+            Database::setUpConnection();
+
             $patientData = [
-                'title' => $_POST['title'] ?? 'Mr.',
+                'title' => $_POST['title'] ?? 'Mr',
                 'name' => $_POST['name'] ?? '',
                 'mobile' => $_POST['mobile'] ?? '',
                 'email' => $_POST['email'] ?? '',
                 'address' => $_POST['address'] ?? ''
             ];
 
-            $slotId = $_POST['slot_id'] ?? 0;
-            $paymentMethod = $_POST['payment_method'] ?? 'Online';
+            $date = $_POST['date'] ?? '';
+            $time = $_POST['time'] ?? '';
 
-            $result = AppointmentManager::bookAppointment($patientData, $slotId, $paymentMethod);
+            if (empty($patientData['name']) || empty($patientData['mobile']) || empty($date) || empty($time)) {
+                echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+                exit;
+            }
+
+            $result = AppointmentManager::createPendingAppointment($date, $time, $patientData);
             echo json_encode($result);
             break;
 
@@ -369,16 +373,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $prescriptionId = AppointmentManager::createPrescription($appointmentId, $prescriptionText);
             echo json_encode(['success' => $prescriptionId !== false, 'prescription_id' => $prescriptionId]);
             break;
+
+        // ------------------ NEW ACTIONS FOR book_appointments.php ------------------
+
+        case 'get_time_slots':
+            $date = $_POST['date'] ?? '';
+            if (empty($date)) {
+                echo json_encode(['success' => false, 'error' => 'Date is required']);
+                exit;
+            }
+
+            // generate slots if not exist
+            $dayOfWeek = date('l', strtotime($date));
+            AppointmentManager::generateTimeSlots($date, $dayOfWeek);
+
+            // get slots with availability
+            $slots = AppointmentManager::getAvailableSlots($date);
+            $slotsArray = [];
+            while ($row = $slots->fetch_assoc()) {
+                $slotsArray[] = $row;
+            }
+
+            echo json_encode(['success' => true, 'slots' => $slotsArray]);
+            break;
+
+        case 'block_slots':
+
+            Database::setUpConnection();
+
+            $date   = $_POST['date']   ?? '';
+            $times  = json_decode($_POST['times'] ?? '[]', true);
+            $reason = $_POST['reason'] ?? '';
+
+            if (empty($date) || empty($times)) {
+                echo json_encode(['success' => false, 'error' => 'Date and times required']);
+                exit;
+            }
+
+            $blocked = 0;
+            foreach ($times as $t) {
+                $reason = Database::$connection->real_escape_string($reason);
+                $date   = Database::$connection->real_escape_string($date);
+                $t      = Database::$connection->real_escape_string($t);
+                $userId = !empty($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'NULL';
+
+                $sql = "INSERT INTO blocked_slots (blocked_date, blocked_time, reason, created_by, created_at) 
+        VALUES ('$date', '$t', '$reason', $userId, NOW())";
+
+                Database::iud($sql);
+
+                // skip if already booked
+                $bookCheck = Database::search("SELECT id FROM appointment 
+                WHERE appointment_date = '$date' AND appointment_time = '$t' 
+                AND status NOT IN ('Cancelled','No-Show')");
+                if ($bookCheck->num_rows > 0) continue;
+
+                // skip if already blocked
+                $blockCheck = Database::search("SELECT id FROM blocked_slots 
+                WHERE blocked_date = '$date' AND blocked_time = '$t'");
+                if ($blockCheck->num_rows > 0) continue;
+
+                Database::iud("INSERT INTO blocked_slots 
+                (blocked_date, blocked_time, reason, created_by, created_at) 
+                VALUES ('$date', '$t', '$reason', $userId, NOW())");
+                $blocked++;
+            }
+
+            echo json_encode(['success' => true, 'message' => "$blocked slot(s) blocked"]);
+            break;
+
+        case 'unblock_slots':
+
+            Database::setUpConnection();
+
+            $date  = $_POST['date']  ?? '';
+            $times = json_decode($_POST['times'] ?? '[]', true);
+
+            if (empty($date) || empty($times)) {
+                echo json_encode(['success' => false, 'error' => 'Date and times required']);
+                exit;
+            }
+
+            $unblocked = 0;
+            foreach ($times as $t) {
+                $t = Database::$connection->real_escape_string($t);
+                Database::iud("DELETE FROM blocked_slots 
+                WHERE blocked_date = '$date' AND blocked_time = '$t'");
+                if (Database::$connection->affected_rows > 0) $unblocked++;
+            }
+
+            echo json_encode(['success' => true, 'message' => "$unblocked slot(s) unblocked"]);
+            break;
+
+        // ------------------ END NEW ACTIONS ------------------
+
         case 'get_recent_appointments':
             try {
                 Database::setUpConnection();
 
                 $query = "SELECT a.*, p.name, p.mobile, p.email, ts.slot_date, ts.slot_time
-                 FROM appointment a
-                 JOIN patient p ON a.patient_id = p.id
-                 JOIN time_slots ts ON a.slot_id = ts.id
-                 ORDER BY a.created_at DESC
-                 LIMIT 20";
+             FROM appointment a
+             JOIN patient p ON a.patient_id = p.id
+             JOIN time_slots ts ON a.slot_id = ts.id
+             ORDER BY a.created_at DESC
+             LIMIT 20";
 
                 $result = Database::search($query);
                 $appointments = [];
@@ -400,11 +498,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Database::setUpConnection();
 
                 $query = "SELECT a.*, p.title, p.name, p.mobile, p.email, p.address, 
-                         ts.slot_date, ts.slot_time
-                 FROM appointment a
-                 JOIN patient p ON a.patient_id = p.id
-                 JOIN time_slots ts ON a.slot_id = ts.id
-                 WHERE a.id = $appointmentId";
+                     ts.slot_date, ts.slot_time
+             FROM appointment a
+             JOIN patient p ON a.patient_id = p.id
+             JOIN time_slots ts ON a.slot_id = ts.id
+             WHERE a.id = $appointmentId";
 
                 $result = Database::search($query);
 
@@ -428,14 +526,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Today's appointments
                 $todayQuery = "SELECT COUNT(*) as count FROM appointment a
-                      JOIN time_slots ts ON a.slot_id = ts.id
-                      WHERE ts.slot_date = '$today'";
+                  JOIN time_slots ts ON a.slot_id = ts.id
+                  WHERE ts.slot_date = '$today'";
                 $todayResult = Database::search($todayQuery);
                 $todayCount = $todayResult->fetch_assoc()['count'];
 
                 // Pending appointments
                 $pendingQuery = "SELECT COUNT(*) as count FROM appointment 
-                        WHERE status IN ('Booked', 'Confirmed')";
+                    WHERE status IN ('Booked', 'Confirmed')";
                 $pendingResult = Database::search($pendingQuery);
                 $pendingCount = $pendingResult->fetch_assoc()['count'];
 
@@ -446,8 +544,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Monthly revenue
                 $revenueQuery = "SELECT SUM(total_amount) as revenue FROM appointment 
-                        WHERE payment_status = 'Paid' AND 
-                        DATE_FORMAT(created_at, '%Y-%m') = '$thisMonth'";
+                    WHERE payment_status = 'Paid' AND 
+                    DATE_FORMAT(created_at, '%Y-%m') = '$thisMonth'";
                 $revenueResult = Database::search($revenueQuery);
                 $revenue = $revenueResult->fetch_assoc()['revenue'] ?? 0;
 
@@ -470,8 +568,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Database::setUpConnection();
 
                 $query = "SELECT * FROM notifications 
-                 ORDER BY created_at DESC 
-                 LIMIT 10";
+             ORDER BY created_at DESC 
+             LIMIT 10";
 
                 $result = Database::search($query);
                 $notifications = [];
@@ -485,7 +583,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             }
             break;
+
+        default:
+            echo json_encode(['success' => false, 'error' => 'Invalid action: ' . $action]);
+            break;
     }
 }
-
-?>

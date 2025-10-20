@@ -12,7 +12,7 @@ require_once 'auth_manager.php';
 
 // Get current user info
 $currentUser = AuthManager::getCurrentUser();
-$currentPage = basename($_SERVER['PHP_SELF']);
+$currentPageFile = basename($_SERVER['PHP_SELF']);
 
 // Define menu items with access permissions
 $menuItems = [
@@ -75,12 +75,12 @@ function hasAccessToPage($allowedRoles)
     return in_array($_SESSION['role'], $allowedRoles);
 }
 
-function renderSidebarMenu($menuItems, $currentPage)
+function renderSidebarMenu($menuItems, $currentPageFile)
 {
     $currentRole = $_SESSION['role'] ?? 'Guest';
 
     foreach ($menuItems as $item) {
-        $isActive = ($currentPage === $item['url']);
+        $isActive = ($currentPageFile === $item['url']);
         $hasAccess = hasAccessToPage($item['allowed_roles']);
 
         if ($hasAccess) {
@@ -123,17 +123,17 @@ try {
 
     // Pagination parameters
     $recordsPerPage = 10;
-    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $currentPage = max(1, $currentPage); // Ensure page is at least 1
-    $offset = ($currentPage - 1) * $recordsPerPage;
+    $paginationPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $paginationPage = max(1, $paginationPage);
+    $offset = ($paginationPage - 1) * $recordsPerPage;
 
-    // Get total appointments count for display (regardless of filters)
+    // Get total appointments count for display
     $totalAppointmentsQuery = "SELECT COUNT(*) as total FROM appointment";
     $totalAppointmentsResult = Database::search($totalAppointmentsQuery);
     $totalAppointmentsRow = $totalAppointmentsResult->fetch_assoc();
     $totalAppointmentsCount = $totalAppointmentsRow['total'] ?? 0;
 
-    // Base query with joins (for counting total records)
+    // Base query with joins (for counting)
     $countQuery = "SELECT COUNT(*) as total FROM appointment a
         LEFT JOIN patient p ON a.patient_id = p.id
         LEFT JOIN time_slots ts ON a.slot_id = ts.id
@@ -176,7 +176,7 @@ try {
         LEFT JOIN time_slots ts ON a.slot_id = ts.id
         WHERE 1=1";
 
-    // Apply filters with proper escaping
+    // Apply filters
     if ($statusFilter !== 'all') {
         $escapedStatus = Database::$connection->real_escape_string($statusFilter);
         $baseQuery .= " AND a.status = '$escapedStatus'";
@@ -239,7 +239,7 @@ try {
     $pendingCount = 0;
     $totalRecords = 0;
     $totalPages = 1;
-    $currentPage = 1;
+    $paginationPage = 1;
 }
 
 // Helper functions
@@ -297,7 +297,7 @@ function getPageUrl($page)
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Appointments - Erundeniya Medical Center</title>
+    <title>Appointments - Erundeniya Ayurveda Hospital</title>
     <link rel="icon" type="image/png" href="../../img/logof1.png">
     <!-- CSS Files -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -306,12 +306,10 @@ function getPageUrl($page)
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
-
-    <!-- Flatpickr CSS for Calendar -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
-        /* Search Bar Styles with Clear Icon */
+        /* All your existing styles remain the same */
         .search-container {
             position: relative;
             width: 100%;
@@ -365,7 +363,6 @@ function getPageUrl($page)
             padding-left: 40px !important;
         }
 
-        /* Status Badge Styles */
         .status-badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -398,7 +395,6 @@ function getPageUrl($page)
             color: #f44336;
         }
 
-        /* Filter Buttons */
         .filter-buttons {
             display: flex;
             gap: 10px;
@@ -430,7 +426,6 @@ function getPageUrl($page)
             background: #45a049;
         }
 
-        /* Notification Badge */
         .notification-badge {
             position: relative;
             background: #f44336;
@@ -444,7 +439,6 @@ function getPageUrl($page)
             flex-direction: row;
         }
 
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -457,7 +451,6 @@ function getPageUrl($page)
             border-radius: 4px;
         }
 
-        /* Stats Cards */
         .stats-cards {
             margin-bottom: 30px;
         }
@@ -469,7 +462,6 @@ function getPageUrl($page)
             margin-top: 10px;
         }
 
-        /* Loading Spinner */
         .loading-spinner {
             display: none;
             text-align: center;
@@ -480,7 +472,6 @@ function getPageUrl($page)
             display: block;
         }
 
-        /* Responsive Improvements */
         @media (max-width: 768px) {
             .filter-buttons {
                 justify-content: center;
@@ -521,7 +512,6 @@ function getPageUrl($page)
                 font-size: 11px !important;
             }
 
-            /* Stack search and filter controls on mobile */
             .search-filters-row {
                 flex-direction: column;
             }
@@ -530,7 +520,6 @@ function getPageUrl($page)
                 margin-bottom: 10px;
             }
 
-            /* Make table more mobile-friendly */
             .table th {
                 font-size: 9px !important;
                 padding: 8px 4px !important;
@@ -541,12 +530,10 @@ function getPageUrl($page)
                 vertical-align: middle;
             }
 
-            /* Hide less important columns on very small screens */
             .table .d-none-mobile {
                 display: none !important;
             }
 
-            /* Adjust stats cards for mobile */
             .col-xl-3.col-sm-6 {
                 margin-bottom: 15px;
             }
@@ -560,7 +547,6 @@ function getPageUrl($page)
                 padding: 15px !important;
             }
 
-            /* Mobile-specific button adjustments */
             .btn.bg-gradient-success {
                 font-size: 12px;
                 padding: 8px 12px;
@@ -594,7 +580,6 @@ function getPageUrl($page)
                 font-size: 12px;
             }
 
-            /* Further compress table on very small screens */
             .table {
                 font-size: 10px;
             }
@@ -604,7 +589,6 @@ function getPageUrl($page)
                 padding: 2px 4px;
             }
 
-            /* Stack action buttons vertically on very small screens */
             .action-buttons {
                 flex-direction: column;
                 width: 100%;
@@ -615,7 +599,6 @@ function getPageUrl($page)
                 margin-bottom: 2px;
             }
 
-            /* Adjust navbar for mobile */
             .navbar-main {
                 flex-wrap: wrap;
             }
@@ -630,7 +613,6 @@ function getPageUrl($page)
             }
         }
 
-        /* Responsive table adjustments */
         @media (max-width: 992px) {
             .table-responsive {
                 border: none;
@@ -641,7 +623,6 @@ function getPageUrl($page)
             }
         }
 
-        /* Ensure buttons don't break on smaller screens */
         @media (max-width: 400px) {
             .btn {
                 font-size: 11px;
@@ -673,7 +654,6 @@ function getPageUrl($page)
             margin-top: auto;
         }
 
-        /* Logout hover effect */
         .sidenav-footer .nav-link:hover {
             background-color: #ff001910 !important;
             color: #dc3545 !important;
@@ -708,7 +688,7 @@ function getPageUrl($page)
         <hr class="horizontal dark mt-0 mb-2">
         <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
             <ul class="navbar-nav">
-                <?php renderSidebarMenu($menuItems, $currentPage); ?>
+                <?php renderSidebarMenu($menuItems, $currentPageFile); ?>
             </ul>
         </div>
         <div class="sidenav-footer">
@@ -736,9 +716,9 @@ function getPageUrl($page)
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <div class="input-group input-group-outline">
+                        <!-- <div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div>
+                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center  justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -1062,8 +1042,8 @@ function getPageUrl($page)
                         <nav aria-label="Appointments pagination">
                             <ul class="pagination justify-content-center flex-wrap">
                                 <!-- Previous button -->
-                                <li class="page-item <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="<?php echo getPageUrl($currentPage - 1); ?>" tabindex="-1">
+                                <li class="page-item <?php echo $paginationPage <= 1 ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="<?php echo getPageUrl($paginationPage - 1); ?>" tabindex="-1">
                                         <i class="material-symbols-rounded">chevron_left</i>
                                     </a>
                                 </li>
@@ -1071,7 +1051,7 @@ function getPageUrl($page)
                                 <?php
                                 // Calculate page range to display
                                 $maxPagesToShow = 5;
-                                $startPage = max(1, $currentPage - floor($maxPagesToShow / 2));
+                                $startPage = max(1, $paginationPage - floor($maxPagesToShow / 2));
                                 $endPage = min($totalPages, $startPage + $maxPagesToShow - 1);
                                 $startPage = max(1, $endPage - $maxPagesToShow + 1);
 
@@ -1088,7 +1068,7 @@ function getPageUrl($page)
                                 <?php endif; ?>
 
                                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                                    <li class="page-item <?php echo $i === $currentPage ? 'active' : ''; ?>">
+                                    <li class="page-item <?php echo $i === $paginationPage ? 'active' : ''; ?>">
                                         <a class="page-link" href="<?php echo getPageUrl($i); ?>">
                                             <?php echo $i; ?>
                                         </a>
@@ -1109,8 +1089,8 @@ function getPageUrl($page)
                                 <?php endif; ?>
 
                                 <!-- Next button -->
-                                <li class="page-item <?php echo $currentPage >= $totalPages ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="<?php echo getPageUrl($currentPage + 1); ?>">
+                                <li class="page-item <?php echo $paginationPage >= $totalPages ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="<?php echo getPageUrl($paginationPage + 1); ?>">
                                         <i class="material-symbols-rounded">chevron_right</i>
                                     </a>
                                 </li>
@@ -1156,57 +1136,41 @@ function getPageUrl($page)
     <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
 
     <script>
-        // Real-time search functionality with clear icon
+        // All your existing JavaScript code remains exactly the same
         let searchTimeout;
         let isRealTimeSearch = true;
 
-        // DOM elements
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const appointmentsTableBody = document.getElementById('appointmentsTableBody');
         const appointmentsTable = document.getElementById('appointmentsTable');
 
-        // Initialize search functionality
         function initializeSearch() {
-            // Search input event listeners
             searchInput.addEventListener('input', handleSearchInput);
             searchInput.addEventListener('keypress', handleSearchKeypress);
-
-            // Clear button event listener
             clearSearchBtn.addEventListener('click', clearSearch);
-
-            // Show/hide clear button based on input
             searchInput.addEventListener('input', toggleClearButton);
-
-            // Initial state
             toggleClearButton();
         }
 
-        // Handle search input with debouncing
         function handleSearchInput(e) {
             const searchTerm = e.target.value.trim();
-
-            // Show/hide clear button
             toggleClearButton();
 
-            // Clear previous timeout
             if (searchTimeout) {
                 clearTimeout(searchTimeout);
             }
 
-            // Set a new timeout for real-time search (300ms delay to avoid too many requests)
             searchTimeout = setTimeout(() => {
                 if (isRealTimeSearch && searchTerm.length > 0) {
                     performRealTimeSearch(searchTerm);
                 } else if (searchTerm.length === 0) {
-                    // If search box is empty, reload page to show all appointments
                     reloadCurrentPage();
                 }
             }, 300);
         }
 
-        // Handle Enter key press
         function handleSearchKeypress(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -1219,7 +1183,6 @@ function getPageUrl($page)
             }
         }
 
-        // Toggle clear button visibility
         function toggleClearButton() {
             if (searchInput.value.trim().length > 0) {
                 clearSearchBtn.classList.add('show');
@@ -1228,32 +1191,26 @@ function getPageUrl($page)
             }
         }
 
-        // Clear search functionality
         function clearSearch() {
             searchInput.value = '';
             clearSearchBtn.classList.remove('show');
             reloadCurrentPage();
         }
 
-        // Reload current page without search parameter
         function reloadCurrentPage() {
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.delete('search');
             window.location.href = currentUrl.toString();
         }
 
-        // Perform real-time search via AJAX
-        // Perform real-time search via AJAX
         function performRealTimeSearch(searchTerm) {
             const currentUrl = new URL(window.location.href);
             const status = currentUrl.searchParams.get('status') || 'all';
             const date = currentUrl.searchParams.get('date') || '';
             const page = currentUrl.searchParams.get('page') || '1';
 
-            // Show loading indicator
             showLoading();
 
-            // Make AJAX request
             fetch('search_appointments_ajax.php', {
                     method: 'POST',
                     headers: {
@@ -1287,19 +1244,16 @@ function getPageUrl($page)
                 });
         }
 
-        // Show loading indicator
         function showLoading() {
             appointmentsTable.style.display = 'none';
             loadingSpinner.classList.add('show');
         }
 
-        // Hide loading indicator
         function hideLoading() {
             loadingSpinner.classList.remove('show');
             appointmentsTable.style.display = 'table';
         }
 
-        // Display no results message
         function displayNoResults() {
             appointmentsTableBody.innerHTML = `
                 <tr>
@@ -1316,7 +1270,6 @@ function getPageUrl($page)
             `;
         }
 
-        // Update the appointments table with search results
         function updateAppointmentsTable(appointments) {
             if (appointments.length === 0) {
                 displayNoResults();
