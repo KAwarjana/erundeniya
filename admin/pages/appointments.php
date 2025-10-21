@@ -942,7 +942,7 @@ function getPageUrl($page)
                                                     <td>
                                                         <div class="d-flex flex-column">
                                                             <span class="text-sm font-weight-bold">
-                                                                <?php echo htmlspecialchars($appointment['patient_title'] . '. ' . $appointment['patient_name']); ?>
+                                                                <?php echo htmlspecialchars($appointment['patient_title'] . $appointment['patient_name']); ?>
                                                             </span>
                                                             <span class="text-xs text-secondary"><?php echo htmlspecialchars($appointment['patient_mobile']); ?></span>
                                                             <?php if ($appointment['patient_email']): ?>
@@ -1137,6 +1137,8 @@ function getPageUrl($page)
 
     <script>
         // All your existing JavaScript code remains exactly the same
+        // Replace the entire <script> section in appointments.php with this code
+
         let searchTimeout;
         let isRealTimeSearch = true;
 
@@ -1147,6 +1149,11 @@ function getPageUrl($page)
         const appointmentsTable = document.getElementById('appointmentsTable');
 
         function initializeSearch() {
+            if (!searchInput || !clearSearchBtn) {
+                console.error('Search elements not found');
+                return;
+            }
+
             searchInput.addEventListener('input', handleSearchInput);
             searchInput.addEventListener('keypress', handleSearchKeypress);
             clearSearchBtn.addEventListener('click', clearSearch);
@@ -1184,16 +1191,22 @@ function getPageUrl($page)
         }
 
         function toggleClearButton() {
-            if (searchInput.value.trim().length > 0) {
-                clearSearchBtn.classList.add('show');
-            } else {
-                clearSearchBtn.classList.remove('show');
+            if (searchInput && clearSearchBtn) {
+                if (searchInput.value.trim().length > 0) {
+                    clearSearchBtn.classList.add('show');
+                } else {
+                    clearSearchBtn.classList.remove('show');
+                }
             }
         }
 
         function clearSearch() {
-            searchInput.value = '';
-            clearSearchBtn.classList.remove('show');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (clearSearchBtn) {
+                clearSearchBtn.classList.remove('show');
+            }
             reloadCurrentPage();
         }
 
@@ -1228,7 +1241,9 @@ function getPageUrl($page)
                     if (data.success) {
                         updateAppointmentsTable(data.appointments);
                         updateStatistics(data.statistics);
-                        updatePagination(data.pagination);
+                        if (typeof updatePagination === 'function') {
+                            updatePagination(data.pagination);
+                        }
                         showNotification(`Found ${data.total_records} appointment(s)`, 'success');
                     } else {
                         showNotification('Search failed: ' + data.message, 'error');
@@ -1245,32 +1260,36 @@ function getPageUrl($page)
         }
 
         function showLoading() {
-            appointmentsTable.style.display = 'none';
-            loadingSpinner.classList.add('show');
+            if (appointmentsTable) appointmentsTable.style.display = 'none';
+            if (loadingSpinner) loadingSpinner.classList.add('show');
         }
 
         function hideLoading() {
-            loadingSpinner.classList.remove('show');
-            appointmentsTable.style.display = 'table';
+            if (loadingSpinner) loadingSpinner.classList.remove('show');
+            if (appointmentsTable) appointmentsTable.style.display = 'table';
         }
 
         function displayNoResults() {
+            if (!appointmentsTableBody) return;
+
             appointmentsTableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center py-4">
-                        <div class="d-flex flex-column align-items-center">
-                            <i class="material-symbols-rounded text-muted" style="font-size: 48px;">search_off</i>
-                            <p class="text-muted mt-2">No appointments found for your search</p>
-                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="clearSearch()">
-                                <i class="material-symbols-rounded" style="font-size: 14px;">refresh</i> Clear Search
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
+        <tr>
+            <td colspan="6" class="text-center py-4">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="material-symbols-rounded text-muted" style="font-size: 48px;">search_off</i>
+                    <p class="text-muted mt-2">No appointments found for your search</p>
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="clearSearch()">
+                        <i class="material-symbols-rounded" style="font-size: 14px;">refresh</i> Clear Search
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
         }
 
         function updateAppointmentsTable(appointments) {
+            if (!appointmentsTableBody) return;
+
             if (appointments.length === 0) {
                 displayNoResults();
                 return;
@@ -1284,77 +1303,82 @@ function getPageUrl($page)
                 const formattedTime = formatTime(appointment.appointment_time);
 
                 html += `
-                    <tr data-status="${appointment.status.toLowerCase()}">
-                        <td>
-                            <div class="d-flex px-2 py-1">
-                                <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-sm font-weight-bold">${escapeHtml(appointment.appointment_number)}</h6>
-                                    <p class="text-xs text-secondary mb-0 d-md-none">
-                                        ${formattedDate}, ${formattedTime}
-                                    </p>
-                                    <p class="text-xs text-secondary mb-0">
-                                        ${capitalizeFirst(appointment.booking_type)} Booking
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column">
-                                <span class="text-sm font-weight-bold">
-                                    ${escapeHtml(appointment.patient_title + '. ' + appointment.patient_name)}
-                                </span>
-                                <span class="text-xs text-secondary">${escapeHtml(appointment.patient_mobile)}</span>
-                                ${appointment.patient_email ? `<span class="text-xs text-secondary d-none d-lg-inline">${escapeHtml(appointment.patient_email)}</span>` : ''}
-                            </div>
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                            <div class="d-flex flex-column">
-                                <span class="text-sm font-weight-bold">${formattedDate}</span>
-                                <span class="text-xs text-secondary">${appointment.day_of_week}</span>
-                                <span class="text-xs text-info">${formattedTime}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="status-badge ${statusClass}">
-                                ${escapeHtml(appointment.status)}
-                            </span>
-                            <div class="text-xs text-secondary d-lg-none mt-1">
-                                ${formatCurrency(appointment.total_amount)} - ${appointment.payment_status}
-                            </div>
-                        </td>
-                        <td class="d-none d-lg-table-cell">
-                            <span class="text-sm font-weight-bold ${paymentColor}">
-                                <i class="material-symbols-rounded text-sm">
-                                    ${appointment.payment_status === 'Paid' ? 'check_circle' : 'pending'}
-                                </i>
-                                ${escapeHtml(appointment.payment_status)}
-                            </span>
-                            <div class="text-xs text-secondary">
-                                ${formatCurrency(appointment.total_amount)}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                ${getActionButtons(appointment)}
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            <tr data-status="${appointment.status.toLowerCase()}">
+                <td>
+                    <div class="d-flex px-2 py-1">
+                        <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm font-weight-bold">${escapeHtml(appointment.appointment_number)}</h6>
+                            <p class="text-xs text-secondary mb-0 d-md-none">
+                                ${formattedDate}, ${formattedTime}
+                            </p>
+                            <p class="text-xs text-secondary mb-0">
+                                ${capitalizeFirst(appointment.booking_type)} Booking
+                            </p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <span class="text-sm font-weight-bold">
+                            ${escapeHtml(appointment.patient_title + '. ' + appointment.patient_name)}
+                        </span>
+                        <span class="text-xs text-secondary">${escapeHtml(appointment.patient_mobile)}</span>
+                        ${appointment.patient_email ? `<span class="text-xs text-secondary d-none d-lg-inline">${escapeHtml(appointment.patient_email)}</span>` : ''}
+                    </div>
+                </td>
+                <td class="d-none d-md-table-cell">
+                    <div class="d-flex flex-column">
+                        <span class="text-sm font-weight-bold">${formattedDate}</span>
+                        <span class="text-xs text-secondary">${appointment.day_of_week}</span>
+                        <span class="text-xs text-info">${formattedTime}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="status-badge ${statusClass}">
+                        ${escapeHtml(appointment.status)}
+                    </span>
+                    <div class="text-xs text-secondary d-lg-none mt-1">
+                        ${formatCurrency(appointment.total_amount)} - ${appointment.payment_status}
+                    </div>
+                </td>
+                <td class="d-none d-lg-table-cell">
+                    <span class="text-sm font-weight-bold ${paymentColor}">
+                        <i class="material-symbols-rounded text-sm">
+                            ${appointment.payment_status === 'Paid' ? 'check_circle' : 'pending'}
+                        </i>
+                        ${escapeHtml(appointment.payment_status)}
+                    </span>
+                    <div class="text-xs text-secondary">
+                        ${formatCurrency(appointment.total_amount)}
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        ${getActionButtons(appointment)}
+                    </div>
+                </td>
+            </tr>
+        `;
             });
 
             appointmentsTableBody.innerHTML = html;
         }
 
-        // Update statistics
         function updateStatistics(statistics) {
-            document.getElementById('todayCount').textContent = statistics.today_count;
-            document.getElementById('confirmedCount').textContent = statistics.confirmed_count;
-            document.getElementById('attendedCount').textContent = statistics.attended_count;
-            document.getElementById('noShowCount').textContent = statistics.no_show_count;
-            document.getElementById('notificationCount').textContent = statistics.pending_count;
+            const updates = {
+                'todayCount': statistics.today_count,
+                'confirmedCount': statistics.confirmed_count,
+                'attendedCount': statistics.attended_count,
+                'noShowCount': statistics.no_show_count,
+                'notificationCount': statistics.pending_count
+            };
+
+            Object.keys(updates).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = updates[id];
+            });
         }
 
-        // Helper functions
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', {
@@ -1415,58 +1439,57 @@ function getPageUrl($page)
 
             if (appointment.status === 'Booked' || appointment.status === 'Confirmed') {
                 buttons += `
-                    <button class="btn btn-sm btn-outline-success" onclick="markAttendance('${appointment.appointment_number}', 'Attended')">
-                        <i class="material-symbols-rounded text-sm">check</i>
-                        <span class="d-none d-xl-inline">Attended</span>
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning" onclick="markAttendance('${appointment.appointment_number}', 'No-Show')">
-                        <i class="material-symbols-rounded text-sm">close</i>
-                        <span class="d-none d-xl-inline">No Show</span>
-                    </button>
-                `;
+            <button class="btn btn-sm btn-outline-success" onclick="markAttendance('${appointment.appointment_number}', 'Attended')">
+                <i class="material-symbols-rounded text-sm">check</i>
+                <span class="d-none d-xl-inline">Attended</span>
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="markAttendance('${appointment.appointment_number}', 'No-Show')">
+                <i class="material-symbols-rounded text-sm">close</i>
+                <span class="d-none d-xl-inline">No Show</span>
+            </button>
+        `;
                 if (appointment.status === 'Booked') {
                     buttons += `
-                        <button class="btn btn-sm btn-outline-danger d-none d-md-inline-block" onclick="cancelAppointment('${appointment.appointment_number}')">
-                            <i class="material-symbols-rounded text-sm">cancel</i>
-                            <span class="d-none d-xl-inline">Cancel</span>
-                        </button>
-                    `;
+                <button class="btn btn-sm btn-outline-danger d-none d-md-inline-block" onclick="cancelAppointment('${appointment.appointment_number}')">
+                    <i class="material-symbols-rounded text-sm">cancel</i>
+                    <span class="d-none d-xl-inline">Cancel</span>
+                </button>
+            `;
                 }
             } else if (appointment.status === 'Attended') {
                 buttons += `
-                    <button class="btn btn-sm btn-dark" onclick="createBill('${appointment.appointment_number}')">
-                        <i class="material-symbols-rounded text-sm">receipt</i>
-                        <span class="d-none d-xl-inline">Create Bill</span>
-                    </button>
-                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
-                        <i class="material-symbols-rounded text-sm">visibility</i>
-                        <span class="d-none d-xl-inline">View</span>
-                    </button>
-                `;
+            <button class="btn btn-sm btn-dark" onclick="createBill('${appointment.appointment_number}')">
+                <i class="material-symbols-rounded text-sm">receipt</i>
+                <span class="d-none d-xl-inline">Create Bill</span>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
+                <i class="material-symbols-rounded text-sm">visibility</i>
+                <span class="d-none d-xl-inline">View</span>
+            </button>
+        `;
             } else if (appointment.status === 'No-Show') {
                 buttons += `
-                    <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment('${appointment.appointment_number}')">
-                        <i class="material-symbols-rounded text-sm">schedule</i>
-                        <span class="d-none d-xl-inline">Reschedule</span>
-                    </button>
-                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
-                        <i class="material-symbols-rounded text-sm">visibility</i>
-                        <span class="d-none d-xl-inline">View</span>
-                    </button>
-                `;
+            <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment('${appointment.appointment_number}')">
+                <i class="material-symbols-rounded text-sm">schedule</i>
+                <span class="d-none d-xl-inline">Reschedule</span>
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
+                <i class="material-symbols-rounded text-sm">visibility</i>
+                <span class="d-none d-xl-inline">View</span>
+            </button>
+        `;
             } else {
                 buttons += `
-                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
-                        <i class="material-symbols-rounded text-sm">visibility</i>
-                        <span class="d-none d-xl-inline">View</span>
-                    </button>
-                `;
+            <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
+                <i class="material-symbols-rounded text-sm">visibility</i>
+                <span class="d-none d-xl-inline">View</span>
+            </button>
+        `;
             }
 
             return buttons;
         }
 
-        // Notification function
         function showNotification(message, type = 'info') {
             const colors = {
                 success: '#4caf50',
@@ -1482,7 +1505,6 @@ function getPageUrl($page)
                 error: 'error'
             };
 
-            // Create notification element
             const toast = document.createElement('div');
             toast.className = 'custom-toast';
             toast.style.cssText = `
@@ -1506,54 +1528,30 @@ function getPageUrl($page)
         font-weight: 500;
     `;
 
-            // Create icon element using Material Symbols
             const iconElement = document.createElement('span');
             iconElement.className = 'material-symbols-rounded';
-            iconElement.style.cssText = `
-        font-size: 24px;
-        flex-shrink: 0;
-    `;
+            iconElement.style.cssText = 'font-size: 24px; flex-shrink: 0;';
             iconElement.textContent = icons[type] || icons.info;
 
-            // Create message element
             const messageElement = document.createElement('span');
-            messageElement.style.cssText = `
-        flex: 1;
-        line-height: 1.4;
-    `;
+            messageElement.style.cssText = 'flex: 1; line-height: 1.4;';
             messageElement.textContent = message;
 
-            // Append elements
             toast.appendChild(iconElement);
             toast.appendChild(messageElement);
 
-            // Add animation styles if not already present
             if (!document.getElementById('toast-animations')) {
                 const style = document.createElement('style');
                 style.id = 'toast-animations';
                 style.textContent = `
             @keyframes slideIn {
-                from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
             }
-            
             @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
             }
-            
             .custom-toast:hover {
                 box-shadow: 0 6px 16px rgba(0,0,0,0.2);
                 transform: translateY(-2px);
@@ -1563,40 +1561,23 @@ function getPageUrl($page)
                 document.head.appendChild(style);
             }
 
-            // Add to document
             document.body.appendChild(toast);
 
-            // Auto remove after 3 seconds with animation
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.3s ease-in';
                 setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
+                    if (toast.parentNode) toast.remove();
                 }, 300);
             }, 3000);
 
-            // Click to dismiss
             toast.addEventListener('click', () => {
                 toast.style.animation = 'slideOut 0.3s ease-in';
                 setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
+                    if (toast.parentNode) toast.remove();
                 }, 300);
             });
         }
 
-        // Global search functionality
-        document.getElementById('globalSearch').addEventListener('input', function() {
-            document.querySelector('input[name="search"]').value = this.value;
-            document.getElementById('searchForm').dispatchEvent(new Event('submit'));
-        });
-
-        // Initialize search when page loads
-        document.addEventListener('DOMContentLoaded', initializeSearch);
-
-        // Keep your existing functions
         function markAttendance(appointmentId, status) {
             if (confirm(`Mark ${appointmentId} as ${status}?`)) {
                 fetch('update_appointment_status.php', {
@@ -1670,7 +1651,6 @@ function getPageUrl($page)
             }
         }
 
-        // Filter appointments by status
         function filterAppointments(status) {
             const currentUrl = new URL(window.location.href);
             if (status === 'all') {
@@ -1681,84 +1661,48 @@ function getPageUrl($page)
             window.location.href = currentUrl.toString();
         }
 
-        // Export button
-        document.getElementById('btnExportExcel').addEventListener('click', exportAppointments);
-
-        // Update pagination
-        function updatePagination(pagination) {
-            if (!pagination || pagination.total_pages <= 1) {
-                document.querySelector('.pagination').parentElement.parentElement.style.display = 'none';
-                return;
-            }
-
-            document.querySelector('.pagination').parentElement.parentElement.style.display = 'block';
-
-            let paginationHtml = '';
-            const currentPage = parseInt(pagination.current_page);
-            const totalPages = parseInt(pagination.total_pages);
-
-            // Previous button
-            paginationHtml += `
-        <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-            <a class="page-link" href="${getPageUrl(currentPage - 1)}" tabindex="-1">
-                <i class="material-symbols-rounded">chevron_left</i>
-            </a>
-        </li>
-    `;
-
-            // Calculate page range
-            const maxPagesToShow = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-            startPage = Math.max(1, endPage - maxPagesToShow + 1);
-
-            // First page and ellipsis
-            if (startPage > 1) {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="${getPageUrl(1)}">1</a></li>`;
-                if (startPage > 2) {
-                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                }
-            }
-
-            // Page numbers
-            for (let i = startPage; i <= endPage; i++) {
-                paginationHtml += `
-            <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="${getPageUrl(i)}">${i}</a>
-            </li>
-        `;
-            }
-
-            // Last page and ellipsis
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                }
-                paginationHtml += `<li class="page-item"><a class="page-link" href="${getPageUrl(totalPages)}">${totalPages}</a></li>`;
-            }
-
-            // Next button
-            paginationHtml += `
-        <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="${getPageUrl(currentPage + 1)}">
-                <i class="material-symbols-rounded">chevron_right</i>
-            </a>
-        </li>
-    `;
-
-            document.querySelector('.pagination').innerHTML = paginationHtml;
-
-            // Update showing text
-            const showingText = `Showing ${Math.min(pagination.offset + 1, pagination.total_records)} to ${Math.min(pagination.offset + pagination.records_per_page, pagination.total_records)} of ${pagination.total_records} appointments`;
-            document.querySelector('.text-muted.text-sm').textContent = showingText;
-        }
-
-        // Helper function to generate page URLs
         function getPageUrl(page) {
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.set('page', page);
             return currentUrl.toString();
         }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - Initializing...');
+
+            // Initialize search functionality
+            initializeSearch();
+
+            // Export button - with null check
+            const exportBtn = document.getElementById('btnExportExcel');
+            if (exportBtn) {
+                console.log('Export button found, attaching listener');
+                exportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    exportAppointments();
+                });
+            } else {
+                console.warn('Export button not found');
+            }
+
+            // Global search - only if element exists (this is in navbar)
+            const globalSearch = document.getElementById('globalSearch');
+            if (globalSearch) {
+                console.log('Global search found');
+                const searchInput = document.querySelector('input[name="search"]');
+                if (searchInput) {
+                    globalSearch.addEventListener('input', function() {
+                        searchInput.value = this.value;
+                        if (this.value.trim().length > 2 || this.value.trim().length === 0) {
+                            performRealTimeSearch(this.value.trim());
+                        }
+                    });
+                }
+            }
+
+            console.log('Initialization complete');
+        });
     </script>
 
 </body>

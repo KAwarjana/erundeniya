@@ -51,7 +51,7 @@ try {
     if (!$aptNum) throw new Exception('Appointment number required');
 
     $sql = "SELECT a.*,
-               CONCAT(p.title, '. ', p.name) AS patient_name,
+               CONCAT(p.title, p.name) AS patient_name,
                p.registration_number, p.mobile, p.email, p.address,
                TIMESTAMPDIFF(MONTH, p.created_at, CURDATE()) AS reg_months,
                ts.slot_time, ts.day_of_week

@@ -1935,3 +1935,21 @@ Stack trace:
 [20-Oct-2025 01:31:52 Europe/Berlin] Request: {"time":"2025-10-20 01:31:52","method":"POST","action":"get_time_slots","ip":"::1"}
 [20-Oct-2025 01:31:52 Europe/Berlin] Processing action: get_time_slots
 [20-Oct-2025 01:31:52 Europe/Berlin] Database connection established successfully
+[20-Oct-2025 20:41:45 Europe/Berlin] Request: {"time":"2025-10-20 20:41:45","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[20-Oct-2025 20:41:45 Europe/Berlin] Processing action: get_all_available_dates
+[20-Oct-2025 20:41:45 Europe/Berlin] Database connection established successfully
+[20-Oct-2025 20:41:45 Europe/Berlin] Request: {"time":"2025-10-20 20:41:45","method":"POST","action":"get_time_slots","ip":"::1"}
+[20-Oct-2025 20:41:45 Europe/Berlin] Processing action: get_time_slots
+[20-Oct-2025 20:41:45 Europe/Berlin] Database connection established successfully
+[20-Oct-2025 20:43:40 Europe/Berlin] Request: {"time":"2025-10-20 20:43:40","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[20-Oct-2025 20:43:40 Europe/Berlin] Processing action: get_all_available_dates
+[20-Oct-2025 20:43:40 Europe/Berlin] Database connection established successfully
+[20-Oct-2025 20:43:40 Europe/Berlin] Request: {"time":"2025-10-20 20:43:40","method":"POST","action":"get_time_slots","ip":"::1"}
+[20-Oct-2025 20:43:40 Europe/Berlin] Processing action: get_time_slots
+[20-Oct-2025 20:43:40 Europe/Berlin] Database connection established successfully
+[21-Oct-2025 16:21:47 Europe/Berlin] Request: {"time":"2025-10-21 16:21:47","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[21-Oct-2025 16:21:47 Europe/Berlin] Processing action: get_all_available_dates
+[21-Oct-2025 16:21:47 Europe/Berlin] Database connection established successfully
+[21-Oct-2025 16:21:47 Europe/Berlin] Request: {"time":"2025-10-21 16:21:47","method":"POST","action":"get_time_slots","ip":"::1"}
+[21-Oct-2025 16:21:47 Europe/Berlin] Processing action: get_time_slots
+[21-Oct-2025 16:21:47 Europe/Berlin] Database connection established successfully
