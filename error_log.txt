@@ -1953,3 +1953,20 @@ Stack trace:
 [21-Oct-2025 16:21:47 Europe/Berlin] Request: {"time":"2025-10-21 16:21:47","method":"POST","action":"get_time_slots","ip":"::1"}
 [21-Oct-2025 16:21:47 Europe/Berlin] Processing action: get_time_slots
 [21-Oct-2025 16:21:47 Europe/Berlin] Database connection established successfully
+[24-Oct-2025 14:56:29 Europe/Berlin] Request: {"time":"2025-10-24 14:56:29","method":"POST","action":"test","ip":"::1"}
+[24-Oct-2025 14:56:29 Europe/Berlin] Processing action: test
+[24-Oct-2025 14:56:29 Europe/Berlin] Request: {"time":"2025-10-24 14:56:29","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[24-Oct-2025 14:56:29 Europe/Berlin] Processing action: get_all_available_dates
+[24-Oct-2025 14:56:29 Europe/Berlin] Database connection established successfully
+[24-Oct-2025 14:56:29 Europe/Berlin] Request: {"time":"2025-10-24 14:56:29","method":"POST","action":"get_consultation_dates","ip":"::1"}
+[24-Oct-2025 14:56:29 Europe/Berlin] Processing action: get_consultation_dates
+[24-Oct-2025 14:56:29 Europe/Berlin] Database connection established successfully
+[24-Oct-2025 14:56:29 Europe/Berlin] Request: {"time":"2025-10-24 14:56:29","method":"POST","action":"get_time_slots","ip":"::1"}
+[24-Oct-2025 14:56:29 Europe/Berlin] Processing action: get_time_slots
+[24-Oct-2025 14:56:29 Europe/Berlin] Database connection established successfully
+[10-Nov-2025 09:49:48 Europe/Berlin] Request: {"time":"2025-11-10 09:49:48","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[10-Nov-2025 09:49:48 Europe/Berlin] Processing action: get_all_available_dates
+[10-Nov-2025 09:49:48 Europe/Berlin] Database connection established successfully
+[10-Nov-2025 09:49:48 Europe/Berlin] Request: {"time":"2025-11-10 09:49:48","method":"POST","action":"get_time_slots","ip":"::1"}
+[10-Nov-2025 09:49:48 Europe/Berlin] Processing action: get_time_slots
+[10-Nov-2025 09:49:48 Europe/Berlin] Database connection established successfully

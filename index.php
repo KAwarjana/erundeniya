@@ -139,7 +139,7 @@
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
                         <a href="gallery.php" class="nav-item nav-link">Gallery</a>
-                        <a href="appointment.php" class="nav-item" style="align-self: center; width: 100%;">
+                        <a href="comingsoon/index.html" class="nav-item" style="align-self: center; width: 100%;">
                             <div class="">
                                 <button type="button" class="btn btn-primary rounded-pill">Appointments</button>
                             </div>
