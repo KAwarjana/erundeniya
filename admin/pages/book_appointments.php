@@ -763,21 +763,21 @@ $currentUser = AuthManager::getCurrentUser();
                                             </div>
 
                                             <div class="form-group">
-                        <div class="form-check" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
-                            <input class="form-check-input" type="checkbox" id="rescheduleNextDay" 
-                                   style="width: 20px; height: 20px; margin-top: 0;">
-                            <label class="form-check-label ms-2" for="rescheduleNextDay" style="cursor: pointer;">
-                                <strong style="color: #333;">
-                                    <i class="fas fa-calendar-check text-success"></i> 
-                                    Reschedule to next day
-                                </strong>
-                                <br>
-                                <small class="text-muted" style="display: block; margin-top: 5px; margin-left: 28px;">
-                                    Make the next day (Thursday/Monday) available for consultations
-                                </small>
-                            </label>
-                        </div>
-                    </div>
+                                                <div class="form-check" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                                                    <input class="form-check-input" type="checkbox" id="rescheduleNextDay"
+                                                        style="width: 20px; height: 20px; margin-top: 0;">
+                                                    <label class="form-check-label ms-2" for="rescheduleNextDay" style="cursor: pointer;">
+                                                        <strong style="color: #333;">
+                                                            <i class="fas fa-calendar-check text-success"></i>
+                                                            Reschedule to next day
+                                                        </strong>
+                                                        <br>
+                                                        <small class="text-muted" style="display: block; margin-top: 5px; margin-left: 28px;">
+                                                            Make the next day (Thursday/Monday) available for consultations
+                                                        </small>
+                                                    </label>
+                                                </div>
+                                            </div>
 
                                             <div class="d-flex gap-2">
                                                 <button type="submit" class="btn-primary btn-with-icon">
@@ -1297,12 +1297,22 @@ $currentUser = AuthManager::getCurrentUser();
                 card.className = `slot-card ${slot.is_available ? 'available' : (slot.is_blocked ? 'blocked' : 'booked')}`;
                 card.dataset.time = slot.time;
                 card.dataset.status = slot.status;
+                card.dataset.slotNumber = slot.slot_number;
 
-                card.innerHTML = `
-                <div class="slot-time">${slot.display_time}</div>
-                <div class="slot-status">${slot.status}</div>
-                ${slot.appointment_number ? `<small style="color: #666;">${slot.appointment_number}</small>` : ''}
-            `;
+                // Card content with slot number
+                let cardContent = `
+            <div style="font-size: 18px; font-weight: bold; color: #017e12ff; margin-bottom: 5px;">
+                #${slot.slot_number}
+            </div>
+            <div class="slot-time">${slot.display_time}</div>
+            <div class="slot-status">${slot.status}</div>
+        `;
+
+                if (slot.appointment_number) {
+                    cardContent += `<small style="color: #666;">${slot.appointment_number}</small>`;
+                }
+
+                card.innerHTML = cardContent;
 
                 if (slot.is_available || slot.is_blocked) {
                     card.onclick = () => toggleSlot(slot.time, card);

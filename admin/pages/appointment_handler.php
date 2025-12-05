@@ -2,6 +2,32 @@
 // appointment_handler.php
 require_once '../../connection/connection.php';
 
+/**
+ * Slot Number Generator Class
+ * Generates slot numbers (01-44) based on time
+ */
+class SlotNumberGenerator {
+    
+    public static function getSlotNumber($time) {
+        // Define time slots from 9:00 AM to 8:00 PM (15-minute intervals = 44 slots)
+        $startTime = strtotime('09:00:00');
+        $slotTime = strtotime($time);
+        
+        // Calculate slot number based on 15-minute intervals
+        $minutesDiff = ($slotTime - $startTime) / 60;
+        $slotNumber = ($minutesDiff / 15) + 1;
+        
+        // Return formatted slot number (01, 02, 03, etc.)
+        return str_pad($slotNumber, 2, '0', STR_PAD_LEFT);
+    }
+    
+    public static function getSlotDisplay($time) {
+        $slotNumber = self::getSlotNumber($time);
+        $displayTime = date('g:i A', strtotime($time));
+        return "Slot {$slotNumber} - {$displayTime}";
+    }
+}
+
 class AppointmentManager
 {
     public static function generateTimeSlots($date, $dayOfWeek)
@@ -282,6 +308,7 @@ class AppointmentManager
         }
     }
 }
+
 // API endpoints
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
@@ -305,6 +332,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $slotsArray = [];
 
             while ($row = $slots->fetch_assoc()) {
+                // Add slot number to each slot
+                $row['slot_number'] = SlotNumberGenerator::getSlotNumber($row['slot_time']);
+                $row['slot_display'] = SlotNumberGenerator::getSlotDisplay($row['slot_time']);
                 $slotsArray[] = $row;
             }
 
@@ -374,31 +404,160 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => $prescriptionId !== false, 'prescription_id' => $prescriptionId]);
             break;
 
-        // ------------------ NEW ACTIONS FOR book_appointments.php ------------------
+        // ------------------ ENHANCED ACTIONS WITH SLOT NUMBERS ------------------
 
         case 'get_time_slots':
-            $date = $_POST['date'] ?? '';
-            if (empty($date)) {
-                echo json_encode(['success' => false, 'error' => 'Date is required']);
-                exit;
+            try {
+                Database::setUpConnection();
+                
+                $date = $_POST['date'] ?? '';
+                if (empty($date)) {
+                    echo json_encode(['success' => false, 'message' => 'Date is required']);
+                    exit;
+                }
+
+                $date = Database::$connection->real_escape_string($date);
+                $dayOfWeek = date('l', strtotime($date));
+                
+                // Check if it's a valid consultation day
+                $isValidDay = ($dayOfWeek === 'Wednesday' || $dayOfWeek === 'Sunday');
+                
+                // Check for temporary consultation day
+                $tempDayQuery = "SELECT * FROM temporary_consultation_days WHERE consultation_date = '$date'";
+                $tempDayResult = Database::search($tempDayQuery);
+                $isTempDay = ($tempDayResult->num_rows > 0);
+                
+                // Check for holiday
+                $holidayQuery = "SELECT * FROM holidays WHERE holiday_date = '$date'";
+                $holidayResult = Database::search($holidayQuery);
+                $isHoliday = ($holidayResult->num_rows > 0);
+                
+                if ($isHoliday) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Selected date is a holiday. All slots are blocked.'
+                    ]);
+                    exit;
+                }
+                
+                if (!$isValidDay && !$isTempDay) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Selected date is not a consultation day'
+                    ]);
+                    exit;
+                }
+                
+                // Generate slots if not exist
+                AppointmentManager::generateTimeSlots($date, $dayOfWeek);
+                
+                // Define time slots (9:00 AM to 8:00 PM, 15-minute intervals)
+                $timeSlots = [];
+                $startTime = new DateTime('09:00');
+                $endTime = new DateTime('20:00');
+                $interval = new DateInterval('PT15M');
+                
+                $currentTime = clone $startTime;
+                while ($currentTime < $endTime) {
+                    $timeSlots[] = $currentTime->format('H:i:s');
+                    $currentTime->add($interval);
+                }
+                
+                $slots = [];
+                
+                foreach ($timeSlots as $time) {
+                    // Get slot number
+                    $slotNumber = SlotNumberGenerator::getSlotNumber($time);
+                    
+                    // Check if slot exists in time_slots table
+                    $slotQuery = "SELECT id FROM time_slots 
+                                 WHERE slot_date = '$date' AND slot_time = '$time'";
+                    $slotResult = Database::search($slotQuery);
+                    
+                    if ($slotResult->num_rows > 0) {
+                        $slotRow = $slotResult->fetch_assoc();
+                        $slotId = $slotRow['id'];
+                        
+                        // Check if slot is booked
+                        $appointmentQuery = "SELECT appointment_number FROM appointment 
+                                           WHERE slot_id = '$slotId' 
+                                           AND status != 'Cancelled'";
+                        $appointmentResult = Database::search($appointmentQuery);
+                        $isBooked = ($appointmentResult->num_rows > 0);
+                        
+                        // Check if slot is blocked
+                        $blockQuery = "SELECT reason FROM blocked_slots 
+                                     WHERE blocked_date = '$date' 
+                                     AND blocked_time = '$time'";
+                        $blockResult = Database::search($blockQuery);
+                        $isBlocked = ($blockResult->num_rows > 0);
+                        
+                        $appointmentNumber = null;
+                        $blockReason = null;
+                        
+                        if ($isBooked) {
+                            $appointmentRow = $appointmentResult->fetch_assoc();
+                            $appointmentNumber = $appointmentRow['appointment_number'];
+                        }
+                        
+                        if ($isBlocked) {
+                            $blockRow = $blockResult->fetch_assoc();
+                            $blockReason = $blockRow['reason'];
+                        }
+                        
+                        $slots[] = [
+                            'slot_id' => $slotId,
+                            'time' => $time,
+                            'slot_number' => $slotNumber,
+                            'display_time' => date('g:i A', strtotime($time)),
+                            'slot_display' => "Slot {$slotNumber} - " . date('g:i A', strtotime($time)),
+                            'is_available' => !$isBooked && !$isBlocked,
+                            'is_booked' => $isBooked,
+                            'is_blocked' => $isBlocked,
+                            'status' => $isBooked ? 'Booked' : ($isBlocked ? 'Blocked' : 'Available'),
+                            'appointment_number' => $appointmentNumber,
+                            'block_reason' => $blockReason
+                        ];
+                    } else {
+                        // Create new slot
+                        $insertQuery = "INSERT INTO time_slots (slot_date, slot_time, day_of_week, is_available) 
+                                      VALUES ('$date', '$time', '$dayOfWeek', 1)";
+                        Database::iud($insertQuery);
+                        $newSlotId = Database::$connection->insert_id;
+                        
+                        $slots[] = [
+                            'slot_id' => $newSlotId,
+                            'time' => $time,
+                            'slot_number' => $slotNumber,
+                            'display_time' => date('g:i A', strtotime($time)),
+                            'slot_display' => "Slot {$slotNumber} - " . date('g:i A', strtotime($time)),
+                            'is_available' => true,
+                            'is_booked' => false,
+                            'is_blocked' => false,
+                            'status' => 'Available',
+                            'appointment_number' => null,
+                            'block_reason' => null
+                        ];
+                    }
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'slots' => $slots,
+                    'date' => $date,
+                    'day_of_week' => $dayOfWeek
+                ]);
+                
+            } catch (Exception $e) {
+                error_log("Get time slots error: " . $e->getMessage());
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Failed to load slots: ' . $e->getMessage()
+                ]);
             }
-
-            // generate slots if not exist
-            $dayOfWeek = date('l', strtotime($date));
-            AppointmentManager::generateTimeSlots($date, $dayOfWeek);
-
-            // get slots with availability
-            $slots = AppointmentManager::getAvailableSlots($date);
-            $slotsArray = [];
-            while ($row = $slots->fetch_assoc()) {
-                $slotsArray[] = $row;
-            }
-
-            echo json_encode(['success' => true, 'slots' => $slotsArray]);
             break;
 
         case 'block_slots':
-
             Database::setUpConnection();
 
             $date   = $_POST['date']   ?? '';
@@ -417,25 +576,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $t      = Database::$connection->real_escape_string($t);
                 $userId = !empty($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'NULL';
 
-                $sql = "INSERT INTO blocked_slots (blocked_date, blocked_time, reason, created_by, created_at) 
-        VALUES ('$date', '$t', '$reason', $userId, NOW())";
-
-                Database::iud($sql);
-
-                // skip if already booked
+                // Skip if already booked
                 $bookCheck = Database::search("SELECT id FROM appointment 
                 WHERE appointment_date = '$date' AND appointment_time = '$t' 
                 AND status NOT IN ('Cancelled','No-Show')");
                 if ($bookCheck->num_rows > 0) continue;
 
-                // skip if already blocked
+                // Skip if already blocked
                 $blockCheck = Database::search("SELECT id FROM blocked_slots 
                 WHERE blocked_date = '$date' AND blocked_time = '$t'");
                 if ($blockCheck->num_rows > 0) continue;
 
-                Database::iud("INSERT INTO blocked_slots 
-                (blocked_date, blocked_time, reason, created_by, created_at) 
-                VALUES ('$date', '$t', '$reason', $userId, NOW())");
+                $sql = "INSERT INTO blocked_slots (blocked_date, blocked_time, reason, created_by, created_at) 
+                        VALUES ('$date', '$t', '$reason', $userId, NOW())";
+                Database::iud($sql);
                 $blocked++;
             }
 
@@ -443,7 +597,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'unblock_slots':
-
             Database::setUpConnection();
 
             $date  = $_POST['date']  ?? '';
@@ -465,23 +618,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => true, 'message' => "$unblocked slot(s) unblocked"]);
             break;
 
-        // ------------------ END NEW ACTIONS ------------------
+        // ------------------ END ENHANCED ACTIONS ------------------
 
         case 'get_recent_appointments':
             try {
                 Database::setUpConnection();
 
                 $query = "SELECT a.*, p.name, p.mobile, p.email, ts.slot_date, ts.slot_time
-             FROM appointment a
-             JOIN patient p ON a.patient_id = p.id
-             JOIN time_slots ts ON a.slot_id = ts.id
-             ORDER BY a.created_at DESC
-             LIMIT 20";
+                         FROM appointment a
+                         JOIN patient p ON a.patient_id = p.id
+                         JOIN time_slots ts ON a.slot_id = ts.id
+                         ORDER BY a.created_at DESC
+                         LIMIT 20";
 
                 $result = Database::search($query);
                 $appointments = [];
 
                 while ($row = $result->fetch_assoc()) {
+                    // Add slot number
+                    $row['slot_number'] = SlotNumberGenerator::getSlotNumber($row['slot_time']);
                     $appointments[] = $row;
                 }
 
@@ -498,16 +653,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Database::setUpConnection();
 
                 $query = "SELECT a.*, p.title, p.name, p.mobile, p.email, p.address, 
-                     ts.slot_date, ts.slot_time
-             FROM appointment a
-             JOIN patient p ON a.patient_id = p.id
-             JOIN time_slots ts ON a.slot_id = ts.id
-             WHERE a.id = $appointmentId";
+                                 ts.slot_date, ts.slot_time
+                         FROM appointment a
+                         JOIN patient p ON a.patient_id = p.id
+                         JOIN time_slots ts ON a.slot_id = ts.id
+                         WHERE a.id = $appointmentId";
 
                 $result = Database::search($query);
 
                 if ($result->num_rows > 0) {
                     $appointment = $result->fetch_assoc();
+                    // Add slot number
+                    $appointment['slot_number'] = SlotNumberGenerator::getSlotNumber($appointment['slot_time']);
                     echo json_encode(['success' => true, 'appointment' => $appointment]);
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Appointment not found']);
@@ -526,14 +683,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Today's appointments
                 $todayQuery = "SELECT COUNT(*) as count FROM appointment a
-                  JOIN time_slots ts ON a.slot_id = ts.id
-                  WHERE ts.slot_date = '$today'";
+                              JOIN time_slots ts ON a.slot_id = ts.id
+                              WHERE ts.slot_date = '$today'";
                 $todayResult = Database::search($todayQuery);
                 $todayCount = $todayResult->fetch_assoc()['count'];
 
                 // Pending appointments
                 $pendingQuery = "SELECT COUNT(*) as count FROM appointment 
-                    WHERE status IN ('Booked', 'Confirmed')";
+                                WHERE status IN ('Booked', 'Confirmed')";
                 $pendingResult = Database::search($pendingQuery);
                 $pendingCount = $pendingResult->fetch_assoc()['count'];
 
@@ -544,8 +701,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Monthly revenue
                 $revenueQuery = "SELECT SUM(total_amount) as revenue FROM appointment 
-                    WHERE payment_status = 'Paid' AND 
-                    DATE_FORMAT(created_at, '%Y-%m') = '$thisMonth'";
+                                WHERE payment_status = 'Paid' AND 
+                                DATE_FORMAT(created_at, '%Y-%m') = '$thisMonth'";
                 $revenueResult = Database::search($revenueQuery);
                 $revenue = $revenueResult->fetch_assoc()['revenue'] ?? 0;
 
@@ -568,8 +725,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Database::setUpConnection();
 
                 $query = "SELECT * FROM notifications 
-             ORDER BY created_at DESC 
-             LIMIT 10";
+                         ORDER BY created_at DESC 
+                         LIMIT 10";
 
                 $result = Database::search($query);
                 $notifications = [];
@@ -589,3 +746,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
     }
 }
+?>
