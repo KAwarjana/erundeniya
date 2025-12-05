@@ -1267,76 +1267,78 @@ $sriLankaLocations = [
         }
 
         // Display patients in table
-        function displayPatients(patients, searchTerm, pagination) {
-            const tbody = document.getElementById('patientsTableBody');
-            tbody.innerHTML = '';
+function displayPatients(patients, searchTerm, pagination) {
+    const tbody = document.getElementById('patientsTableBody');
+    tbody.innerHTML = '';
 
-            if (patients.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">
-                    <i class="material-symbols-rounded text-secondary" style="font-size: 48px;">person_off</i>
-                    <p class="text-muted mt-2">No patients found${searchTerm ? ' for "' + searchTerm + '"' : ''}</p>
-                </td></tr>`;
-                document.getElementById('patientPagination').innerHTML = '';
-                return;
-            }
+    if (patients.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">
+            <i class="material-symbols-rounded text-secondary" style="font-size: 48px;">person_off</i>
+            <p class="text-muted mt-2">No patients found${searchTerm ? ' for "' + searchTerm + '"' : ''}</p>
+        </td></tr>`;
+        document.getElementById('patientPagination').innerHTML = '';
+        return;
+    }
 
-            patients.forEach(function(patient) {
-                const row = document.createElement('tr');
-                const isNewPatient = new Date(patient.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                const registerNumber = 'REG' + String(patient.id).padStart(5, '0');
+    patients.forEach(function(patient) {
+        const row = document.createElement('tr');
+        const isNewPatient = new Date(patient.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        
+        // Use the actual registration_number from database, or generate if null
+        const registerNumber = patient.registration_number || ('REG' + String(patient.id).padStart(5, '0'));
 
-                const highlightedName = highlightSearchTerm(patient.title + ' ' + patient.name, searchTerm);
-                const highlightedRegNumber = highlightSearchTerm(registerNumber, searchTerm);
-                const highlightedMobile = highlightSearchTerm(patient.mobile, searchTerm);
-                const highlightedEmail = patient.email ? highlightSearchTerm(patient.email, searchTerm) : 'N/A';
+        const highlightedName = highlightSearchTerm(patient.title + ' ' + patient.name, searchTerm);
+        const highlightedRegNumber = highlightSearchTerm(registerNumber, searchTerm);
+        const highlightedMobile = highlightSearchTerm(patient.mobile, searchTerm);
+        const highlightedEmail = patient.email ? highlightSearchTerm(patient.email, searchTerm) : 'N/A';
 
-                row.innerHTML = `<td>
-                    <div class="d-flex flex-column px-3">
-                        <h6 class="mb-0 text-sm font-weight-bold">${highlightedName}</h6>
-                        <p class="text-xs text-secondary mb-0">
-                            ${highlightedRegNumber} | Age: ${patient.age || 'N/A'}
-                        </p>
-                        <p class="text-xs text-secondary mb-0">
-                            Gender: ${patient.gender || 'N/A'}
-                        </p>
-                    </div>
-                </td>
-                <td>
-                    <div class="d-flex flex-column">
-                        <span class="text-sm">${highlightedMobile}</span>
-                        <span class="text-xs text-secondary">${highlightedEmail}</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="d-flex flex-column">
-                        <span class="text-sm">${patient.district || 'N/A'}</span>
-                        <span class="text-xs text-secondary">${patient.province || 'N/A'}</span>
-                    </div>
-                </td>
-                <td>
-                    <span class="patient-type-badge ${isNewPatient ? 'new-patient' : 'old-patient'}">
-                        ${isNewPatient ? 'New' : 'Regular'}
-                    </span>
-                    <br>
-                    <span class="text-xs text-secondary">${patient.total_visits || '0'} visits</span>
-                </td>
-                <td>
-                    <div class="d-flex gap-1">
-                        <button class="btn btn-sm btn-outline-success" onclick="viewPatient(${patient.id})" title="View">
-                            <i class="material-symbols-rounded text-sm">visibility</i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="editPatient(${patient.id})" title="Edit">
-                            <i class="material-symbols-rounded text-sm">edit</i>
-                        </button>
-                    </div>
-                </td>`;
-                
-                tbody.appendChild(row);
-            });
+        row.innerHTML = `<td>
+            <div class="d-flex flex-column px-3">
+                <h6 class="mb-0 text-sm font-weight-bold">${highlightedName}</h6>
+                <p class="text-xs text-secondary mb-0">
+                    ${highlightedRegNumber} | Age: ${patient.age || 'N/A'}
+                </p>
+                <p class="text-xs text-secondary mb-0">
+                    Gender: ${patient.gender || 'N/A'}
+                </p>
+            </div>
+        </td>
+        <td>
+            <div class="d-flex flex-column">
+                <span class="text-sm">${highlightedMobile}</span>
+                <span class="text-xs text-secondary">${highlightedEmail}</span>
+            </div>
+        </td>
+        <td>
+            <div class="d-flex flex-column">
+                <span class="text-sm">${patient.district || 'N/A'}</span>
+                <span class="text-xs text-secondary">${patient.province || 'N/A'}</span>
+            </div>
+        </td>
+        <td>
+            <span class="patient-type-badge ${isNewPatient ? 'new-patient' : 'old-patient'}">
+                ${isNewPatient ? 'New' : 'Regular'}
+            </span>
+            <br>
+            <span class="text-xs text-secondary">${patient.total_visits || '0'} visits</span>
+        </td>
+        <td>
+            <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-success" onclick="viewPatient(${patient.id})" title="View">
+                    <i class="material-symbols-rounded text-sm">visibility</i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="editPatient(${patient.id})" title="Edit">
+                    <i class="material-symbols-rounded text-sm">edit</i>
+                </button>
+            </div>
+        </td>`;
+        
+        tbody.appendChild(row);
+    });
 
-            // Render pagination
-            renderPagination(pagination);
-        }
+    // Render pagination
+    renderPagination(pagination);
+}
 
         // Render pagination
         function renderPagination(pagination) {

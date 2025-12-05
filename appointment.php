@@ -236,7 +236,7 @@ require_once 'connection/connection.php';
 
                                     <div class="model-div12">
                                         <label for="patient_mobile" class="model-label">Mobile (Required)*</label>
-                                        <input type="tel" id="patient_mobile" class="model-input1" placeholder="0771234567" pattern="[0-9]{10}" required>
+                                        <input type="tel" id="patient_mobile" class="model-input1" placeholder="0771234567" pattern="[0-9]{10}" maxlength="10" required>
                                     </div>
                                 </div>
 

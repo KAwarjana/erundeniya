@@ -5,14 +5,15 @@ require_once '../../connection/connection.php';
 class HolidayManager
 {
     /**
-     * Add a holiday and optionally reschedule to next day
+     * Add a holiday with optional custom reschedule date
      * 
      * @param string $date Holiday date (YYYY-MM-DD)
      * @param string $reason Reason for holiday
-     * @param bool $rescheduleToNextDay Whether to create temporary consultation day
+     * @param bool $reschedule Whether to reschedule
+     * @param string|null $customRescheduleDate Custom date to reschedule to (YYYY-MM-DD)
      * @return array Result array with success status and message
      */
-    public static function addHoliday($date, $reason, $rescheduleToNextDay = false)
+    public static function addHoliday($date, $reason, $reschedule = false, $customRescheduleDate = null)
     {
         try {
             Database::setUpConnection();
@@ -48,18 +49,57 @@ class HolidayManager
 
             $rescheduledDate = null;
 
-            // If reschedule option is selected, add next day as consultation day
-            if ($rescheduleToNextDay) {
-                $nextDay = date('Y-m-d', strtotime($date . ' +1 day'));
-                $nextDayName = date('l', strtotime($nextDay));
+            // If reschedule option is selected
+            if ($reschedule) {
+                // Use custom date if provided, otherwise use next day
+                $rescheduleDate = $customRescheduleDate ? $customRescheduleDate : date('Y-m-d', strtotime($date . ' +1 day'));
+                
+                // Validate reschedule date
+                $rescheduleTimestamp = strtotime($rescheduleDate);
+                $holidayTimestamp = strtotime($date);
+                
+                // Check if reschedule date is not in the past
+                if ($rescheduleTimestamp < strtotime('today')) {
+                    throw new Exception("Reschedule date cannot be in the past");
+                }
+                
+                // Check if reschedule date is not the holiday itself
+                if ($rescheduleDate === $date) {
+                    throw new Exception("Reschedule date cannot be the same as holiday date");
+                }
+                
+                // Check if reschedule date is already a regular consultation day
+                $rescheduleDayOfWeek = date('N', $rescheduleTimestamp); // 1=Monday, 7=Sunday
+                if ($rescheduleDayOfWeek == 3 || $rescheduleDayOfWeek == 7) {
+                    throw new Exception("Selected date is already a regular consultation day (Wednesday/Sunday)");
+                }
+                
+                // Check if already marked as holiday
+                $holidayCheckQuery = "SELECT id FROM holidays WHERE holiday_date = '$rescheduleDate'";
+                $holidayCheckResult = Database::search($holidayCheckQuery);
+                if ($holidayCheckResult->num_rows > 0) {
+                    throw new Exception("Selected date is already marked as a holiday");
+                }
+                
+                // Check if already exists as temporary consultation day
+                $tempCheckQuery = "SELECT id FROM temporary_consultation_days WHERE consultation_date = '$rescheduleDate'";
+                $tempCheckResult = Database::search($tempCheckQuery);
+                if ($tempCheckResult->num_rows > 0) {
+                    throw new Exception("Selected date is already a temporary consultation day");
+                }
+
+                $rescheduleDayName = date('l', $rescheduleTimestamp);
+                $rescheduleDate = Database::$connection->real_escape_string($rescheduleDate);
 
                 // Insert temporary consultation day
                 $insertTemp = "INSERT INTO temporary_consultation_days 
                               (consultation_date, day_of_week, reason, created_by, created_at) 
-                              VALUES ('$nextDay', '$nextDayName', 'Rescheduled from $dayOfWeek due to holiday', " . ($userId ? $userId : "NULL") . ", NOW())";
+                              VALUES ('$rescheduleDate', '$rescheduleDayName', 
+                              'Rescheduled from $dayOfWeek (" . date('M d', $holidayTimestamp) . ") - $reason', 
+                              " . ($userId ? $userId : "NULL") . ", NOW())";
                 Database::iud($insertTemp);
 
-                $rescheduledDate = $nextDay;
+                $rescheduledDate = $rescheduleDate;
             }
 
             Database::$connection->commit();
@@ -78,6 +118,77 @@ class HolidayManager
                 Database::$connection->rollback();
             }
             error_log("Holiday add error: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get available dates in a month for rescheduling
+     * Excludes: Wednesdays, Sundays, existing holidays, existing temp days
+     * 
+     * @param string $holidayDate The holiday date to get available dates for
+     * @return array Available dates in the same month
+     */
+    public static function getAvailableDatesForRescheduling($holidayDate)
+    {
+        try {
+            Database::setUpConnection();
+            
+            $year = date('Y', strtotime($holidayDate));
+            $month = date('m', strtotime($holidayDate));
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+            
+            $availableDates = [];
+            
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $currentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                $timestamp = strtotime($currentDate);
+                
+                // Skip if in the past
+                if ($timestamp < strtotime('today')) {
+                    continue;
+                }
+                
+                // Skip if it's the holiday date itself
+                if ($currentDate === $holidayDate) {
+                    continue;
+                }
+                
+                $dayOfWeek = date('N', $timestamp); // 1=Monday, 7=Sunday
+                
+                // Skip regular consultation days (Wednesday=3, Sunday=7)
+                if ($dayOfWeek == 3 || $dayOfWeek == 7) {
+                    continue;
+                }
+                
+                // Check if already a holiday
+                $holidayCheck = "SELECT id FROM holidays WHERE holiday_date = '$currentDate'";
+                $holidayResult = Database::search($holidayCheck);
+                if ($holidayResult->num_rows > 0) {
+                    continue;
+                }
+                
+                // Check if already a temporary consultation day
+                $tempCheck = "SELECT id FROM temporary_consultation_days WHERE consultation_date = '$currentDate'";
+                $tempResult = Database::search($tempCheck);
+                if ($tempResult->num_rows > 0) {
+                    continue;
+                }
+                
+                // This date is available
+                $availableDates[] = [
+                    'date' => $currentDate,
+                    'display' => date('l, M d', $timestamp),
+                    'day_name' => date('l', $timestamp)
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'dates' => $availableDates
+            ];
+        } catch (Exception $e) {
+            error_log("Get available dates error: " . $e->getMessage());
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -115,12 +226,21 @@ class HolidayManager
                             )";
             Database::iud($unblockQuery);
 
-            // Remove any temporary consultation day that was added
-            $nextDay = date('Y-m-d', strtotime($date . ' +1 day'));
-            $deleteTemp = "DELETE FROM temporary_consultation_days 
-                          WHERE consultation_date = '$nextDay' 
-                          AND reason LIKE '%Rescheduled from%'";
-            Database::iud($deleteTemp);
+            // Find and remove related temporary consultation day
+            // Look for temp days that mention this holiday
+            $findTempQuery = "SELECT consultation_date FROM temporary_consultation_days 
+                             WHERE reason LIKE '%Rescheduled from%' 
+                             AND reason LIKE '%" . date('M d', strtotime($date)) . "%'";
+            $tempResult = Database::search($findTempQuery);
+            
+            if ($tempResult->num_rows > 0) {
+                while ($row = $tempResult->fetch_assoc()) {
+                    $tempDate = $row['consultation_date'];
+                    $deleteTempQuery = "DELETE FROM temporary_consultation_days 
+                                       WHERE consultation_date = '$tempDate'";
+                    Database::iud($deleteTempQuery);
+                }
+            }
 
             Database::$connection->commit();
 
@@ -350,13 +470,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $date = $_POST['date'] ?? '';
             $reason = $_POST['reason'] ?? '';
             $reschedule = isset($_POST['reschedule']) && $_POST['reschedule'] === 'true';
+            $customDate = $_POST['custom_reschedule_date'] ?? null;
 
             if (empty($date) || empty($reason)) {
                 echo json_encode(['success' => false, 'message' => 'Date and reason are required']);
                 exit;
             }
 
-            $result = HolidayManager::addHoliday($date, $reason, $reschedule);
+            $result = HolidayManager::addHoliday($date, $reason, $reschedule, $customDate);
+            echo json_encode($result);
+            break;
+
+        case 'get_available_reschedule_dates':
+            $holidayDate = $_POST['holiday_date'] ?? '';
+            
+            if (empty($holidayDate)) {
+                echo json_encode(['success' => false, 'message' => 'Holiday date is required']);
+                exit;
+            }
+            
+            $result = HolidayManager::getAvailableDatesForRescheduling($holidayDate);
             echo json_encode($result);
             break;
 

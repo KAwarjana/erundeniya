@@ -86,7 +86,12 @@ try {
             medical_notes = $fullMedicalNotes
             WHERE id = $patientId";
         Database::iud($query);
-        $regNumber = 'REG' . str_pad($patientId, 5, '0', STR_PAD_LEFT);
+        
+        // Get registration number for existing patient
+        $regResult = Database::search("SELECT registration_number FROM patient WHERE id = $patientId");
+        $regRow = $regResult->fetch_assoc();
+        $regNumber = $regRow['registration_number'];
+        
         echo json_encode([
             'success' => true,
             'message' => 'Patient updated successfully',
@@ -102,9 +107,14 @@ try {
         )";
         if (Database::iud($query)) {
             $patientId = $conn->insert_id;
-            $regNumber = 'REG' . str_pad($patientId, 5, '0', STR_PAD_LEFT);
+            
+            // MODIFIED: Generate registration number starting from 1000
+            // Add 1000 to patient ID to start from 1000
+            $regNumber = 'REG' . str_pad($patientId + 1000, 5, '0', STR_PAD_LEFT);
+            
             $updateQuery = "UPDATE patient SET registration_number = '$regNumber' WHERE id = $patientId";
             Database::iud($updateQuery);
+            
             echo json_encode([
                 'success' => true,
                 'message' => 'Patient registered successfully',
