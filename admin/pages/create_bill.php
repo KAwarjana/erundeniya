@@ -50,6 +50,40 @@ function renderSidebarMenu($items, $cur)
     }
 }
 
+function generateNextBillNumber()
+{
+    global $conn;
+
+    try {
+        $conn->begin_transaction();
+
+        $query = "SELECT MAX(CAST(SUBSTRING(bill_number, 5) AS UNSIGNED)) as max_num 
+                  FROM bills 
+                  WHERE bill_number LIKE 'BILL%' 
+                  AND SUBSTRING(bill_number, 5) REGEXP '^[0-9]+$'
+                  FOR UPDATE";
+
+        $result = $conn->query($query);
+
+        if (!$result) {
+            throw new Exception("Failed to get max bill number");
+        }
+
+        $row = $result->fetch_assoc();
+        $maxNum = $row['max_num'] ?? 0;
+        $nextNumber = ($maxNum < 7003) ? 7003 : $maxNum + 1;
+        $billNumber = 'BILL' . $nextNumber;
+
+        $conn->commit();
+
+        return $billNumber;
+    } catch (Exception $e) {
+        $conn->rollback();
+        error_log("Bill number generation error: " . $e->getMessage());
+        throw new Exception("Failed to generate bill number: " . $e->getMessage());
+    }
+}
+
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
@@ -63,6 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             case 'get_attended_appointments':
                 getAttendedAppointments();
+                break;
+            case 'search_appointments':
+                searchAppointments();
                 break;
             case 'get_appointment_details':
                 getAppointmentDetails();
@@ -86,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Functions for handling operations
 function createBill()
 {
     global $currentUser;
@@ -105,7 +141,6 @@ function createBill()
         return;
     }
 
-    // Check if bill already exists for this appointment
     $checkQuery = "SELECT id FROM bills WHERE appointment_id = '$appointmentId'";
     $checkResult = Database::search($checkQuery);
 
@@ -114,10 +149,13 @@ function createBill()
         return;
     }
 
-    // Generate bill number
-    $billNumber = 'BILL' . date('Ymd') . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+    try {
+        $billNumber = generateNextBillNumber();
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Failed to generate bill number: ' . $e->getMessage()]);
+        return;
+    }
 
-    // Insert bill with PAID status since payment is collected at billing time
     $insertQuery = "INSERT INTO bills (bill_number, appointment_id, doctor_fee, medicine_cost, other_charges, 
                     discount_amount, discount_percentage, discount_reason, total_amount, payment_status, created_by) 
                     VALUES ('$billNumber', '$appointmentId', '$doctorFee', '$medicineCost', '$otherCharges', 
@@ -150,7 +188,8 @@ function updateBill()
         return;
     }
 
-    // Update bill
+    $discountReason = Database::$connection->real_escape_string($discountReason);
+
     $updateQuery = "UPDATE bills SET 
                 doctor_fee = '$doctorFee',
                 medicine_cost = '$medicineCost',
@@ -169,9 +208,55 @@ function updateBill()
     ]);
 }
 
+function searchAppointments()
+{
+    $searchTerm = $_POST['search_term'] ?? '';
+
+    if (strlen($searchTerm) < 2) {
+        echo json_encode(['success' => true, 'data' => []]);
+        return;
+    }
+
+    $searchTerm = Database::$connection->real_escape_string($searchTerm);
+
+    $query = "SELECT 
+                a.id,
+                a.appointment_number,
+                a.appointment_date,
+                a.appointment_time,
+                p.title,
+                p.name as patient_name,
+                p.registration_number as patient_reg_number,
+                p.mobile as patient_mobile,
+                p.email as patient_email,
+                p.address as patient_address
+              FROM appointment a
+              INNER JOIN patient p ON a.patient_id = p.id
+              LEFT JOIN bills b ON a.id = b.appointment_id
+              WHERE a.status IN ('Attended', 'Confirmed', 'Booked') 
+              AND b.id IS NULL
+              AND a.appointment_date <= CURDATE()
+              AND (
+                a.appointment_number LIKE '%$searchTerm%' OR
+                p.name LIKE '%$searchTerm%' OR
+                p.registration_number LIKE '%$searchTerm%' OR
+                p.mobile LIKE '%$searchTerm%'
+              )
+              ORDER BY a.appointment_date DESC, a.appointment_time DESC
+              LIMIT 10";
+
+    $result = Database::search($query);
+    $appointments = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $appointments[] = $row;
+    }
+
+    echo json_encode(['success' => true, 'data' => $appointments]);
+}
+
 function getAttendedAppointments()
 {
-    // Get appointments with status 'Attended' or 'Confirmed' that don't have bills yet
     $query = "SELECT 
                 a.id,
                 a.appointment_number,
@@ -241,7 +326,6 @@ function getAllBills()
     $recordsPerPage = 5;
     $offset = ($page - 1) * $recordsPerPage;
 
-    // Base query
     $query = "SELECT SQL_CALC_FOUND_ROWS
                 b.id,
                 b.bill_number,
@@ -292,7 +376,6 @@ function getAllBills()
         $bills[] = $row;
     }
 
-    // Get total count
     $totalResult = Database::search("SELECT FOUND_ROWS() as total");
     $totalRows = $totalResult->fetch_assoc()['total'];
     $totalPages = ceil($totalRows / $recordsPerPage);
@@ -339,10 +422,9 @@ function getBillDetails()
     }
 }
 
-// Get statistics for the dashboard cards
 function getStatistics()
 {
-    $totalBillsQuery = "SELECT COUNT(*) as total FROM bills";
+    $totalBillsQuery = "SELECT COUNT(*) as total FROM bills WHERE payment_status = 'Paid'";
     $totalBillsResult = Database::search($totalBillsQuery);
     $totalBills = $totalBillsResult->fetch_assoc()['total'];
 
@@ -354,7 +436,7 @@ function getStatistics()
     $pendingBillsResult = Database::search($pendingBillsQuery);
     $pendingBills = $pendingBillsResult->fetch_assoc()['total'];
 
-    $todayRevenueQuery = "SELECT SUM(total_amount) as revenue FROM bills WHERE DATE(created_at) = CURDATE()";
+    $todayRevenueQuery = "SELECT COALESCE(SUM(total_amount), 0) as revenue FROM bills WHERE DATE(created_at) = CURDATE() AND payment_status = 'Paid'";
     $todayRevenueResult = Database::search($todayRevenueQuery);
     $todayRevenue = $todayRevenueResult->fetch_assoc()['revenue'] ?? 0;
 
@@ -394,8 +476,6 @@ try {
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
-
-    <!-- Flatpickr CSS for Calendar -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
@@ -618,7 +698,6 @@ try {
             justify-content: center;
         }
 
-        /* Logout hover effect */
         .sidenav-footer .nav-link:hover {
             background-color: #ff001910 !important;
             color: #dc3545 !important;
@@ -630,6 +709,72 @@ try {
         .sidenav-footer .nav-link:hover .nav-link-text {
             color: #dc3545 !important;
             opacity: 1 !important;
+        }
+
+        .appointment-search-wrapper {
+            position: relative;
+        }
+
+        .appointment-search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointment-search-result {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .appointment-search-result:hover {
+            background-color: #f5f5f5;
+        }
+
+        .appointment-search-result:last-child {
+            border-bottom: none;
+        }
+
+        .appointment-result-number {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .appointment-result-patient {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .appointment-result-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .no-results {
+            padding: 12px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .loading-results {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -672,9 +817,6 @@ try {
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <!-- <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" placeholder="Search bills..." id="globalSearch">
-                        </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -824,11 +966,11 @@ try {
                             <form id="createBillForm">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group appointment-search-wrapper">
                                             <label><i class="material-symbols-rounded text-sm">search</i> Appointment Number</label>
-                                            <select id="appointmentNumber" required>
-                                                <option value="">Select Appointment</option>
-                                            </select>
+                                            <input type="text" id="appointmentNumberSearch" placeholder="Type to search..." autocomplete="off">
+                                            <input type="hidden" id="appointmentNumber">
+                                            <div class="appointment-search-results" id="appointmentSearchResults"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6">
@@ -884,14 +1026,14 @@ try {
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
-                                            <label><i class="material-symbols-rounded text-sm">percent</i> Discount Percentage</label>
-                                            <input type="number" id="discountPercentage" step="0.01" min="0" max="100" value="0.00" placeholder="0.00">
+                                            <label><i class="material-symbols-rounded text-sm">money_off</i> Discount Amount</label>
+                                            <input type="number" id="discountAmount" step="0.01" min="0" value="0.00" placeholder="0.00">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
-                                            <label><i class="material-symbols-rounded text-sm">money_off</i> Discount Amount</label>
-                                            <input type="number" id="discountAmount" step="0.01" min="0" value="0.00" readonly style="background: #f5f5f5;">
+                                            <label><i class="material-symbols-rounded text-sm">percent</i> Discount Percentage</label>
+                                            <input type="number" id="discountPercentage" step="0.01" min="0" max="100" value="0.00" placeholder="0%">
                                         </div>
                                     </div>
                                 </div>
@@ -994,134 +1136,180 @@ try {
 
     <script>
         let currentEditingBillId = null;
+        let currentSearchTerm = '';
+        let searchTimeout = null;
+        let isUpdatingFromPercentage = false;
+        let isUpdatingFromAmount = false;
 
-        // Calculate total amount with discount
+        // Bidirectional discount calculation
         function calculateTotal() {
             const doctorFee = parseFloat(document.getElementById('doctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('medicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
-            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
-
+            
             const subtotal = doctorFee + medicineCost + otherCharges;
-            const discountAmount = (subtotal * discountPercentage) / 100;
-            document.getElementById('discountAmount').value = discountAmount.toFixed(2);
+            
+            if (!isUpdatingFromAmount) {
+                const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+                const discountAmount = (subtotal * discountPercentage) / 100;
+                document.getElementById('discountAmount').value = discountAmount.toFixed(2);
+            }
 
-            const total = subtotal - discountAmount;
+            const finalDiscountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const total = subtotal - finalDiscountAmount;
             document.getElementById('totalAmount').value = 'Rs. ' + total.toFixed(2);
         }
 
-        // Initialize on page load
+        function updateDiscountFromPercentage() {
+            if (isUpdatingFromAmount) return;
+            isUpdatingFromPercentage = true;
+            calculateTotal();
+            isUpdatingFromPercentage = false;
+        }
+
+        function updateDiscountFromAmount() {
+            if (isUpdatingFromPercentage) return;
+            isUpdatingFromAmount = true;
+            
+            const doctorFee = parseFloat(document.getElementById('doctorFee').value) || 0;
+            const medicineCost = parseFloat(document.getElementById('medicineCost').value) || 0;
+            const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
+            const subtotal = doctorFee + medicineCost + otherCharges;
+            
+            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            
+            if (subtotal > 0) {
+                const discountPercentage = (discountAmount / subtotal) * 100;
+                document.getElementById('discountPercentage').value = discountPercentage.toFixed(2);
+            }
+            
+            calculateTotal();
+            isUpdatingFromAmount = false;
+        }
+
+        // Real-time appointment search
+        function searchAppointments(searchTerm) {
+            const resultsDiv = document.getElementById('appointmentSearchResults');
+            
+            if (searchTerm.length < 2) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="loading-results">Searching...</div>';
+            resultsDiv.style.display = 'block';
+
+            fetch('create_bill.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=search_appointments&search_term=' + encodeURIComponent(searchTerm)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displaySearchResults(data.data);
+                    } else {
+                        resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                });
+        }
+
+        function displaySearchResults(appointments) {
+            const resultsDiv = document.getElementById('appointmentSearchResults');
+            
+            if (appointments.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No appointments found</div>';
+                return;
+            }
+
+            let html = '';
+            appointments.forEach(appointment => {
+                html += `
+                    <div class="appointment-search-result" onclick="selectAppointment(${appointment.id}, '${appointment.appointment_number}', '${appointment.title} ${appointment.patient_name}', '${appointment.patient_mobile}', '${appointment.appointment_date}', '${appointment.appointment_time}')">
+                        <div class="appointment-result-number">${appointment.appointment_number}</div>
+                        <div class="appointment-result-patient">${appointment.title} ${appointment.patient_name} - ${appointment.patient_mobile}</div>
+                        <div class="appointment-result-date">${appointment.appointment_date} ${appointment.appointment_time}</div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function selectAppointment(id, number, name, mobile, date, time) {
+            document.getElementById('appointmentNumber').value = id;
+            document.getElementById('appointmentNumberSearch').value = number;
+            document.getElementById('appointmentDate').value = date + ' ' + time;
+            document.getElementById('patientName').value = name;
+            document.getElementById('patientMobile').value = mobile;
+            document.getElementById('appointmentSearchResults').style.display = 'none';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            loadAttendedAppointments();
             loadAllBills();
 
-            // Add event listeners for calculation
+            // Appointment search with debounce
+            document.getElementById('appointmentNumberSearch').addEventListener('input', function() {
+                const searchTerm = this.value;
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchAppointments(searchTerm);
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                const searchWrapper = document.querySelector('.appointment-search-wrapper');
+                if (searchWrapper && !searchWrapper.contains(e.target)) {
+                    document.getElementById('appointmentSearchResults').style.display = 'none';
+                }
+            });
+
+            // Discount calculations
             document.getElementById('doctorFee').addEventListener('input', calculateTotal);
             document.getElementById('medicineCost').addEventListener('input', calculateTotal);
             document.getElementById('otherCharges').addEventListener('input', calculateTotal);
-            document.getElementById('discountPercentage').addEventListener('input', calculateTotal);
+            document.getElementById('discountPercentage').addEventListener('input', updateDiscountFromPercentage);
+            document.getElementById('discountAmount').addEventListener('input', updateDiscountFromAmount);
 
-            // Search functionality
             document.getElementById('billSearch').addEventListener('input', function() {
                 const clearBtn = document.getElementById('clearBillSearch');
+                currentSearchTerm = this.value;
                 if (this.value.length > 0) {
                     clearBtn.style.display = 'block';
                 } else {
                     clearBtn.style.display = 'none';
                 }
-                loadAllBills(this.value);
+                loadAllBills(currentSearchTerm);
             });
 
-            document.getElementById('globalSearch').addEventListener('input', function() {
-                loadAllBills(this.value);
-            });
-
-            // Appointment selection
-            document.getElementById('appointmentNumber').addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption.value && selectedOption.dataset.appointment) {
-                    try {
-                        const appointment = JSON.parse(selectedOption.dataset.appointment);
-                        document.getElementById('appointmentDate').value = appointment.appointment_date + ' ' + appointment.appointment_time;
-                        document.getElementById('patientName').value = appointment.title + ' ' + appointment.patient_name;
-                        document.getElementById('patientMobile').value = appointment.patient_mobile;
-                    } catch (e) {
-                        console.error('Error parsing appointment data:', e);
-                        clearAppointmentFields();
-                    }
-                } else {
-                    clearAppointmentFields();
-                }
-            });
-
-            // Form submission
             document.getElementById('createBillForm').addEventListener('submit', handleFormSubmit);
 
             calculateTotal();
         });
 
-        // Clear appointment fields
         function clearAppointmentFields() {
             document.getElementById('appointmentDate').value = '';
             document.getElementById('patientName').value = '';
             document.getElementById('patientMobile').value = '';
         }
 
-        // Clear bill search
         function clearBillSearch() {
             const searchInput = document.getElementById('billSearch');
             const clearBtn = document.getElementById('clearBillSearch');
             searchInput.value = '';
             clearBtn.style.display = 'none';
+            currentSearchTerm = '';
             loadAllBills('');
             searchInput.focus();
         }
 
-        // Load attended appointments
-        function loadAttendedAppointments() {
-            fetch('create_bill.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'action=get_attended_appointments'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const select = document.getElementById('appointmentNumber');
-                        select.innerHTML = '<option value="">Select Appointment</option>';
-
-                        if (data.data.length === 0) {
-                            const option = document.createElement('option');
-                            option.value = "";
-                            option.textContent = "No appointments available for billing";
-                            option.disabled = true;
-                            select.appendChild(option);
-                        } else {
-                            data.data.forEach(appointment => {
-                                const option = document.createElement('option');
-                                option.value = appointment.id;
-                                option.textContent = appointment.appointment_number + ' - ' + appointment.title + ' ' + appointment.patient_name + ' - ' + appointment.appointment_date;
-                                option.dataset.appointment = JSON.stringify(appointment);
-                                select.appendChild(option);
-                            });
-                        }
-                    } else {
-                        const select = document.getElementById('appointmentNumber');
-                        select.innerHTML = '<option value="">Error loading appointments</option>';
-                        showNotification(data.message || 'Error loading appointments', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    const select = document.getElementById('appointmentNumber');
-                    select.innerHTML = '<option value="">Error loading appointments</option>';
-                    showNotification('Error loading appointments', 'error');
-                });
-        }
-
-        // Load all bills with search
         function loadAllBills(searchTerm, page = 1) {
             searchTerm = searchTerm || '';
             fetch('create_bill.php', {
@@ -1146,14 +1334,12 @@ try {
                 });
         }
 
-        // Highlight search term
         function highlightSearchTerm(text, searchTerm) {
             if (!searchTerm || !text) return text;
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             return text.replace(regex, '<mark>$1</mark>');
         }
 
-        // Display bills in table
         function displayBills(bills, searchTerm, pagination) {
             const tbody = document.getElementById('billsTableBody');
             tbody.innerHTML = '';
@@ -1174,8 +1360,6 @@ try {
                 const discountInfo = bill.discount_amount > 0 ?
                     '<span class="text-sm text-success">Discount: Rs. ' + parseFloat(bill.discount_amount).toFixed(2) +
                     ' (' + bill.discount_percentage + '%)</span><br>' : '';
-
-                const statusBadge = '<span class="status-badge status-paid">Paid</span>';
 
                 row.innerHTML = '<td>' +
                     '<div class="d-flex flex-column">' +
@@ -1203,7 +1387,6 @@ try {
                 tbody.appendChild(row);
             });
 
-            // Render pagination
             let paginationHtml = '';
             const currentPage = parseInt(pagination.current_page);
             const totalPages = parseInt(pagination.total_pages);
@@ -1211,23 +1394,20 @@ try {
             if (totalPages > 1) {
                 paginationHtml += '<nav aria-label="Bill pagination"><ul class="pagination justify-content-center flex-wrap">';
 
-                // Prev
                 paginationHtml += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="loadAllBills('', ${currentPage - 1}); return false;">
+            <a class="page-link" href="#" onclick="loadAllBills(currentSearchTerm, ${currentPage - 1}); return false;">
                 <i class="material-symbols-rounded">chevron_left</i>
             </a>
         </li>`;
 
-                // Page numbers
                 for (let i = 1; i <= totalPages; i++) {
                     paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="loadAllBills('', ${i}); return false;">${i}</a>
+                <a class="page-link" href="#" onclick="loadAllBills(currentSearchTerm, ${i}); return false;">${i}</a>
             </li>`;
                 }
 
-                // Next
                 paginationHtml += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="loadAllBills('', ${currentPage + 1}); return false;">
+            <a class="page-link" href="#" onclick="loadAllBills(currentSearchTerm, ${currentPage + 1}); return false;">
                 <i class="material-symbols-rounded">chevron_right</i>
             </a>
         </li>`;
@@ -1236,10 +1416,8 @@ try {
             }
 
             document.getElementById('billPagination').innerHTML = paginationHtml;
-
         }
 
-        // Handle form submission
         function handleFormSubmit(e) {
             e.preventDefault();
 
@@ -1278,8 +1456,9 @@ try {
                         document.getElementById('createBillForm').reset();
                         document.getElementById('totalAmount').value = '';
                         document.getElementById('discountAmount').value = '0.00';
-                        loadAttendedAppointments();
+                        document.getElementById('appointmentNumberSearch').value = '';
                         loadAllBills();
+                        location.reload(); // Reload to update statistics
                     } else {
                         showNotification(data.message, 'error');
                     }
@@ -1290,7 +1469,6 @@ try {
                 });
         }
 
-        // Create and print bill
         function createAndPrintBill() {
             const form = document.getElementById('createBillForm');
             if (form.checkValidity()) {
@@ -1324,7 +1502,7 @@ try {
                             form.reset();
                             document.getElementById('totalAmount').value = '';
                             document.getElementById('discountAmount').value = '0.00';
-                            loadAttendedAppointments();
+                            document.getElementById('appointmentNumberSearch').value = '';
                             loadAllBills();
 
                             setTimeout(function() {
@@ -1340,6 +1518,7 @@ try {
                                         if (billData.success && billData.data.length > 0) {
                                             printBill(billData.data[0].id);
                                         }
+                                        location.reload(); // Reload to update statistics
                                     });
                             }, 500);
                         } else {
@@ -1355,7 +1534,6 @@ try {
             }
         }
 
-        // View bill
         function viewBill(billId) {
             fetch('create_bill.php', {
                     method: 'POST',
@@ -1378,7 +1556,6 @@ try {
                 });
         }
 
-        // Edit bill
         function editBill(billId) {
             fetch('create_bill.php', {
                     method: 'POST',
@@ -1402,7 +1579,6 @@ try {
                 });
         }
 
-        // Display bill modal for viewing (read-only)
         function displayBillModalForView(bill) {
             const emailSection = bill.patient_email ? '<p class="mb-1">' + bill.patient_email + '</p>' : '';
             const regSection = bill.patient_reg_number ? '<p class="mb-1">Reg: ' + bill.patient_reg_number + '</p>' : '';
@@ -1493,7 +1669,6 @@ try {
             document.getElementById('viewBillModal').style.display = 'block';
         }
 
-        // Display bill modal for editing
         function displayBillModalForEdit(bill) {
             const emailSection = bill.patient_email ? '<p class="mb-1">' + bill.patient_email + '</p>' : '';
             const regSection = bill.patient_reg_number ? '<p class="mb-1">Reg: ' + bill.patient_reg_number + '</p>' : '';
@@ -1552,7 +1727,7 @@ try {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Discount Percentage (%)</label>
-                                <input type="number" id="editDiscountPercentage" class="form-control" value="${parseFloat(bill.discount_percentage).toFixed(2)}" step="0.01" min="0" max="100" onchange="calculateEditTotal()">
+                                <input type="number" id="editDiscountPercentage" class="form-control" value="${parseFloat(bill.discount_percentage).toFixed(2)}" step="0.01" min="0" max="100" oninput="updateEditDiscountFromPercentage()">
                             </div>
                         </div>
                     </div>
@@ -1560,7 +1735,7 @@ try {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Discount Amount</label>
-                                <input type="number" id="editDiscountAmount" class="form-control" value="${parseFloat(bill.discount_amount).toFixed(2)}" step="0.01" readonly style="background: #f5f5f5;">
+                                <input type="number" id="editDiscountAmount" class="form-control" value="${parseFloat(bill.discount_amount).toFixed(2)}" step="0.01" oninput="updateEditDiscountFromAmount()">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -1584,23 +1759,54 @@ try {
             document.getElementById('editBillModal').style.display = 'block';
         }
 
-        // Calculate total in edit mode
+        let isEditUpdatingFromPercentage = false;
+        let isEditUpdatingFromAmount = false;
+
         function calculateEditTotal() {
             const doctorFee = parseFloat(document.getElementById('editDoctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('editMedicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('editOtherCharges').value) || 0;
-            const discountPercentage = parseFloat(document.getElementById('editDiscountPercentage').value) || 0;
-
+            
             const subtotal = doctorFee + medicineCost + otherCharges;
-            const discountAmount = (subtotal * discountPercentage) / 100;
-            const total = subtotal - discountAmount;
+            
+            if (!isEditUpdatingFromAmount) {
+                const discountPercentage = parseFloat(document.getElementById('editDiscountPercentage').value) || 0;
+                const discountAmount = (subtotal * discountPercentage) / 100;
+                document.getElementById('editDiscountAmount').value = discountAmount.toFixed(2);
+            }
 
-            document.getElementById('editDiscountAmount').value = discountAmount.toFixed(2);
+            const finalDiscountAmount = parseFloat(document.getElementById('editDiscountAmount').value) || 0;
+            const total = subtotal - finalDiscountAmount;
             document.getElementById('editTotalAmount').value = total.toFixed(2);
         }
 
-        // Save edited bill
-        // Save edited bill
+        function updateEditDiscountFromPercentage() {
+            if (isEditUpdatingFromAmount) return;
+            isEditUpdatingFromPercentage = true;
+            calculateEditTotal();
+            isEditUpdatingFromPercentage = false;
+        }
+
+        function updateEditDiscountFromAmount() {
+            if (isEditUpdatingFromPercentage) return;
+            isEditUpdatingFromAmount = true;
+            
+            const doctorFee = parseFloat(document.getElementById('editDoctorFee').value) || 0;
+            const medicineCost = parseFloat(document.getElementById('editMedicineCost').value) || 0;
+            const otherCharges = parseFloat(document.getElementById('editOtherCharges').value) || 0;
+            const subtotal = doctorFee + medicineCost + otherCharges;
+            
+            const discountAmount = parseFloat(document.getElementById('editDiscountAmount').value) || 0;
+            
+            if (subtotal > 0) {
+                const discountPercentage = (discountAmount / subtotal) * 100;
+                document.getElementById('editDiscountPercentage').value = discountPercentage.toFixed(2);
+            }
+            
+            calculateEditTotal();
+            isEditUpdatingFromAmount = false;
+        }
+
         function saveEditedBill() {
             if (!currentEditingBillId) {
                 showNotification('Error: No bill selected for editing', 'error');
@@ -1615,7 +1821,6 @@ try {
             const discountReason = document.getElementById('editDiscountReason').value;
             const totalAmount = document.getElementById('editTotalAmount').value;
 
-            // Send as form data, not JSON
             fetch('create_bill.php', {
                     method: 'POST',
                     headers: {
@@ -1636,8 +1841,9 @@ try {
                     if (data.success) {
                         showNotification('Bill updated successfully!', 'success');
                         closeEditBillModal();
-                        loadAllBills();
+                        loadAllBills(currentSearchTerm);
                         currentEditingBillId = null;
+                        location.reload(); // Reload to update statistics
                     } else {
                         showNotification(data.message || 'Error updating bill', 'error');
                     }
@@ -1648,7 +1854,6 @@ try {
                 });
         }
 
-        // Print bill
         function printBill(billId) {
             fetch('create_bill.php', {
                     method: 'POST',
@@ -1668,7 +1873,6 @@ try {
                 });
         }
 
-        // Print bill data
         function printBillData(bill) {
             const printWindow = window.open('', '', 'height=600,width=800');
             const emailSection = bill.patient_email ? '<p>' + bill.patient_email + '</p>' : '';
@@ -1728,111 +1932,6 @@ try {
                 '<div>' +
                 '<div class="d-flex">' +
                 '<span>Doctor Consultation Fee</span>' +
-                '<span>Rs. ' + parseFloat(bill.doctor_fee).toFixed(2) + '</span>' +
-                '</div>' +
-                '<div class="d-flex">' +
-                '<span>Medicine Cost</span>' +
-                '<span>Rs. ' + parseFloat(bill.medicine_cost).toFixed(2) + '</span>' +
-                '</div>' +
-                '<div class="d-flex">' +
-                '<span>Other Charges</span>' +
-                '<span>Rs. ' + parseFloat(bill.other_charges).toFixed(2) + '</span>' +
-                '</div>' +
-                discountSection +
-                '<div class="d-flex bill-total">' +
-                '<span>Total Amount</span>' +
-                '<span>Rs. ' + parseFloat(bill.total_amount).toFixed(2) + '</span>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<script>' +
-                'window.onload = function() {' +
-                'window.print();' +
-                'window.onafterprint = function() { window.close(); }' +
-                '}' +
-                '<\/script>' +
-                '</body>' +
-                '</html>'
-            );
-            printWindow.document.close();
-        }
-
-        // Print bill modal
-        function printBillModal() {
-            // Get the bill content from the modal
-            const billViewForm = document.querySelector('#billContent .bill-view-form');
-            if (!billViewForm) return;
-
-            // Extract bill data from the modal
-            const billNumber = billViewForm.querySelector('h5').textContent;
-            const patientInfo = billViewForm.querySelectorAll('.row')[0].querySelectorAll('.col-md-6')[0].querySelectorAll('p');
-            const billInfo = billViewForm.querySelectorAll('.row')[0].querySelectorAll('.col-md-6')[1].querySelectorAll('p');
-            
-            const doctorFee = billViewForm.querySelectorAll('.row')[1].querySelectorAll('input')[0].value;
-            const medicineCost = billViewForm.querySelectorAll('.row')[1].querySelectorAll('input')[1].value;
-            const otherCharges = billViewForm.querySelectorAll('.row')[2].querySelectorAll('input')[0].value;
-            const discountPercentage = billViewForm.querySelectorAll('.row')[2].querySelectorAll('input')[1].value;
-            const discountAmount = billViewForm.querySelectorAll('.row')[3].querySelectorAll('input')[0].value;
-            const totalAmount = billViewForm.querySelectorAll('.row')[3].querySelectorAll('input')[1].value;
-            const discountReason = billViewForm.querySelectorAll('.row')[4].querySelectorAll('input')[0].value;
-
-            const printWindow = window.open('', '', 'height=600,width=800');
-            
-            const discountSection = parseFloat(discountAmount) > 0 ?
-                '<div class="d-flex">' +
-                '<span>Discount (' + parseFloat(discountPercentage).toFixed(2) + '%)</span>' +
-                '<span>- Rs. ' + parseFloat(discountAmount).toFixed(2) + '</span>' +
-                '</div>' : '';
-
-            printWindow.document.write(
-                '<html>' +
-                '<head>' +
-                '<title>Print Bill - ' + billNumber + '</title>' +
-                '<style>' +
-                'body { font-family: Arial, sans-serif; padding: 20px; }' +
-                '.bill-summary { max-width: 600px; margin: 0 auto; }' +
-                '.text-center { text-align: center; }' +
-                '.mb-4 { margin-bottom: 1.5rem; }' +
-                '.row { display: flex; margin-bottom: 20px; }' +
-                '.col-md-6 { flex: 0 0 50%; max-width: 50%; }' +
-                'hr { border: 1px solid #eee; margin: 20px 0; }' +
-                '.d-flex { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }' +
-                '.bill-total { border-top: 2px solid #333 !important; font-weight: bold; font-size: 18px; color: #2e7d32; margin-top: 10px; padding-top: 10px !important; }' +
-                '.paid-status { color: #4CAF50; font-weight: bold; font-size: 16px; }' +
-                '@media print { body { padding: 0; } }' +
-                '</style>' +
-                '</head>' +
-                '<body>' +
-                '<div class="bill-summary">' +
-                '<div class="text-center mb-4">' +
-                '<h2>Erundeniya Ayurveda Hospital</h2>' +
-                '<p>Medical Bill</p>' +
-                '<h3>' + billNumber + '</h3>' +
-                '<p class="paid-status">PAID</p>' +
-                '</div>' +
-                '<div class="row">' +
-                '<div class="col-md-6">' +
-                '<strong>Patient Information:</strong>' +
-                '<div>' +
-                patientInfo[0].outerHTML +
-                patientInfo[1].outerHTML +
-                (patientInfo[2] ? patientInfo[2].outerHTML : '') +
-                (patientInfo[3] ? patientInfo[3].outerHTML : '') +
-                '</div>' +
-                '</div>' +
-                '<div class="col-md-6">' +
-                '<strong>Bill Information:</strong>' +
-                '<div>' +
-                billInfo[0].outerHTML +
-                billInfo[1].outerHTML +
-                billInfo[2].outerHTML +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<hr>' +
-                '<div>' +
-                '<div class="d-flex">' +
-                '<span>Doctor Consultation Fee</span>' +
                 '<span>Rs. ' + parseFloat(doctorFee).toFixed(2) + '</span>' +
                 '</div>' +
                 '<div class="d-flex">' +
@@ -1862,16 +1961,15 @@ try {
             printWindow.document.close();
         }
 
-        // Close bill modals
         function closeViewBillModal() {
             document.getElementById('viewBillModal').style.display = 'none';
         }
 
         function closeEditBillModal() {
             document.getElementById('editBillModal').style.display = 'none';
+            currentEditingBillId = null;
         }
 
-        // Modal click outside to close
         window.addEventListener('click', function(event) {
             const viewModal = document.getElementById('viewBillModal');
             const editModal = document.getElementById('editBillModal');
@@ -1880,10 +1978,10 @@ try {
             }
             if (event.target === editModal) {
                 editModal.style.display = 'none';
+                currentEditingBillId = null;
             }
         });
 
-        // Show notification
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger') + ' position-fixed top-0 end-0 m-3';
@@ -1900,7 +1998,6 @@ try {
             }, 3000);
         }
 
-        // Logout function
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 window.location.href = 'logout.php';

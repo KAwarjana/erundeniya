@@ -91,9 +91,6 @@ $currentUser = AuthManager::getCurrentUser();
     <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-    <!-- Flatpickr CSS for Calendar -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css ">
-
     <style>
         .slot-grid {
             display: grid;
@@ -284,7 +281,6 @@ $currentUser = AuthManager::getCurrentUser();
             flex-direction: row;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -352,7 +348,7 @@ $currentUser = AuthManager::getCurrentUser();
         }
 
         .form-group select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 12px center;
             background-repeat: no-repeat;
             background-size: 16px;
@@ -441,7 +437,6 @@ $currentUser = AuthManager::getCurrentUser();
             line-height: 1;
         }
 
-        /* Calendar styling */
         #consultationDate {
             cursor: pointer;
         }
@@ -454,7 +449,6 @@ $currentUser = AuthManager::getCurrentUser();
             transition: border-color 0.3s;
         }
 
-        /* Logout hover effect */
         .sidenav-footer .nav-link:hover {
             background-color: #ff001910 !important;
             color: #dc3545 !important;
@@ -494,23 +488,6 @@ $currentUser = AuthManager::getCurrentUser();
         .btn-sm {
             padding: 4px 12px;
             font-size: 12px;
-        }
-
-        /* Holiday Management Styles */
-        .holiday-card {
-            background: linear-gradient(135deg, #66ea78ff 0%, #4ba25eff 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .temp-day-card {
-            background: linear-gradient(135deg, #93fb98ff 0%, #57f564ff 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
         }
 
         .flatpickr-day.rescheduled-day {
@@ -590,11 +567,8 @@ $currentUser = AuthManager::getCurrentUser();
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center searchbar--header">
-                        <!-- <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div> -->
                     </div>
-                    <ul class="navbar-nav d-flex align-items-center  justify-content-end">
+                    <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
                             <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
                                 <div class="sidenav-toggler-inner">
@@ -611,7 +585,6 @@ $currentUser = AuthManager::getCurrentUser();
                             </a>
                             <div class="dropdown-menu dropdown-menu-end px-2 py-3" id="notificationDropdown">
                                 <div id="notificationsList">
-                                    <!-- Notifications will be loaded here -->
                                 </div>
                             </div>
                         </li>
@@ -659,16 +632,12 @@ $currentUser = AuthManager::getCurrentUser();
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="card">
-                                        <!-- Mobile-first responsive card header -->
                                         <div class="card-header pb-0">
                                             <div class="row align-items-center g-2">
-                                                <!-- Title & description -->
-                                                <div class="col-12 col-ms-8 col-lg-9">
+                                                <div class="col-12 col-sm-8 col-lg-9">
                                                     <h5 class="mb-1">Holiday & Consultation Day Management</h5>
                                                     <p class="text-sm mb-0">Manage holidays and reschedule consultation days</p>
                                                 </div>
-
-                                                <!-- Action button -->
                                                 <div class="col-12 col-sm-4 col-lg-3 text-sm-end mt-3 mt-sm-3">
                                                     <button class="btn btn-primary w-100" onclick="openAddHolidayModal()">
                                                         <i class="fas fa-plus"></i> Add Holiday
@@ -727,66 +696,6 @@ $currentUser = AuthManager::getCurrentUser();
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Add Holiday Modal -->
-                            <div id="addHolidayModal" class="modal" style="display: none;">
-                                <div class="modal-content" style="max-width: 500px;">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">
-                                            <i class="material-symbols-rounded">event_busy</i>
-                                            <span>Add Holiday</span>
-                                        </h4>
-                                        <span class="close" onclick="closeAddHolidayModal()">&times;</span>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form id="addHolidayForm">
-                                            <div class="form-group">
-                                                <label>
-                                                    <i class="material-symbols-rounded">event</i>
-                                                    <span>Holiday Date *</span>
-                                                </label>
-                                                <input type="text" id="holidayDate" class="form-control book--appointment--input"
-                                                    placeholder="Select consultation day" readonly required>
-                                                <small class="text-muted">Only Wednesday or Sunday can be marked as holiday</small>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>
-                                                    <i class="material-symbols-rounded">edit_note</i>
-                                                    <span>Reason *</span>
-                                                </label>
-                                                <textarea id="holidayReason" class="form-control" rows="3"
-                                                    placeholder="e.g., Poya Day, Christmas" required></textarea>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <div class="form-check" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
-                                                    <input class="form-check-input" type="checkbox" id="rescheduleNextDay"
-                                                        style="width: 20px; height: 20px; margin-top: 0;">
-                                                    <label class="form-check-label ms-2" for="rescheduleNextDay" style="cursor: pointer;">
-                                                        <strong style="color: #333;">
-                                                            <i class="fas fa-calendar-check text-success"></i>
-                                                            Reschedule to next day
-                                                        </strong>
-                                                        <br>
-                                                        <small class="text-muted" style="display: block; margin-top: 5px; margin-left: 28px;">
-                                                            Make the next day (Thursday/Monday) available for consultations
-                                                        </small>
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex gap-2">
-                                                <button type="submit" class="btn-primary btn-with-icon">
-                                                    <i class="material-symbols-rounded">check_circle</i>
-                                                    <span>Add Holiday</span>
-                                                </button>
-                                                <button type="button" class="btn-secondary" onclick="closeAddHolidayModal()">Cancel</button>
-                                            </div>
-                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -880,6 +789,80 @@ $currentUser = AuthManager::getCurrentUser();
         </footer>
     </main>
 
+    <!-- Add Holiday Modal -->
+    <div id="addHolidayModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <i class="material-symbols-rounded">event_busy</i>
+                    <span>Add Holiday</span>
+                </h4>
+                <span class="close" onclick="closeAddHolidayModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addHolidayForm">
+                    <div class="form-group">
+                        <label>
+                            <i class="material-symbols-rounded">event</i>
+                            <span>Holiday Date *</span>
+                        </label>
+                        <input type="text" id="holidayDate" class="form-control book--appointment--input"
+                            placeholder="Select consultation day" readonly required>
+                        <small class="text-muted">Only Wednesday or Sunday can be marked as holiday</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="material-symbols-rounded">edit_note</i>
+                            <span>Reason *</span>
+                        </label>
+                        <textarea id="holidayReason" class="form-control" rows="3"
+                            placeholder="e.g., Poya Day, Christmas" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check" style="padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                            <input class="form-check-input" type="checkbox" id="rescheduleNextDay"
+                                style="width: 20px; height: 20px; margin-top: 0;" onchange="toggleRescheduleDatePicker()">
+                            <label class="form-check-label ms-2" for="rescheduleNextDay" style="cursor: pointer;">
+                                <strong style="color: #333;">
+                                    <i class="fas fa-calendar-check text-success"></i>
+                                    Reschedule consultation to another day
+                                </strong>
+                                <br>
+                                <small class="text-muted" style="display: block; margin-top: 5px; margin-left: 28px;">
+                                    Choose a replacement day for this consultation (within the same month)
+                                </small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="rescheduleDatePickerContainer" style="display: none;">
+                        <label>
+                            <i class="material-symbols-rounded">event_available</i>
+                            <span>Select Replacement Consultation Date *</span>
+                        </label>
+                        <input type="text" id="rescheduleDate" class="form-control book--appointment--input"
+                            placeholder="Click to select a date" readonly>
+                        <small class="text-muted">
+                            <strong>Available dates:</strong> Any day in the same month (excludes Wed/Sun and existing holidays)
+                            <br>
+                            <span style="color: #d32f2f;">⚠️ You must select a replacement date when rescheduling</span>
+                        </small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-primary btn-with-icon">
+                            <i class="material-symbols-rounded">check_circle</i>
+                            <span>Add Holiday</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="closeAddHolidayModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Booking Modal -->
     <div id="bookingModal" class="modal">
         <div class="modal-content">
@@ -892,7 +875,6 @@ $currentUser = AuthManager::getCurrentUser();
             </div>
             <div class="modal-body">
                 <form id="onlineBookingForm">
-                    <!-- Row 1: Title and Full Name -->
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
@@ -919,7 +901,6 @@ $currentUser = AuthManager::getCurrentUser();
                         </div>
                     </div>
 
-                    <!-- Row 2: Mobile Number and Email -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -941,7 +922,6 @@ $currentUser = AuthManager::getCurrentUser();
                         </div>
                     </div>
 
-                    <!-- Row 3: Address (Full Width) -->
                     <div class="form-group">
                         <label>
                             <i class="material-symbols-rounded">home</i>
@@ -950,7 +930,6 @@ $currentUser = AuthManager::getCurrentUser();
                         <textarea id="bookingAddress" rows="3" placeholder="Your address"></textarea>
                     </div>
 
-                    <!-- Row 4: Date & Time and Channeling Fee -->
                     <div class="row">
                         <div class="col-md-7">
                             <div class="form-group">
@@ -998,39 +977,30 @@ $currentUser = AuthManager::getCurrentUser();
     <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
-
-    <!-- Flatpickr JS for Calendar -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr "></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
         let selectedSlots = new Set();
         let currentDate = '';
         let slotsData = [];
         let selectedSlotData = null;
-        let availableConsultationDates = []; // Store all available dates including rescheduled ones
+        let availableConsultationDates = [];
+        let holidayPicker = null;
+        let rescheduleDatePicker = null;
+        let availableRescheduleDates = [];
 
-        // Initialize calendar
         document.addEventListener('DOMContentLoaded', function() {
-            // Load available dates first, then initialize calendar
             loadAvailableDatesForCalendar();
-
-            // Initialize holiday calendar
             initializeHolidayCalendar();
-
-            // Load holidays and temporary days
             loadHolidays();
             loadTempDays();
         });
 
-        /**
-         * Load all available consultation dates (regular + rescheduled)
-         * This is used to enable dates in the Flatpickr calendar
-         */
         async function loadAvailableDatesForCalendar() {
             try {
                 const formData = new FormData();
                 formData.append('action', 'get_all_available_dates');
-                formData.append('days', '90'); // Load 90 days ahead
+                formData.append('days', '90');
 
                 const response = await fetch('../../appointment_handler.php', {
                     method: 'POST',
@@ -1039,48 +1009,27 @@ $currentUser = AuthManager::getCurrentUser();
 
                 const data = await response.json();
 
-                console.log('Raw API Response:', data); // Debug log
-
                 if (data.success && data.dates) {
-                    // Store available dates - keep full objects
                     availableConsultationDates = data.dates;
-
                     console.log('Available consultation dates loaded:', availableConsultationDates);
-                    console.log('Total dates:', data.total_dates || availableConsultationDates.length);
-
-                    // Log temporary days specifically
-                    const tempDays = availableConsultationDates.filter(d => d.is_temporary);
-                    console.log('Temporary/Rescheduled days:', tempDays);
-
-                    // Now initialize the main calendar with these dates
                     initializeMainCalendar();
                 } else {
                     console.error('Failed to load available dates:', data.message || 'Unknown error');
-                    // Fallback to Wednesday/Sunday only
                     availableConsultationDates = [];
                     initializeMainCalendar();
                 }
             } catch (error) {
                 console.error('Error loading available dates:', error);
-                // Fallback to Wednesday/Sunday only
                 availableConsultationDates = [];
                 initializeMainCalendar();
             }
         }
 
-        /**
-         * Initialize the main consultation date picker
-         * This calendar enables regular consultation days + rescheduled days
-         */
         function initializeMainCalendar() {
-            console.log('Initializing main calendar with dates:', availableConsultationDates);
-
-            // Get next consultation date
             const today = new Date();
             let nextDate = new Date(today);
             nextDate.setDate(nextDate.getDate() + 1);
 
-            // Find next available consultation date
             let attempts = 0;
             while (attempts < 90) {
                 const dayOfWeek = nextDate.getDay();
@@ -1095,9 +1044,6 @@ $currentUser = AuthManager::getCurrentUser();
                 attempts++;
             }
 
-            console.log('Default date selected:', nextDate.toISOString().split('T')[0]);
-
-            // Initialize Flatpickr
             const consultationDatePicker = flatpickr("#consultationDate", {
                 dateFormat: "Y-m-d",
                 minDate: "today",
@@ -1106,46 +1052,20 @@ $currentUser = AuthManager::getCurrentUser();
                     function(date) {
                         const dayOfWeek = date.getDay();
                         const dateStr = formatDateForComparison(date);
-
-                        // Check if this date is in available dates list
-                        const foundInList = availableConsultationDates.some(d => {
-                            return d.date === dateStr;
-                        });
-
-                        // Enable if it's Wednesday (3), Sunday (0), OR in available list
-                        const shouldEnable = (dayOfWeek === 0 || dayOfWeek === 3 || foundInList);
-
-                        // Debug log for specific dates
-                        if (dateStr.includes('2025-10-23')) {
-                            console.log('Checking Oct 23:', {
-                                dateStr,
-                                dayOfWeek,
-                                foundInList,
-                                shouldEnable,
-                                availableDates: availableConsultationDates
-                            });
-                        }
-
-                        return shouldEnable;
+                        const foundInList = availableConsultationDates.some(d => d.date === dateStr);
+                        return (dayOfWeek === 0 || dayOfWeek === 3 || foundInList);
                     }
                 ],
                 onDayCreate: function(dObj, dStr, fp, dayElem) {
                     const dateStr = formatDateForComparison(dayElem.dateObj);
-
-                    // Find this date in available dates list
                     const availableDateInfo = availableConsultationDates.find(d => d.date === dateStr);
 
-                    // Check if it's a temporary/rescheduled consultation day
                     if (availableDateInfo && availableDateInfo.is_temporary) {
-                        // Add special styling for rescheduled days
                         dayElem.innerHTML += '<span class="rescheduled-badge" title="Rescheduled consultation day">★</span>';
                         dayElem.classList.add('rescheduled-day');
-
-                        console.log('Added rescheduled badge to:', dateStr);
                     }
                 },
                 onChange: function(selectedDates, dateStr, instance) {
-                    console.log('Date selected:', dateStr);
                     if (dateStr) {
                         loadSlotsForDate(dateStr);
                         checkAndShowRescheduledInfo(dateStr);
@@ -1153,24 +1073,101 @@ $currentUser = AuthManager::getCurrentUser();
                 }
             });
 
-            // Load slots for the default date
             const defaultDate = nextDate.toISOString().split('T')[0];
             consultationDatePicker.setDate(defaultDate);
             loadSlotsForDate(defaultDate);
         }
 
-        /**
-         * Check if a date is in the available dates list
-         */
-        function isDateInAvailableList(date) {
-            const dateStr = formatDateForComparison(date);
-            const found = availableConsultationDates.some(d => d.date === dateStr);
-            return found;
+        function initializeHolidayCalendar() {
+            holidayPicker = flatpickr("#holidayDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                enable: [
+                    function(date) {
+                        return (date.getDay() === 0 || date.getDay() === 3);
+                    }
+                ],
+                onChange: async function(selectedDates, dateStr, instance) {
+                    if (dateStr) {
+                        await loadAvailableRescheduleDates(dateStr);
+                    }
+                }
+            });
         }
 
-        /**
-         * Format date for comparison
-         */
+        function toggleRescheduleDatePicker() {
+            const checkbox = document.getElementById('rescheduleNextDay');
+            const container = document.getElementById('rescheduleDatePickerContainer');
+
+            if (checkbox.checked) {
+                container.style.display = 'block';
+
+                if (!rescheduleDatePicker) {
+                    initializeRescheduleDatePicker();
+                }
+
+                const holidayDate = document.getElementById('holidayDate').value;
+                if (holidayDate) {
+                    loadAvailableRescheduleDates(holidayDate);
+                }
+            } else {
+                container.style.display = 'none';
+                if (rescheduleDatePicker) {
+                    rescheduleDatePicker.clear();
+                }
+            }
+        }
+
+        function initializeRescheduleDatePicker() {
+            rescheduleDatePicker = flatpickr("#rescheduleDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                enable: [],
+                disable: [
+                    function(date) {
+                        const dayOfWeek = date.getDay();
+                        return (dayOfWeek === 0 || dayOfWeek === 3);
+                    }
+                ]
+            });
+        }
+
+        async function loadAvailableRescheduleDates(holidayDate) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_available_reschedule_dates');
+                formData.append('holiday_date', holidayDate);
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.dates) {
+                    availableRescheduleDates = data.dates;
+
+                    if (rescheduleDatePicker) {
+                        rescheduleDatePicker.set('enable', data.dates.map(d => d.date));
+                    }
+
+                    console.log('Available reschedule dates loaded:', data.dates.length);
+                } else {
+                    console.error('Failed to load available dates:', data.message);
+                    availableRescheduleDates = [];
+                }
+            } catch (error) {
+                console.error('Error loading available dates:', error);
+                availableRescheduleDates = [];
+            }
+        }
+
+        function isDateInAvailableList(date) {
+            const dateStr = formatDateForComparison(date);
+            return availableConsultationDates.some(d => d.date === dateStr);
+        }
+
         function formatDateForComparison(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1178,9 +1175,6 @@ $currentUser = AuthManager::getCurrentUser();
             return `${year}-${month}-${day}`;
         }
 
-        /**
-         * Check and show info if selected date is a rescheduled consultation day
-         */
         async function checkAndShowRescheduledInfo(dateStr) {
             try {
                 const formData = new FormData();
@@ -1195,7 +1189,6 @@ $currentUser = AuthManager::getCurrentUser();
                 const data = await response.json();
 
                 if (data.success && data.is_temporary) {
-                    // Show notification that this is a rescheduled day
                     showRescheduledDayNotification(data.reason);
                 }
             } catch (error) {
@@ -1203,17 +1196,12 @@ $currentUser = AuthManager::getCurrentUser();
             }
         }
 
-        /**
-         * Show notification for rescheduled day
-         */
         function showRescheduledDayNotification(reason) {
-            // Remove existing notification if any
             const existingNotification = document.querySelector('.rescheduled-notification');
             if (existingNotification) {
                 existingNotification.remove();
             }
 
-            // Create new notification
             const notification = document.createElement('div');
             notification.className = 'rescheduled-notification';
             notification.innerHTML = `
@@ -1226,24 +1214,10 @@ $currentUser = AuthManager::getCurrentUser();
             </div>
         `;
 
-            // Insert after the date selection
             const dateContainer = document.querySelector('.row.mb-4');
             if (dateContainer) {
                 dateContainer.insertAdjacentElement('afterend', notification);
             }
-        }
-
-        function initializeHolidayCalendar() {
-            holidayPicker = flatpickr("#holidayDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                enable: [
-                    function(date) {
-                        // Enable only Wednesdays (3) and Sundays (0)
-                        return (date.getDay() === 0 || date.getDay() === 3);
-                    }
-                ]
-            });
         }
 
         async function loadSlotsForDate(date) {
@@ -1299,14 +1273,13 @@ $currentUser = AuthManager::getCurrentUser();
                 card.dataset.status = slot.status;
                 card.dataset.slotNumber = slot.slot_number;
 
-                // Card content with slot number
                 let cardContent = `
-            <div style="font-size: 18px; font-weight: bold; color: #017e12ff; margin-bottom: 5px;">
-                #${slot.slot_number}
-            </div>
-            <div class="slot-time">${slot.display_time}</div>
-            <div class="slot-status">${slot.status}</div>
-        `;
+                <div style="font-size: 18px; font-weight: bold; color: #017e12ff; margin-bottom: 5px;">
+                    #${slot.slot_number}
+                </div>
+                <div class="slot-time">${slot.display_time}</div>
+                <div class="slot-status">${slot.status}</div>
+            `;
 
                 if (slot.appointment_number) {
                     cardContent += `<small style="color: #666;">${slot.appointment_number}</small>`;
@@ -1455,7 +1428,6 @@ $currentUser = AuthManager::getCurrentUser();
             const displayDate = dateObj.toLocaleDateString('en-US', options);
 
             document.getElementById('selectedDateTime').value = `${displayDate} at ${slot.display_time}`;
-
             document.getElementById('bookingModal').style.display = 'block';
         }
 
@@ -1495,7 +1467,6 @@ $currentUser = AuthManager::getCurrentUser();
                 if (result.success) {
                     closeBookingModal();
                     showSuccess(`Appointment ${result.appointment_number} booked successfully!`);
-
                     selectedSlots.clear();
                     selectedSlotData = null;
                     await loadSlotsForDate(currentDate);
@@ -1551,14 +1522,6 @@ $currentUser = AuthManager::getCurrentUser();
             }
         }
 
-        window.addEventListener('click', function(event) {
-            const bookingModal = document.getElementById('bookingModal');
-            if (event.target === bookingModal) {
-                closeBookingModal();
-            }
-        });
-
-        // Holiday Management Functions
         function openAddHolidayModal() {
             document.getElementById('addHolidayModal').style.display = 'block';
         }
@@ -1566,6 +1529,16 @@ $currentUser = AuthManager::getCurrentUser();
         function closeAddHolidayModal() {
             document.getElementById('addHolidayModal').style.display = 'none';
             document.getElementById('addHolidayForm').reset();
+            document.getElementById('rescheduleDatePickerContainer').style.display = 'none';
+
+            if (holidayPicker) {
+                holidayPicker.clear();
+            }
+            if (rescheduleDatePicker) {
+                rescheduleDatePicker.clear();
+            }
+
+            availableRescheduleDates = [];
         }
 
         async function loadHolidays() {
@@ -1603,28 +1576,72 @@ $currentUser = AuthManager::getCurrentUser();
 
             tbody.innerHTML = holidays.map(holiday => {
                 const date = new Date(holiday.holiday_date);
-                const nextDay = new Date(date);
-                nextDay.setDate(nextDay.getDate() + 1);
-                const rescheduledTo = nextDay.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
+                let rescheduledInfo = 'Not rescheduled';
 
                 return `
-                    <tr>
-                        <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td><span class="badge badge-warning">${holiday.day_of_week}</span></td>
-                        <td>${holiday.reason}</td>
-                        <td>${rescheduledTo}</td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="removeHoliday('${holiday.holiday_date}')">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                <tr data-holiday-date="${holiday.holiday_date}">
+                    <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                    <td><span class="badge badge-warning">${holiday.day_of_week}</span></td>
+                    <td>${holiday.reason}</td>
+                    <td id="reschedule-info-${holiday.holiday_date.replace(/-/g, '')}">${rescheduledInfo}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removeHoliday('${holiday.holiday_date}')">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </td>
+                </tr>`;
             }).join('');
+            updateRescheduleInfo(holidays);
+        }
+
+        async function updateRescheduleInfo(holidays) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_temp_days');
+
+                const response = await fetch('holiday_manager.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.days) {
+                    holidays.forEach(holiday => {
+                        const holidayDateStr = holiday.holiday_date;
+                        const holidayDate = new Date(holidayDateStr);
+                        const holidayMonth = holidayDate.getMonth();
+                        const holidayYear = holidayDate.getFullYear();
+
+                        const matchingTempDay = data.days.find(tempDay => {
+                            const tempDate = new Date(tempDay.consultation_date);
+                            const tempMonth = tempDate.getMonth();
+                            const tempYear = tempDate.getFullYear();
+
+                            return tempMonth === holidayMonth &&
+                                tempYear === holidayYear &&
+                                tempDay.reason.includes('Rescheduled from');
+                        });
+
+                        if (matchingTempDay) {
+                            const tempDate = new Date(matchingTempDay.consultation_date);
+                            const rescheduledText = tempDate.toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric'
+                            });
+
+                            const cellId = 'reschedule-info-' + holidayDateStr.replace(/-/g, '');
+                            const cell = document.getElementById(cellId);
+                            if (cell) {
+                                cell.innerHTML = `<span class="badge badge-info">${rescheduledText}</span>`;
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating reschedule info:', error);
+            }
         }
 
         async function loadTempDays() {
@@ -1663,25 +1680,30 @@ $currentUser = AuthManager::getCurrentUser();
             tbody.innerHTML = days.map(day => {
                 const date = new Date(day.consultation_date);
                 return `
-                    <tr>
-                        <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td><span class="badge badge-info">${day.day_of_week}</span></td>
-                        <td><small>${day.reason}</small></td>
-                    </tr>
-                `;
+                <tr>
+                    <td>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                    <td><span class="badge badge-info">${day.day_of_week}</span></td>
+                    <td><small>${day.reason}</small></td>
+                </tr>
+            `;
             }).join('');
         }
 
-        // Add holiday form submission
         document.getElementById('addHolidayForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const date = document.getElementById('holidayDate').value;
             const reason = document.getElementById('holidayReason').value;
             const reschedule = document.getElementById('rescheduleNextDay').checked;
+            const customRescheduleDate = reschedule ? document.getElementById('rescheduleDate').value : null;
 
             if (!date || !reason) {
                 alert('Please fill in all required fields');
+                return;
+            }
+
+            if (reschedule && !customRescheduleDate) {
+                alert('Please select a date to reschedule the consultation to');
                 return;
             }
 
@@ -1693,6 +1715,10 @@ $currentUser = AuthManager::getCurrentUser();
                 formData.append('date', date);
                 formData.append('reason', reason);
                 formData.append('reschedule', reschedule ? 'true' : 'false');
+
+                if (customRescheduleDate) {
+                    formData.append('custom_reschedule_date', customRescheduleDate);
+                }
 
                 const response = await fetch('holiday_manager.php', {
                     method: 'POST',
@@ -1706,20 +1732,21 @@ $currentUser = AuthManager::getCurrentUser();
                     if (data.rescheduled_to) {
                         const reschDate = new Date(data.rescheduled_to);
                         message += `\n\nConsultation day rescheduled to: ${reschDate.toLocaleDateString('en-US', { 
-                            weekday: 'long', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        })}`;
+                        weekday: 'long', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}`;
                     }
                     alert(message);
                     closeAddHolidayModal();
                     loadHolidays();
                     loadTempDays();
 
-                    // Reload slots if viewing a date
                     if (currentDate) {
                         await loadSlotsForDate(currentDate);
                     }
+
+                    await loadAvailableDatesForCalendar();
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -1731,7 +1758,6 @@ $currentUser = AuthManager::getCurrentUser();
             }
         });
 
-        // Remove holiday
         async function removeHoliday(date) {
             if (!confirm('Are you sure you want to remove this holiday?\n\nThis will unblock all slots for that day (if not already booked).')) {
                 return;
@@ -1756,10 +1782,11 @@ $currentUser = AuthManager::getCurrentUser();
                     loadHolidays();
                     loadTempDays();
 
-                    // Reload slots if viewing that date
                     if (currentDate === date) {
                         await loadSlotsForDate(currentDate);
                     }
+
+                    await loadAvailableDatesForCalendar();
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -1771,14 +1798,20 @@ $currentUser = AuthManager::getCurrentUser();
             }
         }
 
-        // Close modal when clicking outside
         window.addEventListener('click', function(event) {
+            const bookingModal = document.getElementById('bookingModal');
             const holidayModal = document.getElementById('addHolidayModal');
+
+            if (event.target === bookingModal) {
+                closeBookingModal();
+            }
+
             if (event.target === holidayModal) {
                 closeAddHolidayModal();
             }
         });
     </script>
+
 </body>
 
 </html>
