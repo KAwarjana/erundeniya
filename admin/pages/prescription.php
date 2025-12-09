@@ -59,6 +59,13 @@ $menuItems = [
         'icon' => 'local_hospital',
         'allowed_roles' => ['Admin', 'Receptionist'],
         'show_to_all' => true
+    ],
+    [
+        'title' => 'Reports',
+        'url' => 'reports.php',
+        'icon' => 'assessment',
+        'allowed_roles' => ['Admin'],
+        'show_to_all' => true
     ]
 ];
 
@@ -163,7 +170,7 @@ function getAllPrescriptions()
         Database::setUpConnection();
 
         $query = "SELECT p.*, a.appointment_number, a.appointment_date, a.appointment_time, 
-                  a.patient_id, pt.title, pt.name, pt.mobile 
+                  pt.title, pt.name, pt.mobile, pt.registration_number 
                   FROM prescriptions p 
                   INNER JOIN appointment a ON p.appointment_id = a.id 
                   INNER JOIN patient pt ON a.patient_id = pt.id 
@@ -184,7 +191,7 @@ function getAttendedAppointments()
         Database::setUpConnection();
 
         $query = "SELECT a.id, a.appointment_number, a.appointment_date, a.appointment_time, 
-                  a.patient_id, pt.title, pt.name, pt.mobile 
+                  pt.title, pt.name, pt.mobile, pt.id as patient_id 
                   FROM appointment a 
                   INNER JOIN patient pt ON a.patient_id = pt.id 
                   WHERE a.status = 'Attended' 
@@ -205,7 +212,7 @@ function getPrescriptionById($id)
         Database::setUpConnection();
 
         $query = "SELECT p.*, a.appointment_number, a.appointment_date, a.appointment_time, 
-                  a.patient_id, pt.title, pt.name, pt.mobile 
+                  pt.title, pt.name, pt.mobile, pt.registration_number 
                   FROM prescriptions p 
                   INNER JOIN appointment a ON p.appointment_id = a.id 
                   INNER JOIN patient pt ON a.patient_id = pt.id 
@@ -219,10 +226,29 @@ function getPrescriptionById($id)
     }
 }
 
+// Get all patients for walk-in functionality
+function getAllPatients()
+{
+    try {
+        Database::setUpConnection();
+
+        $query = "SELECT id, registration_number, title, name, mobile 
+                  FROM patient 
+                  ORDER BY name ASC";
+
+        $result = Database::search($query);
+        return $result;
+    } catch (Exception $e) {
+        error_log("Error getting all patients: " . $e->getMessage());
+        return false;
+    }
+}
+
 // Get statistics for display
 $stats = getPrescriptionStats();
 $prescriptions = getAllPrescriptions();
 $attendedAppointments = getAttendedAppointments();
+$allPatients = getAllPatients();
 ?>
 
 <!DOCTYPE html>
@@ -508,7 +534,7 @@ $attendedAppointments = getAttendedAppointments();
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg  ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 12px center;
             background-repeat: no-repeat;
             background-size: 16px;
@@ -732,12 +758,7 @@ $attendedAppointments = getAttendedAppointments();
             width: 100%;
         }
 
-        /* Ensure the clear button is above the calendar icon */
-        .clear-date-btn {
-            z-index: 10;
-        }
-
-        /* Alternative approach: hide native calendar icon when clear button is visible */
+        /* Hide native calendar icon when clear button is visible */
         .date-filter-container.has-value #dateFilter::-webkit-calendar-picker-indicator {
             display: none;
         }
@@ -800,6 +821,187 @@ $attendedAppointments = getAttendedAppointments();
                 right: 5px;
             }
         }
+
+        /*CSS to fix the responsive modal issue for screen widths 1200-1510px */
+
+        /* Modal responsive adjustments for medium-large screens */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+
+            /* Adjust modal positioning and sizing */
+            .modal {
+                padding-left: 0px !important;
+                /* Account for sidebar width */
+            }
+
+            .modal-content {
+                max-width: calc(100vw - 300px) !important;
+                /* Responsive max-width */
+                margin: 2% auto !important;
+                width: 95% !important;
+            }
+
+            /* Ensure sidebar stays in place */
+            .sidenav {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                z-index: 1040 !important;
+                /* Below modals but above content */
+            }
+
+            /* Prevent sidebar from moving down */
+            .main-content {
+                margin-left: 250px !important;
+                /* Match sidebar width */
+                width: calc(100% - 250px) !important;
+            }
+
+            /* Adjust modal header for better fit */
+            .modal-header {
+                padding: 15px 20px !important;
+            }
+
+            /* Ensure modal body scrolls properly */
+            .modal-body {
+                max-height: calc(90vh - 120px) !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        /* Additional adjustments for better responsiveness */
+        @media (min-width: 1200px) and (max-width: 1400px) {
+
+            /* Reduce modal padding for smaller screens in this range */
+            .modal-content {
+                padding: 0 !important;
+            }
+
+            /* Adjust form elements */
+            .form-group {
+                margin-bottom: 15px !important;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+
+            /* Smaller buttons */
+            .btn-primary,
+            .btn-secondary,
+            .print-btn {
+                padding: 8px 20px !important;
+                font-size: 14px !important;
+                min-height: 40px !important;
+            }
+        }
+
+        /* Ensure proper stacking order */
+        .modal {
+            z-index: 1050 !important;
+            /* Higher than sidebar */
+        }
+
+        .sidenav {
+            z-index: 1040 !important;
+            /* Lower than modals */
+        }
+
+        /* Fix for modal backdrop */
+        .modal-backdrop {
+            z-index: 1049 !important;
+            /* Between sidebar and modal */
+        }
+
+        /* Responsive adjustments for treatment cards in modals */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .treatment-row {
+                gap: 10px !important;
+                padding: 10px !important;
+            }
+
+            .treatment-dropdown {
+                flex: 1.5 !important;
+                min-width: 180px !important;
+            }
+
+            .price-input {
+                flex: 0.8 !important;
+                min-width: 100px !important;
+            }
+
+            .quantity-treatment-input {
+                flex: 0.4 !important;
+                min-width: 60px !important;
+            }
+
+            .remove-btn {
+                padding: 6px 8px !important;
+            }
+        }
+
+        /* Ensure proper layout for discount section */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .discount-row {
+                gap: 10px !important;
+            }
+
+            .discount-col {
+                flex: 1 !important;
+            }
+
+            .discount-section {
+                padding: 15px !important;
+            }
+
+            .discount-display {
+                padding: 10px 15px !important;
+            }
+        }
+
+        /* Fix for table responsiveness in modals */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .table-responsive {
+                font-size: 13px !important;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 10px !important;
+            }
+
+            .btn-sm {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                min-height: 28px !important;
+            }
+        }
+
+        /* Ensure modal doesn't push sidebar down */
+        @media (min-width: 1200px) {
+            body.modal-open {
+                overflow: hidden !important;
+            }
+
+            body.modal-open .sidenav {
+                position: fixed !important;
+            }
+        }
+
+        /* Additional fix for modal positioning */
+        .modal-dialog {
+            margin: 1.75rem auto !important;
+        }
+
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .modal-dialog {
+                margin: 1rem auto !important;
+                max-width: calc(100vw - 280px) !important;
+            }
+        }
     </style>
 </head>
 
@@ -844,9 +1046,9 @@ $attendedAppointments = getAttendedAppointments();
                 </nav>
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4">
                     <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                        <!-- <div class="input-group input-group-outline">
+                        <!--<div class="input-group input-group-outline">
                             <input type="text" class="form-control" placeholder="Search appointments..." id="globalSearch">
-                        </div> -->
+                        </div>-->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
                         <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
@@ -989,7 +1191,7 @@ $attendedAppointments = getAttendedAppointments();
                                     <tbody id="prescriptionsTableBody">
                                         <?php
                                         /* ----------  pagination  ---------- */
-                                        $recordsPerPage = 10;  
+                                        $recordsPerPage = 10;
                                         $page           = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
                                         $offset         = ($page - 1) * $recordsPerPage;
 
@@ -1153,20 +1355,13 @@ $attendedAppointments = getAttendedAppointments();
                                                 <select id="appointmentNumber" onchange="loadPatientFromAppointment()" class="form-control">
                                                     <option value="">Select Appointment</option>
                                                     <?php if ($attendedAppointments && $attendedAppointments->num_rows > 0): ?>
-                                                        <?php while ($row = $attendedAppointments->fetch_assoc()):
-                                                            // Properly escape all data for HTML attributes
-                                                            $patientId = htmlspecialchars($row['patient_id'] ?? '', ENT_QUOTES, 'UTF-8');
-                                                            $patientName = htmlspecialchars($row['title'] . ' ' . $row['name'], ENT_QUOTES, 'UTF-8');
-                                                            $patientMobile = htmlspecialchars($row['mobile'], ENT_QUOTES, 'UTF-8');
-                                                            $appointmentDate = htmlspecialchars($row['appointment_date'], ENT_QUOTES, 'UTF-8');
-                                                            $appointmentNumber = htmlspecialchars($row['appointment_number'], ENT_QUOTES, 'UTF-8');
-                                                        ?>
+                                                        <?php while ($row = $attendedAppointments->fetch_assoc()): ?>
                                                             <option value="<?php echo $row['id']; ?>"
-                                                                data-patient-id="<?php echo $patientId; ?>"
-                                                                data-patient="<?php echo $patientName; ?>"
-                                                                data-mobile="<?php echo $patientMobile; ?>"
-                                                                data-date="<?php echo $appointmentDate; ?>">
-                                                                <?php echo $appointmentNumber; ?> - <?php echo $patientName; ?>
+                                                                data-patient-id="<?php echo $row['patient_id']; ?>"
+                                                                data-patient="<?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>"
+                                                                data-mobile="<?php echo htmlspecialchars($row['mobile']); ?>"
+                                                                data-date="<?php echo htmlspecialchars($row['appointment_date']); ?>">
+                                                                <?php echo htmlspecialchars($row['appointment_number']); ?> - <?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>
                                                             </option>
                                                         <?php endwhile; ?>
                                                     <?php else: ?>
@@ -1189,25 +1384,13 @@ $attendedAppointments = getAttendedAppointments();
                                                 </label>
                                                 <select id="walkinPatientSelect" onchange="loadWalkinPatient()" class="form-control">
                                                     <option value="">Select Patient</option>
-                                                    <?php
-                                                    // Get all patients
-                                                    $allPatientsQuery = "SELECT id, registration_number, title, name, mobile 
-        FROM patient 
-        ORDER BY name ASC";
-                                                    $allPatients = Database::search($allPatientsQuery);
-                                                    if ($allPatients && $allPatients->num_rows > 0):
-                                                        while ($row = $allPatients->fetch_assoc()):
-                                                            // Properly escape all data
-                                                            $patientId = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
-                                                            $regNumber = htmlspecialchars($row['registration_number'], ENT_QUOTES, 'UTF-8');
-                                                            $patientName = htmlspecialchars($row['title'] . ' ' . $row['name'], ENT_QUOTES, 'UTF-8');
-                                                            $mobile = htmlspecialchars($row['mobile'], ENT_QUOTES, 'UTF-8');
-                                                    ?>
-                                                            <option value="<?php echo $patientId; ?>"
-                                                                data-patient="<?php echo $patientName; ?>"
-                                                                data-mobile="<?php echo $mobile; ?>"
-                                                                data-reg="<?php echo $regNumber; ?>">
-                                                                <?php echo $regNumber; ?> - <?php echo $patientName; ?> (<?php echo $mobile; ?>)
+                                                    <?php if ($allPatients && $allPatients->num_rows > 0): ?>
+                                                        <?php while ($row = $allPatients->fetch_assoc()): ?>
+                                                            <option value="<?php echo $row['id']; ?>"
+                                                                data-patient="<?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>"
+                                                                data-mobile="<?php echo htmlspecialchars($row['mobile']); ?>"
+                                                                data-reg="<?php echo htmlspecialchars($row['registration_number']); ?>">
+                                                                <?php echo htmlspecialchars($row['registration_number']); ?> - <?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?> (<?php echo htmlspecialchars($row['mobile']); ?>)
                                                             </option>
                                                         <?php endwhile; ?>
                                                     <?php endif; ?>
@@ -1504,18 +1687,36 @@ Next visit: After 2 weeks with BP chart`
         };
 
         // Load patient details from appointment
-        function loadPatientDetails() {
-            const appointmentSelect = document.getElementById('appointmentNumber');
-            const selectedOption = appointmentSelect.options[appointmentSelect.selectedIndex];
+        function loadPatientFromAppointment() {
+            const select = document.getElementById('appointmentNumber');
+            const selectedOption = select.options[select.selectedIndex];
 
             if (selectedOption.value) {
+                const patientId = selectedOption.getAttribute('data-patient-id');
+
+                if (!patientId) {
+                    console.error('No patient ID found in appointment data');
+                    alert('Error: This appointment has no associated patient');
+                    return;
+                }
+
+                // Set the hidden fields
+                document.getElementById('selectedPatientId').value = patientId;
+                document.getElementById('selectedAppointmentId').value = selectedOption.value;
                 document.getElementById('patientName').value = selectedOption.getAttribute('data-patient');
                 document.getElementById('patientMobile').value = selectedOption.getAttribute('data-mobile');
-                document.getElementById('appointmentDate').value = selectedOption.getAttribute('data-date');
+
+                // Visual feedback
+                document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
+                document.getElementById('patientMobile').style.backgroundColor = '#e8f5e8';
+
+                setTimeout(() => {
+                    document.getElementById('patientName').style.backgroundColor = '#f5f5f5';
+                    document.getElementById('patientMobile').style.backgroundColor = '#f5f5f5';
+                }, 1000);
+
             } else {
-                document.getElementById('patientName').value = '';
-                document.getElementById('patientMobile').value = '';
-                document.getElementById('appointmentDate').value = '';
+                clearPrescriptionFields();
             }
         }
 
@@ -1527,7 +1728,6 @@ Next visit: After 2 weeks with BP chart`
             }
         }
 
-        // Save prescription
         // Save prescription
         document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1632,13 +1832,12 @@ Next visit: After 2 weeks with BP chart`
 
         // Preview prescription
         function previewPrescription() {
-            const appointmentSelect = document.getElementById('appointmentNumber');
-            const selectedOption = appointmentSelect.options[appointmentSelect.selectedIndex];
-            const patientName = selectedOption.getAttribute('data-patient');
-            const patientMobile = selectedOption.getAttribute('data-mobile');
+            const patientId = document.getElementById('selectedPatientId').value;
+            const patientName = document.getElementById('patientName').value;
+            const patientMobile = document.getElementById('patientMobile').value;
             const prescriptionText = document.getElementById('prescriptionText').value;
 
-            if (!appointmentSelect.value || !patientName || !prescriptionText) {
+            if (!patientId || !patientName || !prescriptionText) {
                 alert('Please fill all required fields');
                 return;
             }
@@ -1844,265 +2043,6 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('previewModal').style.display = 'none';
         }
 
-        // Replace your existing displayPrescriptions function with this enhanced version
-        function displayPrescriptions(prescriptions, searchTerm = '') {
-            const tbody = document.getElementById('prescriptionsTableBody');
-            tbody.innerHTML = '';
-
-            if (prescriptions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No prescriptions found' + (searchTerm ? ' for "' + searchTerm + '"' : '') + '</td></tr>';
-                return;
-            }
-
-            prescriptions.forEach(function(prescription) {
-                const row = document.createElement('tr');
-
-                // Highlight search terms in relevant fields
-                const highlightedPrescriptionId = highlightSearchTerm('PRES' + String(prescription.id).padStart(3, '0'), searchTerm);
-                const highlightedPatientName = highlightSearchTerm(prescription.title + ' ' + prescription.name, searchTerm);
-                const highlightedMobile = highlightSearchTerm(prescription.mobile, searchTerm);
-                const highlightedRegNumber = highlightSearchTerm(prescription.registration_number || 'N/A', searchTerm);
-                const highlightedAppointment = highlightSearchTerm(prescription.appointment_number || 'Walk-in', searchTerm);
-
-                row.innerHTML =
-                    '<td>' +
-                    '<div class="d-flex flex-column">' +
-                    '<h6 class="mb-0 text-sm font-weight-bold">' + highlightedPrescriptionId + '</h6>' +
-                    '<p class="text-xs text-secondary mb-0">' +
-                    '<i class="material-symbols-rounded" style="font-size: 12px; vertical-align: middle;">calendar_today</i> ' +
-                    highlightedAppointment +
-                    '</p>' +
-                    '</div>' +
-                    '</td>' +
-                    '<td>' +
-                    '<div class="d-flex flex-column">' +
-                    '<span class="text-sm font-weight-bold">' + highlightedPatientName + '</span>' +
-                    '<span class="text-xs text-secondary">' +
-                    highlightedRegNumber + ' | ' + highlightedMobile +
-                    '</span>' +
-                    '</div>' +
-                    '</td>' +
-                    '<td>' +
-                    '<span class="text-sm">' + highlightSearchTerm(prescription.created_at.split(' ')[0], searchTerm) + '</span>' +
-                    '</td>' +
-                    '<td>' +
-                    '<div class="d-flex gap-1">' +
-                    '<button class="btn btn-sm btn-outline-success" onclick="viewPrescription(' + prescription.id + ')">View</button>' +
-                    '<button class="btn btn-sm btn-outline-primary" onclick="editPrescription(' + prescription.id + ')">Edit</button>' +
-                    '<button class="print-btn btn-sm" onclick="printPrescription(' + prescription.id + ')">Print</button>' +
-                    '</div>' +
-                    '</td>';
-                tbody.appendChild(row);
-            });
-        }
-
-        // Add this function for clearing search
-        function clearPrescriptionSearch() {
-            const searchInput = document.getElementById('prescriptionSearch');
-            searchInput.value = '';
-            searchInput.focus();
-
-            // Re-apply filters after clearing search
-            applyCombinedFilters();
-        }
-
-        // Clear date filter function - only clears date filter
-        function clearDateFilter() {
-            const dateFilter = document.getElementById('dateFilter');
-            dateFilter.value = '';
-
-            // Re-apply filters after clearing date
-            applyCombinedFilters();
-        }
-
-        // Clear all filters function - clears both search and date
-        function clearAllFilters() {
-            document.getElementById('prescriptionSearch').value = '';
-            document.getElementById('dateFilter').value = '';
-            applyCombinedFilters();
-        }
-
-        // Search prescriptions function
-        function searchPrescriptions() {
-            const searchTerm = document.getElementById('prescriptionSearch').value.toLowerCase();
-            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
-
-            // Only apply text search, ignore date filter
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (!searchTerm || text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Filter by date
-        function filterByDate() {
-            const selectedDate = document.getElementById('dateFilter').value;
-            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
-
-            // Only apply date filter, ignore text search
-            rows.forEach(row => {
-                const dateCell = row.querySelector('td:nth-child(3) span').textContent;
-                if (!selectedDate || dateCell === selectedDate) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Combined filter function - applies both search and date filter together
-        function applyCombinedFilters() {
-            const searchTerm = document.getElementById('prescriptionSearch').value.toLowerCase();
-            const selectedDate = document.getElementById('dateFilter').value;
-            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                const dateCell = row.querySelector('td:nth-child(3) span').textContent;
-
-                // Check both search term and date filter
-                const matchesSearch = !searchTerm || text.includes(searchTerm);
-                const matchesDate = !selectedDate || dateCell === selectedDate;
-
-                // Show row only if both conditions are met (AND logic)
-                if (matchesSearch && matchesDate) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Add event listener for search input clear button visibility
-        document.getElementById('prescriptionSearch').addEventListener('input', function() {
-            const clearBtn = this.nextElementSibling;
-            if (this.value.length > 0) {
-                clearBtn.style.display = 'block';
-            } else {
-                clearBtn.style.display = 'none';
-            }
-
-            // Apply combined filters when search changes
-            applyCombinedFilters();
-        });
-
-        // Enhanced date filter functionality
-        document.getElementById('dateFilter').addEventListener('change', function() {
-            const wrapper = this.parentElement;
-            const clearBtn = wrapper.querySelector('.date-clear-btn');
-
-            if (this.value) {
-                wrapper.classList.add('has-date');
-                clearBtn.style.display = 'flex';
-                clearBtn.style.alignItems = 'center';
-                clearBtn.style.justifyContent = 'center';
-
-                // Position the clear button based on browser support
-                if (this.offsetWidth - this.clientWidth > 20) {
-                    // Browser shows calendar icon (Chrome, Edge)
-                    clearBtn.style.right = '25px';
-                } else {
-                    // Browser doesn't show calendar icon (Firefox)
-                    clearBtn.style.right = '5px';
-                }
-            } else {
-                wrapper.classList.remove('has-date');
-                clearBtn.style.display = 'none';
-            }
-
-            applyCombinedFilters();
-        });
-
-        // Enhanced clear function
-        function clearDateFilter() {
-            const dateFilter = document.getElementById('dateFilter');
-            const wrapper = dateFilter.parentElement;
-            const clearBtn = wrapper.querySelector('.date-clear-btn');
-
-            dateFilter.value = '';
-            wrapper.classList.remove('has-date');
-            clearBtn.style.display = 'none';
-
-            applyCombinedFilters();
-
-            // Trigger change event to ensure proper state
-            dateFilter.dispatchEvent(new Event('change'));
-
-            // Focus back on the date input
-            dateFilter.focus();
-        }
-
-        // Search functionality
-        document.getElementById('globalSearch').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-
-        // Add to your existing DOMContentLoaded function
-        document.getElementById('prescriptionSearch').addEventListener('input', function() {
-            const clearBtn = this.nextElementSibling; // The button after the input
-            if (this.value.length > 0) {
-                clearBtn.style.display = 'block';
-            } else {
-                clearBtn.style.display = 'none';
-            }
-        });
-
-        // Utility functions
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
-            notification.style.zIndex = '9999';
-            notification.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
-                    ${message}
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function toggleNotifications() {
-            showNotification('Notifications feature coming soon!', 'info');
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                window.location.href = '?logout=1';
-            }
-        }
-
-        // Close modals when clicking outside
-        window.addEventListener('click', function(event) {
-            const modals = ['prescriptionModal', 'previewModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        });
-
-
-
         // Mode switching functionality
         document.querySelectorAll('input[name="prescriptionMode"]').forEach(radio => {
             radio.addEventListener('change', function() {
@@ -2125,40 +2065,6 @@ Next visit: After 2 weeks with BP chart`
                 clearPrescriptionFields();
             });
         });
-
-        // Load patient from appointment
-        function loadPatientFromAppointment() {
-            const select = document.getElementById('appointmentNumber');
-            const selectedOption = select.options[select.selectedIndex];
-
-            if (selectedOption.value) {
-                const patientId = selectedOption.getAttribute('data-patient-id');
-
-                if (!patientId) {
-                    console.error('No patient ID found in appointment data');
-                    alert('Error: This appointment has no associated patient');
-                    return;
-                }
-
-                // Set the hidden fields
-                document.getElementById('selectedPatientId').value = patientId;
-                document.getElementById('selectedAppointmentId').value = selectedOption.value;
-                document.getElementById('patientName').value = selectedOption.getAttribute('data-patient');
-                document.getElementById('patientMobile').value = selectedOption.getAttribute('data-mobile');
-
-                // Visual feedback
-                document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
-                document.getElementById('patientMobile').style.backgroundColor = '#e8f5e8';
-
-                setTimeout(() => {
-                    document.getElementById('patientName').style.backgroundColor = '#f5f5f5';
-                    document.getElementById('patientMobile').style.backgroundColor = '#f5f5f5';
-                }, 1000);
-
-            } else {
-                clearPrescriptionFields();
-            }
-        }
 
         // Load walk-in patient
         function loadWalkinPatient() {
@@ -2209,106 +2115,200 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('patientMobile').value = '';
             document.getElementById('prescriptionText').value = '';
             document.getElementById('prescriptionHistoryAlert').style.display = 'none';
+            document.getElementById('appointmentNumber').value = '';
+            document.getElementById('walkinPatientSelect').value = '';
         }
 
-        // Form submission
-        document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Utility functions
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
+                    ${message}
+                </div>
+            `;
 
-            // Debug: Check values before submission
-            console.log('Form submission debug:', {
-                patientId: document.getElementById('selectedPatientId').value,
-                appointmentId: document.getElementById('selectedAppointmentId').value,
-                patientName: document.getElementById('patientName').value,
-                prescriptionText: document.getElementById('prescriptionText').value
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function toggleNotifications() {
+            showNotification('Notifications feature coming soon!', 'info');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '?logout=1';
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = ['prescriptionModal', 'previewModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
             });
-
-            const patientId = document.getElementById('selectedPatientId').value;
-            const appointmentId = document.getElementById('selectedAppointmentId').value;
-            const prescriptionText = document.getElementById('prescriptionText').value;
-
-            if (!patientId) {
-                alert('Please select a patient or appointment - Patient ID is missing');
-                return;
-            }
-
-            if (!prescriptionText.trim()) {
-                alert('Please enter prescription details');
-                return;
-            }
-
-            const prescriptionData = {
-                patient_id: patientId,
-                appointment_id: appointmentId || null,
-                prescription_text: prescriptionText,
-                created_by: <?php echo $_SESSION['user_id'] ?? 1; ?>
-            };
-
-            fetch('save_prescription.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(prescriptionData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(`Prescription ${data.prescription_number} saved successfully!`);
-                        showNotification('Prescription saved successfully!', 'success');
-                        this.reset();
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        alert('Error saving prescription: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error saving prescription. Please try again.');
-                });
         });
 
-        // Debug: Check appointment dropdown data
-        function debugAppointmentData() {
-            const select = document.getElementById('appointmentNumber');
-            console.log('Available appointments:');
-            for (let i = 0; i < select.options.length; i++) {
-                const option = select.options[i];
-                console.log(`Option ${i}:`, {
-                    value: option.value,
-                    text: option.text,
-                    'data-patient-id': option.getAttribute('data-patient-id'),
-                    'data-patient': option.getAttribute('data-patient'),
-                    'data-mobile': option.getAttribute('data-mobile')
-                });
+        // Enhanced search functionality
+        function searchPrescriptions() {
+            const searchTerm = document.getElementById('prescriptionSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // If both search and date filter are active, apply both
+            if (document.getElementById('dateFilter').value) {
+                filterByDate();
             }
         }
 
-        // Run this when page loads
-        window.addEventListener('load', debugAppointmentData);
+        // Filter by date
+        function filterByDate() {
+            const selectedDate = document.getElementById('dateFilter').value;
+            const searchTerm = document.getElementById('prescriptionSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
 
-        // Debug: Check the actual HTML of the appointment dropdown
-        function debugAppointmentDropdown() {
-            const select = document.getElementById('appointmentNumber');
-            console.log('Appointment dropdown HTML:');
-            console.log(select.innerHTML);
+            rows.forEach(row => {
+                const dateCell = row.querySelector('td:nth-child(3) span').textContent;
+                const text = row.textContent.toLowerCase();
 
-            // Check first few options
-            for (let i = 0; i < Math.min(3, select.options.length); i++) {
-                const option = select.options[i];
-                console.log(`Option ${i}:`, {
-                    value: option.value,
-                    text: option.text,
-                    patientId: option.getAttribute('data-patient-id'),
-                    patientName: option.getAttribute('data-patient'),
-                    mobile: option.getAttribute('data-mobile')
-                });
-            }
+                // Check both date and search conditions
+                const matchesDate = !selectedDate || dateCell === selectedDate;
+                const matchesSearch = !searchTerm || text.includes(searchTerm);
+
+                if (matchesDate && matchesSearch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
 
-        // Run debug when page loads
-        window.addEventListener('load', function() {
-            setTimeout(debugAppointmentDropdown, 1000);
+        // Clear search function
+        function clearPrescriptionSearch() {
+            const searchInput = document.getElementById('prescriptionSearch');
+            searchInput.value = '';
+            searchInput.focus();
+
+            // Re-apply filters after clearing search
+            searchPrescriptions();
+        }
+
+        // Clear date filter function
+        function clearDateFilter() {
+            const dateFilter = document.getElementById('dateFilter');
+            dateFilter.value = '';
+
+            // Re-apply filters after clearing date
+            filterByDate();
+        }
+
+        // Clear all filters function
+        function clearAllFilters() {
+            document.getElementById('prescriptionSearch').value = '';
+            document.getElementById('dateFilter').value = '';
+            searchPrescriptions();
+        }
+
+        // Add event listener for search input clear button visibility
+        document.getElementById('prescriptionSearch').addEventListener('input', function() {
+            const clearBtn = this.nextElementSibling;
+            if (this.value.length > 0) {
+                clearBtn.style.display = 'block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+
+            // Apply filters when search changes
+            searchPrescriptions();
+        });
+
+        // Enhanced date filter functionality
+        document.getElementById('dateFilter').addEventListener('change', function() {
+            const wrapper = this.parentElement;
+            const clearBtn = wrapper.querySelector('.date-clear-btn');
+
+            if (this.value) {
+                wrapper.classList.add('has-date');
+                clearBtn.style.display = 'flex';
+                clearBtn.style.alignItems = 'center';
+                clearBtn.style.justifyContent = 'center';
+
+                // Position the clear button based on browser support
+                if (this.offsetWidth - this.clientWidth > 20) {
+                    // Browser shows calendar icon (Chrome, Edge)
+                    clearBtn.style.right = '25px';
+                } else {
+                    // Browser doesn't show calendar icon (Firefox)
+                    clearBtn.style.right = '5px';
+                }
+            } else {
+                wrapper.classList.remove('has-date');
+                clearBtn.style.display = 'none';
+            }
+
+            filterByDate();
+        });
+
+        // Enhanced clear function
+        function clearDateFilter() {
+            const dateFilter = document.getElementById('dateFilter');
+            const wrapper = dateFilter.parentElement;
+            const clearBtn = wrapper.querySelector('.date-clear-btn');
+
+            dateFilter.value = '';
+            wrapper.classList.remove('has-date');
+            clearBtn.style.display = 'none';
+
+            filterByDate();
+
+            // Trigger change event to ensure proper state
+            dateFilter.dispatchEvent(new Event('change'));
+
+            // Focus back on the date input
+            dateFilter.focus();
+        }
+
+        // Search functionality
+        document.getElementById('globalSearch').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Add to your existing DOMContentLoaded function
+        document.getElementById('prescriptionSearch').addEventListener('input', function() {
+            const clearBtn = this.nextElementSibling; // The button after the input
+            if (this.value.length > 0) {
+                clearBtn.style.display = 'block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
         });
 
         // Add this function for highlighting search terms

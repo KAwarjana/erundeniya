@@ -66,7 +66,7 @@ try {
         $fullMedicalNotes = "Medical Conditions: $illnesses";
     }
     if ($medical_notes) {
-        $fullMedicalNotes .= ($fullMedicalNotes ? "\n\n" : "") . $medical_notes;
+        $fullMedicalNotes .= ($fullMedicalNotes ? "\n\n" : "") . "Additional Notes:\n" . $medical_notes;
     }
     $fullMedicalNotes = $fullMedicalNotes ? "'" . $conn->real_escape_string($fullMedicalNotes) . "'" : "NULL";
 
@@ -107,14 +107,28 @@ try {
         )";
         if (Database::iud($query)) {
             $patientId = $conn->insert_id;
-            
-            // MODIFIED: Generate registration number starting from 1000
-            // Add 1000 to patient ID to start from 1000
-            $regNumber = 'REG' . str_pad($patientId + 1000, 5, '0', STR_PAD_LEFT);
-            
+
+            // 🔥 NEW: Generate registration number from last REG number
+            $lastRegResult = Database::search("SELECT registration_number FROM patient WHERE registration_number IS NOT NULL ORDER BY id DESC LIMIT 1");
+            $lastRegNumber = null;
+
+            if ($lastRegResult->num_rows > 0) {
+                $lastRow = $lastRegResult->fetch_assoc();
+                $lastRegNumber = $lastRow['registration_number'];
+            }
+
+            if ($lastRegNumber && preg_match('/REG(\d+)/', $lastRegNumber, $matches)) {
+                $lastNumber = (int)$matches[1];
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1000; // Default start
+            }
+
+            $regNumber = 'REG' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+
             $updateQuery = "UPDATE patient SET registration_number = '$regNumber' WHERE id = $patientId";
             Database::iud($updateQuery);
-            
+
             echo json_encode([
                 'success' => true,
                 'message' => 'Patient registered successfully',
