@@ -117,6 +117,95 @@ function renderSidebarMenu($menuItems, $currentPage)
 // Database connection for dynamic data
 require_once '../../connection/connection.php';
 
+// Handle AJAX requests for search
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
+    header('Content-Type: application/json');
+
+    try {
+        Database::setUpConnection();
+
+        if ($_POST['ajax_action'] === 'search_appointments') {
+            $searchTerm = $_POST['search_term'] ?? '';
+
+            if (strlen($searchTerm) < 2) {
+                echo json_encode(['success' => true, 'data' => []]);
+                exit;
+            }
+
+            $searchTerm = Database::$connection->real_escape_string($searchTerm);
+
+            $query = "SELECT 
+                        a.id,
+                        a.appointment_number,
+                        a.appointment_date,
+                        a.appointment_time,
+                        p.title,
+                        p.name as patient_name,
+                        p.id as patient_id,
+                        p.mobile as patient_mobile
+                      FROM appointment a
+                      INNER JOIN patient p ON a.patient_id = p.id
+                      WHERE a.status = 'Attended'
+                      AND (
+                        a.appointment_number LIKE '%$searchTerm%' OR
+                        p.name LIKE '%$searchTerm%' OR
+                        p.registration_number LIKE '%$searchTerm%' OR
+                        p.mobile LIKE '%$searchTerm%'
+                      )
+                      ORDER BY a.appointment_date DESC, a.appointment_time DESC
+                      LIMIT 10";
+
+            $result = Database::search($query);
+            $appointments = [];
+
+            while ($row = $result->fetch_assoc()) {
+                $appointments[] = $row;
+            }
+
+            echo json_encode(['success' => true, 'data' => $appointments]);
+            exit;
+        }
+
+        if ($_POST['ajax_action'] === 'search_patients') {
+            $searchTerm = $_POST['search_term'] ?? '';
+
+            if (strlen($searchTerm) < 2) {
+                echo json_encode(['success' => true, 'data' => []]);
+                exit;
+            }
+
+            $searchTerm = Database::$connection->real_escape_string($searchTerm);
+
+            $query = "SELECT 
+                        id,
+                        registration_number,
+                        title,
+                        name,
+                        mobile
+                      FROM patient
+                      WHERE 
+                        name LIKE '%$searchTerm%' OR
+                        registration_number LIKE '%$searchTerm%' OR
+                        mobile LIKE '%$searchTerm%'
+                      ORDER BY name ASC
+                      LIMIT 10";
+
+            $result = Database::search($query);
+            $patients = [];
+
+            while ($row = $result->fetch_assoc()) {
+                $patients[] = $row;
+            }
+
+            echo json_encode(['success' => true, 'data' => $patients]);
+            exit;
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
 // Function to get prescription statistics
 function getPrescriptionStats()
 {
@@ -1002,6 +1091,73 @@ $allPatients = getAllPatients();
                 max-width: calc(100vw - 280px) !important;
             }
         }
+
+        /* Search dropdown styles */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffff;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-result {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .search-result:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-result:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-number {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .search-result-patient {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .search-result-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .no-results {
+            padding: 12px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .loading-results {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
     </style>
 </head>
 
@@ -1347,27 +1503,13 @@ $allPatients = getAllPatients();
                                 <div id="appointmentModeSection">
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <div class="form-group">
+                                            <div class="form-group search-wrapper appointment-search-wrapper">
                                                 <label>
                                                     <i class="material-symbols-rounded text-sm">search</i>
                                                     Appointment Number
                                                 </label>
-                                                <select id="appointmentNumber" onchange="loadPatientFromAppointment()" class="form-control">
-                                                    <option value="">Select Appointment</option>
-                                                    <?php if ($attendedAppointments && $attendedAppointments->num_rows > 0): ?>
-                                                        <?php while ($row = $attendedAppointments->fetch_assoc()): ?>
-                                                            <option value="<?php echo $row['id']; ?>"
-                                                                data-patient-id="<?php echo $row['patient_id']; ?>"
-                                                                data-patient="<?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>"
-                                                                data-mobile="<?php echo htmlspecialchars($row['mobile']); ?>"
-                                                                data-date="<?php echo htmlspecialchars($row['appointment_date']); ?>">
-                                                                <?php echo htmlspecialchars($row['appointment_number']); ?> - <?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>
-                                                            </option>
-                                                        <?php endwhile; ?>
-                                                    <?php else: ?>
-                                                        <option value="">No attended appointments available</option>
-                                                    <?php endif; ?>
-                                                </select>
+                                                <input type="text" id="appointmentNumberSearch" class="form-control bg-white" placeholder="Type to search appointment..." autocomplete="off">
+                                                <div class="search-results" id="appointmentSearchResults"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -1377,24 +1519,13 @@ $allPatients = getAllPatients();
                                 <div id="walkinModeSection" style="display: none;">
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <div class="form-group">
+                                            <div class="form-group search-wrapper patient-search-wrapper">
                                                 <label>
                                                     <i class="material-symbols-rounded text-sm">person_search</i>
                                                     Search Patient
                                                 </label>
-                                                <select id="walkinPatientSelect" onchange="loadWalkinPatient()" class="form-control">
-                                                    <option value="">Select Patient</option>
-                                                    <?php if ($allPatients && $allPatients->num_rows > 0): ?>
-                                                        <?php while ($row = $allPatients->fetch_assoc()): ?>
-                                                            <option value="<?php echo $row['id']; ?>"
-                                                                data-patient="<?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?>"
-                                                                data-mobile="<?php echo htmlspecialchars($row['mobile']); ?>"
-                                                                data-reg="<?php echo htmlspecialchars($row['registration_number']); ?>">
-                                                                <?php echo htmlspecialchars($row['registration_number']); ?> - <?php echo htmlspecialchars($row['title'] . ' ' . $row['name']); ?> (<?php echo htmlspecialchars($row['mobile']); ?>)
-                                                            </option>
-                                                        <?php endwhile; ?>
-                                                    <?php endif; ?>
-                                                </select>
+                                                <input type="text" id="walkinPatientSearch" class="form-control bg-white" placeholder="Type to search patient..." autocomplete="off">
+                                                <div class="search-results" id="patientSearchResults"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -1686,39 +1817,197 @@ Advice:
 Next visit: After 2 weeks with BP chart`
         };
 
-        // Load patient details from appointment
-        function loadPatientFromAppointment() {
-            const select = document.getElementById('appointmentNumber');
-            const selectedOption = select.options[select.selectedIndex];
+        let searchTimeout = null;
+        let currentMode = 'appointment';
 
-            if (selectedOption.value) {
-                const patientId = selectedOption.getAttribute('data-patient-id');
+        // ============================================
+        // SEARCH FUNCTIONS
+        // ============================================
 
-                if (!patientId) {
-                    console.error('No patient ID found in appointment data');
-                    alert('Error: This appointment has no associated patient');
-                    return;
-                }
+        // Real-time appointment search
+        function searchAppointments(searchTerm) {
+            const resultsDiv = document.getElementById('appointmentSearchResults');
 
-                // Set the hidden fields
-                document.getElementById('selectedPatientId').value = patientId;
-                document.getElementById('selectedAppointmentId').value = selectedOption.value;
-                document.getElementById('patientName').value = selectedOption.getAttribute('data-patient');
-                document.getElementById('patientMobile').value = selectedOption.getAttribute('data-mobile');
-
-                // Visual feedback
-                document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
-                document.getElementById('patientMobile').style.backgroundColor = '#e8f5e8';
-
-                setTimeout(() => {
-                    document.getElementById('patientName').style.backgroundColor = '#f5f5f5';
-                    document.getElementById('patientMobile').style.backgroundColor = '#f5f5f5';
-                }, 1000);
-
-            } else {
-                clearPrescriptionFields();
+            if (searchTerm.length < 2) {
+                resultsDiv.style.display = 'none';
+                return;
             }
+
+            resultsDiv.innerHTML = '<div class="loading-results">Searching...</div>';
+            resultsDiv.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('ajax_action', 'search_appointments');
+            formData.append('search_term', searchTerm);
+
+            fetch('prescription.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayAppointmentResults(data.data);
+                    } else {
+                        resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                });
         }
+
+        function displayAppointmentResults(appointments) {
+            const resultsDiv = document.getElementById('appointmentSearchResults');
+
+            if (appointments.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No appointments found</div>';
+                return;
+            }
+
+            let html = '';
+            appointments.forEach(appointment => {
+                html += `
+            <div class="search-result" onclick="selectAppointment('${appointment.id}', '${appointment.appointment_number}', '${appointment.patient_id}', '${escapeHtml(appointment.title)} ${escapeHtml(appointment.patient_name)}', '${appointment.patient_mobile}')">
+                <div class="search-result-number">${appointment.appointment_number}</div>
+                <div class="search-result-patient">${appointment.title} ${appointment.patient_name} - ${appointment.patient_mobile}</div>
+                <div class="search-result-date">${appointment.appointment_date} ${appointment.appointment_time}</div>
+            </div>
+        `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function selectAppointment(id, number, patientId, name, mobile) {
+            document.getElementById('selectedAppointmentId').value = id;
+            document.getElementById('selectedPatientId').value = patientId;
+            document.getElementById('appointmentNumberSearch').value = number;
+            document.getElementById('patientName').value = name;
+            document.getElementById('patientMobile').value = mobile;
+            document.getElementById('appointmentSearchResults').style.display = 'none';
+
+            // Visual feedback
+            document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
+            document.getElementById('patientMobile').style.backgroundColor = '#e8f5e8';
+
+            setTimeout(() => {
+                document.getElementById('patientName').style.backgroundColor = '#f5f5f5';
+                document.getElementById('patientMobile').style.backgroundColor = '#f5f5f5';
+            }, 1000);
+        }
+
+        // Real-time patient search
+        function searchPatients(searchTerm) {
+            const resultsDiv = document.getElementById('patientSearchResults');
+
+            if (searchTerm.length < 2) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="loading-results">Searching...</div>';
+            resultsDiv.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('ajax_action', 'search_patients');
+            formData.append('search_term', searchTerm);
+
+            fetch('prescription.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayPatientResults(data.data);
+                    } else {
+                        resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = '<div class="no-results">Error loading results</div>';
+                });
+        }
+
+        function displayPatientResults(patients) {
+            const resultsDiv = document.getElementById('patientSearchResults');
+
+            if (patients.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No patients found</div>';
+                return;
+            }
+
+            let html = '';
+            patients.forEach(patient => {
+                html += `
+            <div class="search-result" onclick="selectPatient('${patient.id}', '${escapeHtml(patient.title)} ${escapeHtml(patient.name)}', '${patient.mobile}', '${patient.registration_number}')">
+                <div class="search-result-number">${patient.registration_number}</div>
+                <div class="search-result-patient">${patient.title} ${patient.name} - ${patient.mobile}</div>
+            </div>
+        `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function selectPatient(id, name, mobile, regNumber) {
+            document.getElementById('selectedPatientId').value = id;
+            document.getElementById('selectedAppointmentId').value = '';
+            document.getElementById('walkinPatientSearch').value = regNumber + ' - ' + name;
+            document.getElementById('patientName').value = name;
+            document.getElementById('patientMobile').value = mobile;
+            document.getElementById('patientSearchResults').style.display = 'none';
+
+            // Visual feedback
+            document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
+            document.getElementById('patientMobile').style.backgroundColor = '#e8f5e8';
+
+            setTimeout(() => {
+                document.getElementById('patientName').style.backgroundColor = '#f5f5f5';
+                document.getElementById('patientMobile').style.backgroundColor = '#f5f5f5';
+            }, 1000);
+
+            // Load prescription history
+            loadPrescriptionHistory(id);
+        }
+
+        function loadPrescriptionHistory(patientId) {
+            fetch('get_patient_prescription_history.php?id=' + patientId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.prescriptions && data.prescriptions.length > 0) {
+                        let historyHTML = '<ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">';
+                        data.prescriptions.forEach(pres => {
+                            const date = new Date(pres.created_at).toLocaleDateString();
+                            const type = pres.appointment_number ? pres.appointment_number : 'Walk-in';
+                            historyHTML += `<li>${date} - ${type} <a href="#" onclick="viewPrescription(${pres.id}); return false;" style="font-size: 11px;">[View]</a></li>`;
+                        });
+                        historyHTML += '</ul>';
+
+                        document.getElementById('historyListContainer').innerHTML = historyHTML;
+                        document.getElementById('prescriptionHistoryAlert').style.display = 'block';
+                    } else {
+                        document.getElementById('prescriptionHistoryAlert').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading prescription history:', error);
+                    document.getElementById('prescriptionHistoryAlert').style.display = 'none';
+                });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // TEMPLATE FUNCTIONS
+        // ============================================
 
         // Insert template
         function insertTemplate(templateType) {
@@ -1727,6 +2016,10 @@ Next visit: After 2 weeks with BP chart`
                 document.getElementById('prescriptionText').value = template;
             }
         }
+
+        // ============================================
+        // PRESCRIPTION SAVE FUNCTIONS
+        // ============================================
 
         // Save prescription
         document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
@@ -1766,6 +2059,7 @@ Next visit: After 2 weeks with BP chart`
                         alert(`Prescription ${data.prescription_number} saved successfully!`);
                         showNotification('Prescription saved successfully!', 'success');
                         this.reset();
+                        clearPrescriptionFields();
                         setTimeout(() => location.reload(), 1500);
                     } else {
                         alert('Error saving prescription: ' + data.message);
@@ -1814,6 +2108,7 @@ Next visit: After 2 weeks with BP chart`
                         if (data.success) {
                             alert(`Prescription ${data.prescription_number} saved and printing...`);
                             form.reset();
+                            clearPrescriptionFields();
                             showNotification('Prescription saved and sent to printer!', 'success');
                             printPrescription(data.prescription_id);
                             setTimeout(() => location.reload(), 1500);
@@ -1851,6 +2146,10 @@ Next visit: After 2 weeks with BP chart`
 
             document.getElementById('previewModal').style.display = 'block';
         }
+
+        // ============================================
+        // VIEW/EDIT PRESCRIPTION FUNCTIONS
+        // ============================================
 
         // View prescription
         function viewPrescription(prescriptionId) {
@@ -1918,7 +2217,6 @@ Next visit: After 2 weeks with BP chart`
                         alert('Prescription updated successfully!');
                         closePrescriptionModal();
                         showNotification('Prescription updated successfully!', 'success');
-                        // Reload page to update the list
                         setTimeout(() => location.reload(), 1500);
                     } else {
                         alert('Error updating prescription: ' + data.message);
@@ -1929,6 +2227,10 @@ Next visit: After 2 weeks with BP chart`
                     alert('Error updating prescription. Please try again.');
                 });
         }
+
+        // ============================================
+        // PRINT FUNCTIONS
+        // ============================================
 
         // Print prescription
         function printPrescription(prescriptionId) {
@@ -1977,64 +2279,67 @@ Next visit: After 2 weeks with BP chart`
         // Create print content
         function createPrintContent(id, patient, mobile, date, text) {
             return `
-                <div style="font-family: 'Times New Roman', serif; max-width: 600px; margin: 0 auto;">
-                    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
-                        <h2>Dr. Erundeniya Medical Center</h2>
-                        <p>Specialized Medical Consultation</p>
-                        <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+        <div style="font-family: 'Times New Roman', serif; max-width: 600px; margin: 0 auto;">
+            <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2>Dr. Erundeniya Medical Center</h2>
+                <p>Specialized Medical Consultation</p>
+                <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+            </div>
+            
+            <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <strong>Patient:</strong> ${patient}<br>
+                        <strong>Mobile:</strong> ${mobile}
                     </div>
-                    
-                    <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <div>
-                                <strong>Patient:</strong> ${patient}<br>
-                                <strong>Mobile:</strong> ${mobile}
-                            </div>
-                            <div>
-                                <strong>Date:</strong> ${date}<br>
-                                <strong>Prescription No:</strong> ${id}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="min-height: 250px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; white-space: pre-line;">
-                        ${text}
-                    </div>
-                    
-                    <div style="text-align: right; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
-                        <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
-                        <p style="margin: 5px 0;"><strong>Doctor's Signature</strong></p>
-                        <p style="margin: 5px 0;">Dr. [Doctor Name]</p>
-                        <p style="margin: 5px 0;">MBBS, MD</p>
+                    <div>
+                        <strong>Date:</strong> ${date}<br>
+                        <strong>Prescription No:</strong> ${id}
                     </div>
                 </div>
-            `;
+            </div>
+            
+            <div style="min-height: 250px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; white-space: pre-line;">
+                ${text}
+            </div>
+            
+            <div style="text-align: right; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
+                <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
+                <p style="margin: 5px 0;"><strong>Doctor's Signature</strong></p>
+                <p style="margin: 5px 0;">Dr. [Doctor Name]</p>
+                <p style="margin: 5px 0;">MBBS, MD</p>
+            </div>
+        </div>
+    `;
         }
 
         // Print content
         function printContent(content) {
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Print Prescription</title>
-                    <style>
-                        body { font-family: 'Times New Roman', serif; margin: 20px; }
-                        @media print {
-                            body { margin: 0; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${content}
-                </body>
-                </html>
-            `);
+        <html>
+        <head>
+            <title>Print Prescription</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; margin: 20px; }
+                @media print {
+                    body { margin: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>
+    `);
             printWindow.document.close();
             printWindow.print();
         }
 
-        // Modal functions
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+
         function closePrescriptionModal() {
             document.getElementById('prescriptionModal').style.display = 'none';
         }
@@ -2043,7 +2348,10 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('previewModal').style.display = 'none';
         }
 
-        // Mode switching functionality
+        // ============================================
+        // MODE SWITCHING
+        // ============================================
+
         document.querySelectorAll('input[name="prescriptionMode"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 const mode = this.value;
@@ -2052,60 +2360,18 @@ Next visit: After 2 weeks with BP chart`
                 if (mode === 'appointment') {
                     document.getElementById('appointmentModeSection').style.display = 'block';
                     document.getElementById('walkinModeSection').style.display = 'none';
-                    document.getElementById('appointmentNumber').required = true;
-                    document.getElementById('walkinPatientSelect').required = false;
                 } else {
                     document.getElementById('appointmentModeSection').style.display = 'none';
                     document.getElementById('walkinModeSection').style.display = 'block';
-                    document.getElementById('appointmentNumber').required = false;
-                    document.getElementById('walkinPatientSelect').required = true;
                 }
 
-                // Clear all fields
                 clearPrescriptionFields();
             });
         });
 
-        // Load walk-in patient
-        function loadWalkinPatient() {
-            const select = document.getElementById('walkinPatientSelect');
-            const patientId = select.value;
-
-            if (!patientId) {
-                clearPrescriptionFields();
-                return;
-            }
-
-            const option = select.options[select.selectedIndex];
-            document.getElementById('selectedPatientId').value = patientId;
-            document.getElementById('selectedAppointmentId').value = '';
-            document.getElementById('patientName').value = option.getAttribute('data-patient');
-            document.getElementById('patientMobile').value = option.getAttribute('data-mobile');
-
-            // Fetch and display prescription history
-            fetch('get_patient_prescription_history.php?id=' + patientId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.prescriptions && data.prescriptions.length > 0) {
-                        let historyHTML = '<ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">';
-                        data.prescriptions.forEach(pres => {
-                            const date = new Date(pres.created_at).toLocaleDateString();
-                            const type = pres.appointment_number ? pres.appointment_number : 'Walk-in';
-                            historyHTML += `<li>${date} - ${type} <a href="#" onclick="viewPrescription(${pres.id}); return false;" style="font-size: 11px;">[View]</a></li>`;
-                        });
-                        historyHTML += '</ul>';
-
-                        document.getElementById('historyListContainer').innerHTML = historyHTML;
-                        document.getElementById('prescriptionHistoryAlert').style.display = 'block';
-                    } else {
-                        document.getElementById('prescriptionHistoryAlert').style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading prescription history:', error);
-                    document.getElementById('prescriptionHistoryAlert').style.display = 'none';
-                });
-        }
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
 
         // Clear prescription fields
         function clearPrescriptionFields() {
@@ -2115,21 +2381,20 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('patientMobile').value = '';
             document.getElementById('prescriptionText').value = '';
             document.getElementById('prescriptionHistoryAlert').style.display = 'none';
-            document.getElementById('appointmentNumber').value = '';
-            document.getElementById('walkinPatientSelect').value = '';
+            document.getElementById('appointmentNumberSearch').value = '';
+            document.getElementById('walkinPatientSearch').value = '';
         }
 
-        // Utility functions
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
             notification.style.zIndex = '9999';
             notification.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
-                    ${message}
-                </div>
-            `;
+        <div class="d-flex align-items-center">
+            <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
+            ${message}
+        </div>
+    `;
 
             document.body.appendChild(notification);
 
@@ -2148,16 +2413,9 @@ Next visit: After 2 weeks with BP chart`
             }
         }
 
-        // Close modals when clicking outside
-        window.addEventListener('click', function(event) {
-            const modals = ['prescriptionModal', 'previewModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        });
+        // ============================================
+        // SEARCH AND FILTER FUNCTIONS
+        // ============================================
 
         // Enhanced search functionality
         function searchPrescriptions() {
@@ -2189,7 +2447,6 @@ Next visit: After 2 weeks with BP chart`
                 const dateCell = row.querySelector('td:nth-child(3) span').textContent;
                 const text = row.textContent.toLowerCase();
 
-                // Check both date and search conditions
                 const matchesDate = !selectedDate || dateCell === selectedDate;
                 const matchesSearch = !searchTerm || text.includes(searchTerm);
 
@@ -2206,8 +2463,6 @@ Next visit: After 2 weeks with BP chart`
             const searchInput = document.getElementById('prescriptionSearch');
             searchInput.value = '';
             searchInput.focus();
-
-            // Re-apply filters after clearing search
             searchPrescriptions();
         }
 
@@ -2215,8 +2470,6 @@ Next visit: After 2 weeks with BP chart`
         function clearDateFilter() {
             const dateFilter = document.getElementById('dateFilter');
             dateFilter.value = '';
-
-            // Re-apply filters after clearing date
             filterByDate();
         }
 
@@ -2227,103 +2480,103 @@ Next visit: After 2 weeks with BP chart`
             searchPrescriptions();
         }
 
-        // Add event listener for search input clear button visibility
-        document.getElementById('prescriptionSearch').addEventListener('input', function() {
-            const clearBtn = this.nextElementSibling;
-            if (this.value.length > 0) {
-                clearBtn.style.display = 'block';
-            } else {
-                clearBtn.style.display = 'none';
-            }
-
-            // Apply filters when search changes
-            searchPrescriptions();
-        });
-
-        // Enhanced date filter functionality
-        document.getElementById('dateFilter').addEventListener('change', function() {
-            const wrapper = this.parentElement;
-            const clearBtn = wrapper.querySelector('.date-clear-btn');
-
-            if (this.value) {
-                wrapper.classList.add('has-date');
-                clearBtn.style.display = 'flex';
-                clearBtn.style.alignItems = 'center';
-                clearBtn.style.justifyContent = 'center';
-
-                // Position the clear button based on browser support
-                if (this.offsetWidth - this.clientWidth > 20) {
-                    // Browser shows calendar icon (Chrome, Edge)
-                    clearBtn.style.right = '25px';
-                } else {
-                    // Browser doesn't show calendar icon (Firefox)
-                    clearBtn.style.right = '5px';
-                }
-            } else {
-                wrapper.classList.remove('has-date');
-                clearBtn.style.display = 'none';
-            }
-
-            filterByDate();
-        });
-
-        // Enhanced clear function
-        function clearDateFilter() {
-            const dateFilter = document.getElementById('dateFilter');
-            const wrapper = dateFilter.parentElement;
-            const clearBtn = wrapper.querySelector('.date-clear-btn');
-
-            dateFilter.value = '';
-            wrapper.classList.remove('has-date');
-            clearBtn.style.display = 'none';
-
-            filterByDate();
-
-            // Trigger change event to ensure proper state
-            dateFilter.dispatchEvent(new Event('change'));
-
-            // Focus back on the date input
-            dateFilter.focus();
-        }
-
-        // Search functionality
-        document.getElementById('globalSearch').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#prescriptionsTableBody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-
-        // Add to your existing DOMContentLoaded function
-        document.getElementById('prescriptionSearch').addEventListener('input', function() {
-            const clearBtn = this.nextElementSibling; // The button after the input
-            if (this.value.length > 0) {
-                clearBtn.style.display = 'block';
-            } else {
-                clearBtn.style.display = 'none';
-            }
-        });
-
-        // Add this function for highlighting search terms
         function highlightSearchTerm(text, searchTerm) {
             if (!searchTerm || !text) return text;
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             return text.replace(regex, '<mark>$1</mark>');
         }
 
-        // keep search & date when paginating
-        document.addEventListener('DOMContentLoaded', () => {
-            const search = new URLSearchParams(location.search).get('search') || '';
-            const date = new URLSearchParams(location.search).get('date') || '';
-            if (search) document.getElementById('prescriptionSearch').value = search;
-            if (date) document.getElementById('dateFilter').value = date;
+        // ============================================
+        // WINDOW AND MODAL EVENT LISTENERS
+        // ============================================
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = ['prescriptionModal', 'previewModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // ============================================
+        // DOCUMENT READY
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Appointment search with debounce
+            const appointmentSearchInput = document.getElementById('appointmentNumberSearch');
+            if (appointmentSearchInput) {
+                appointmentSearchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        searchAppointments(searchTerm);
+                    }, 300);
+                });
+            }
+
+            // Patient search with debounce
+            const patientSearchInput = document.getElementById('walkinPatientSearch');
+            if (patientSearchInput) {
+                patientSearchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        searchPatients(searchTerm);
+                    }, 300);
+                });
+            }
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                const appointmentWrapper = document.querySelector('.appointment-search-wrapper');
+                const patientWrapper = document.querySelector('.patient-search-wrapper');
+
+                if (appointmentWrapper && !appointmentWrapper.contains(e.target)) {
+                    document.getElementById('appointmentSearchResults').style.display = 'none';
+                }
+
+                if (patientWrapper && !patientWrapper.contains(e.target)) {
+                    document.getElementById('patientSearchResults').style.display = 'none';
+                }
+            });
+
+            // Prescription search clear button
+            document.getElementById('prescriptionSearch').addEventListener('input', function() {
+                const clearBtn = this.nextElementSibling;
+                if (this.value.length > 0) {
+                    clearBtn.style.display = 'block';
+                } else {
+                    clearBtn.style.display = 'none';
+                }
+            });
+
+            // Date filter with clear button
+            document.getElementById('dateFilter').addEventListener('change', function() {
+                const wrapper = this.parentElement;
+                const clearBtn = wrapper.querySelector('.date-clear-btn');
+
+                if (this.value) {
+                    wrapper.classList.add('has-date');
+                    clearBtn.style.display = 'flex';
+                    clearBtn.style.alignItems = 'center';
+                    clearBtn.style.justifyContent = 'center';
+
+                    if (this.offsetWidth - this.clientWidth > 20) {
+                        clearBtn.style.right = '25px';
+                    } else {
+                        clearBtn.style.right = '5px';
+                    }
+                } else {
+                    wrapper.classList.remove('has-date');
+                    clearBtn.style.display = 'none';
+                }
+
+                filterByDate();
+            });
         });
     </script>
 </body>
