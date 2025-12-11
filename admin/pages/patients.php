@@ -59,6 +59,13 @@ $menuItems = [
         'icon' => 'local_hospital',
         'allowed_roles' => ['Admin', 'Receptionist'],
         'show_to_all' => true
+    ],
+    [
+        'title' => 'Reports',
+        'url' => 'reports.php',
+        'icon' => 'assessment',
+        'allowed_roles' => ['Admin'],
+        'show_to_all' => true
     ]
 ];
 
@@ -113,10 +120,10 @@ require_once '../../connection/connection.php';
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
-    
+
     try {
         $action = $_POST['action'];
-        
+
         switch ($action) {
             case 'get_all_patients':
                 getAllPatientsAjax();
@@ -132,7 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // Function to get all patients with pagination via AJAX
-function getAllPatientsAjax() {
+function getAllPatientsAjax()
+{
     $searchTerm = $_POST['search'] ?? '';
     $provinceFilter = $_POST['province'] ?? '';
     $typeFilter = $_POST['type'] ?? '';
@@ -142,7 +150,7 @@ function getAllPatientsAjax() {
 
     try {
         Database::setUpConnection();
-        
+
         // Base query
         $query = "SELECT SQL_CALC_FOUND_ROWS p.*, 
                   (SELECT COUNT(*) FROM appointment WHERE patient_id = p.id) as total_visits,
@@ -204,26 +212,27 @@ function getAllPatientsAjax() {
 }
 
 // Function to get patient statistics
-function getPatientStats() {
+function getPatientStats()
+{
     try {
         Database::setUpConnection();
-        
+
         // Total patients
         $totalResult = Database::search("SELECT COUNT(*) as total FROM patient");
         $totalRow = $totalResult->fetch_assoc();
         $total = $totalRow['total'];
-        
+
         // New patients (registered in last 30 days)
         $newResult = Database::search("SELECT COUNT(*) as new_count FROM patient WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
         $newRow = $newResult->fetch_assoc();
         $newCount = $newRow['new_count'];
-        
+
         // Patients with appointments this month
         $monthStart = date('Y-m-01');
         $activeResult = Database::search("SELECT COUNT(DISTINCT patient_id) as active FROM appointment WHERE appointment_date >= '$monthStart'");
         $activeRow = $activeResult->fetch_assoc();
         $activeCount = $activeRow['active'];
-        
+
         return [
             'total' => $total,
             'new' => $newCount,
@@ -240,7 +249,8 @@ function getPatientStats() {
 }
 
 // Function to get illnesses from database
-function getAllIllnesses() {
+function getAllIllnesses()
+{
     try {
         Database::setUpConnection();
         $result = Database::search("SELECT * FROM illness ORDER BY name ASC");
@@ -337,6 +347,7 @@ $sriLankaLocations = [
                 transform: translateY(-50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -451,13 +462,13 @@ $sriLankaLocations = [
         }
 
         .new-patient {
-            background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
-            color: white;
+             background: #e8f5e8;
+            color: #2e7d32;
         }
 
         .old-patient {
-            background: linear-gradient(135deg, #42a5f5 0%, #64b5f6 100%);
-            color: white;
+             background: #e3f2fd;
+            color: #1976d2;
         }
 
         .illness-selector {
@@ -589,6 +600,7 @@ $sriLankaLocations = [
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -600,6 +612,7 @@ $sriLankaLocations = [
                 transform: translateX(0);
                 opacity: 1;
             }
+
             to {
                 transform: translateX(400px);
                 opacity: 0;
@@ -727,6 +740,113 @@ $sriLankaLocations = [
         .d-flex.gap-1 {
             gap: 0.25rem;
         }
+
+        /* Modal responsive adjustments for medium-large screens */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+
+            /* Adjust modal positioning and sizing */
+            .modal {
+                padding-left: 0px !important;
+            }
+
+            .modal-content {
+                max-width: calc(100vw - 300px) !important;
+                margin: 2% auto !important;
+                width: 95% !important;
+            }
+
+            /* Ensure sidebar stays in place */
+            .sidenav {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                z-index: 1040 !important;
+            }
+
+            /* Prevent sidebar from moving down */
+            .main-content {
+                margin-left: 250px !important;
+                width: calc(100% - 250px) !important;
+            }
+
+            /* Adjust modal header for better fit */
+            .modal-header {
+                padding: 15px 20px !important;
+            }
+
+            /* Ensure modal body scrolls properly */
+            .modal-body {
+                max-height: calc(90vh - 120px) !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        /* Additional adjustments for better responsiveness */
+        @media (min-width: 1200px) and (max-width: 1400px) {
+
+            /* Reduce modal padding for smaller screens in this range */
+            .modal-content {
+                padding: 0 !important;
+            }
+
+            /* Adjust form elements */
+            .form-group {
+                margin-bottom: 15px !important;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+
+            /* Smaller buttons */
+            .btn-primary,
+            .btn-secondary {
+                padding: 8px 20px !important;
+                font-size: 14px !important;
+                min-height: 40px !important;
+            }
+        }
+
+        /* Ensure proper stacking order */
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        .sidenav {
+            z-index: 1040 !important;
+        }
+
+        /* Fix for modal backdrop */
+        .modal-backdrop {
+            z-index: 1049 !important;
+        }
+
+        /* Ensure modal doesn't push sidebar down */
+        @media (min-width: 1200px) {
+            body.modal-open {
+                overflow: hidden !important;
+            }
+
+            body.modal-open .sidenav {
+                position: fixed !important;
+            }
+        }
+
+        /* Additional fix for modal positioning */
+        .modal-dialog {
+            margin: 1.75rem auto !important;
+        }
+
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .modal-dialog {
+                margin: 1rem auto !important;
+                max-width: calc(100vw - 280px) !important;
+            }
+        }
     </style>
 </head>
 
@@ -776,6 +896,15 @@ $sriLankaLocations = [
                         </div> -->
                     </div>
                     <ul class="navbar-nav d-flex align-items-center justify-content-end">
+                        <li class="nav-item d-xl-none ps-3 d-flex align-items-center mt-1 me-3">
+                            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                                <div class="sidenav-toggler-inner">
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                </div>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown pe-3 d-flex align-items-center">
                             <a href="#" class="nav-link text-body p-0" onclick="toggleNotifications()">
                                 <img src="../../img/bell.png" width="20" height="20">
@@ -913,7 +1042,7 @@ $sriLankaLocations = [
                 </div>
 
                 <!-- Quick Add Patient Panel -->
-                <div class="col-lg-4">
+                <div class="col-lg-4 mt-lg-0 mt-5">
                     <div class="card patient-card">
                         <div class="patient-header">
                             <h5 class="mb-1 card--header--text">
@@ -939,8 +1068,8 @@ $sriLankaLocations = [
                                 </div>
                                 <div class="form-group">
                                     <label>Mobile Number *</label>
-                                    <input type="tel" id="quickMobile" required pattern="[0-9]{10}" 
-                                           placeholder="0771234567" maxlength="10">
+                                    <input type="tel" id="quickMobile" required pattern="[0-9]{10}"
+                                        placeholder="0771234567" maxlength="10">
                                 </div>
                                 <div class="form-group">
                                     <label>Gender *</label>
@@ -974,7 +1103,9 @@ $sriLankaLocations = [
                 <div class="row align-items-center justify-content-lg-between">
                     <div class="mb-lg-0 mb-4">
                         <div class="copyright text-center text-sm text-muted text-lg-start">
-                            © <script>document.write(new Date().getFullYear())</script>,
+                            © <script>
+                                document.write(new Date().getFullYear())
+                            </script>,
                             design and develop by
                             <a href="#" class="font-weight-bold">Evon Technologies Software Solution (PVT) Ltd.</a>
                             All rights reserved.
@@ -990,7 +1121,7 @@ $sriLankaLocations = [
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="card--header--text">
-                    <i class="material-symbols-rounded">person</i> 
+                    <i class="material-symbols-rounded">person</i>
                     <span id="modalTitle">Add New Patient</span>
                 </h4>
                 <span class="close" onclick="closePatientModal()">&times;</span>
@@ -998,7 +1129,7 @@ $sriLankaLocations = [
             <div class="modal-body">
                 <form id="patientForm" onsubmit="submitPatientForm(event)">
                     <input type="hidden" id="patientId">
-                    
+
                     <!-- Personal Information -->
                     <h6 class="section-title">Personal Information</h6>
                     <div class="row">
@@ -1044,8 +1175,8 @@ $sriLankaLocations = [
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Mobile Number *</label>
-                                <input type="tel" id="patientMobile" required pattern="[0-9]{10}" 
-                                       placeholder="0771234567" maxlength="10">
+                                <input type="tel" id="patientMobile" required pattern="[0-9]{10}"
+                                    placeholder="0771234567" maxlength="10">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -1236,10 +1367,10 @@ $sriLankaLocations = [
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'action=get_all_patients&search=' + encodeURIComponent(searchTerm) + 
-                          '&province=' + encodeURIComponent(provinceFilter) + 
-                          '&type=' + encodeURIComponent(typeFilter) + 
-                          '&page=' + page
+                    body: 'action=get_all_patients&search=' + encodeURIComponent(searchTerm) +
+                        '&province=' + encodeURIComponent(provinceFilter) +
+                        '&type=' + encodeURIComponent(typeFilter) +
+                        '&page=' + page
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1267,32 +1398,32 @@ $sriLankaLocations = [
         }
 
         // Display patients in table
-function displayPatients(patients, searchTerm, pagination) {
-    const tbody = document.getElementById('patientsTableBody');
-    tbody.innerHTML = '';
+        function displayPatients(patients, searchTerm, pagination) {
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
 
-    if (patients.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">
+            if (patients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">
             <i class="material-symbols-rounded text-secondary" style="font-size: 48px;">person_off</i>
             <p class="text-muted mt-2">No patients found${searchTerm ? ' for "' + searchTerm + '"' : ''}</p>
         </td></tr>`;
-        document.getElementById('patientPagination').innerHTML = '';
-        return;
-    }
+                document.getElementById('patientPagination').innerHTML = '';
+                return;
+            }
 
-    patients.forEach(function(patient) {
-        const row = document.createElement('tr');
-        const isNewPatient = new Date(patient.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        
-        // Use the actual registration_number from database, or generate if null
-        const registerNumber = patient.registration_number || ('REG' + String(patient.id).padStart(5, '0'));
+            patients.forEach(function(patient) {
+                const row = document.createElement('tr');
+                const isNewPatient = new Date(patient.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-        const highlightedName = highlightSearchTerm(patient.title + ' ' + patient.name, searchTerm);
-        const highlightedRegNumber = highlightSearchTerm(registerNumber, searchTerm);
-        const highlightedMobile = highlightSearchTerm(patient.mobile, searchTerm);
-        const highlightedEmail = patient.email ? highlightSearchTerm(patient.email, searchTerm) : 'N/A';
+                // Use the actual registration_number from database, or generate if null
+                const registerNumber = patient.registration_number || ('REG' + String(patient.id).padStart(5, '0'));
 
-        row.innerHTML = `<td>
+                const highlightedName = highlightSearchTerm(patient.title + ' ' + patient.name, searchTerm);
+                const highlightedRegNumber = highlightSearchTerm(registerNumber, searchTerm);
+                const highlightedMobile = highlightSearchTerm(patient.mobile, searchTerm);
+                const highlightedEmail = patient.email ? highlightSearchTerm(patient.email, searchTerm) : 'N/A';
+
+                row.innerHTML = `<td>
             <div class="d-flex flex-column px-3">
                 <h6 class="mb-0 text-sm font-weight-bold">${highlightedName}</h6>
                 <p class="text-xs text-secondary mb-0">
@@ -1332,13 +1463,13 @@ function displayPatients(patients, searchTerm, pagination) {
                 </button>
             </div>
         </td>`;
-        
-        tbody.appendChild(row);
-    });
 
-    // Render pagination
-    renderPagination(pagination);
-}
+                tbody.appendChild(row);
+            });
+
+            // Render pagination
+            renderPagination(pagination);
+        }
 
         // Render pagination
         function renderPagination(pagination) {
@@ -1380,9 +1511,9 @@ function displayPatients(patients, searchTerm, pagination) {
         function updateDistricts() {
             const province = document.getElementById('patientProvince').value;
             const districtSelect = document.getElementById('patientDistrict');
-            
+
             districtSelect.innerHTML = '<option value="">Select District</option>';
-            
+
             if (province && sriLankaLocations[province]) {
                 sriLankaLocations[province].forEach(district => {
                     const option = document.createElement('option');
@@ -1412,26 +1543,26 @@ function displayPatients(patients, searchTerm, pagination) {
             }
 
             fetch('save_patient.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(patientData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Patient registered successfully!', 'success');
-                    document.getElementById('quickPatientForm').reset();
-                    setTimeout(() => loadAllPatients(), 1500);
-                } else {
-                    showNotification('Error: ' + (data.message || 'Failed to register patient'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error registering patient', 'error');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patientData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Patient registered successfully!', 'success');
+                        document.getElementById('quickPatientForm').reset();
+                        setTimeout(() => loadAllPatients(), 1500);
+                    } else {
+                        showNotification('Error: ' + (data.message || 'Failed to register patient'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error registering patient', 'error');
+                });
         }
 
         // Full patient form submission
@@ -1467,29 +1598,29 @@ function displayPatients(patients, searchTerm, pagination) {
             const url = patientData.id ? 'update_patient.php' : 'save_patient.php';
 
             fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(patientData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(
-                        patientData.id ? 'Patient updated successfully!' : 'Patient registered successfully!', 
-                        'success'
-                    );
-                    closePatientModal();
-                    setTimeout(() => loadAllPatients(), 1500);
-                } else {
-                    showNotification('Error: ' + (data.message || 'Failed to save patient'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error saving patient', 'error');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patientData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(
+                            patientData.id ? 'Patient updated successfully!' : 'Patient registered successfully!',
+                            'success'
+                        );
+                        closePatientModal();
+                        setTimeout(() => loadAllPatients(), 1500);
+                    } else {
+                        showNotification('Error: ' + (data.message || 'Failed to save patient'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error saving patient', 'error');
+                });
         }
 
         // Open add patient modal
@@ -1512,7 +1643,7 @@ function displayPatients(patients, searchTerm, pagination) {
                 .then(data => {
                     if (data.success) {
                         const patient = data.patient;
-                        
+
                         document.getElementById('modalTitle').textContent = 'Edit Patient';
                         document.getElementById('patientId').value = patient.id;
                         document.getElementById('patientTitle').value = patient.title;
@@ -1523,13 +1654,13 @@ function displayPatients(patients, searchTerm, pagination) {
                         document.getElementById('patientEmail').value = patient.email || '';
                         document.getElementById('patientAddress').value = patient.address || '';
                         document.getElementById('patientProvince').value = patient.province || '';
-                        
+
                         // Update districts and set district value
                         updateDistricts();
                         setTimeout(() => {
                             document.getElementById('patientDistrict').value = patient.district || '';
                         }, 100);
-                        
+
                         // Set illnesses
                         document.querySelectorAll('#illnessSelector input[type="checkbox"]').forEach(cb => cb.checked = false);
                         if (patient.illnesses) {
@@ -1539,9 +1670,9 @@ function displayPatients(patients, searchTerm, pagination) {
                                 if (checkbox) checkbox.checked = true;
                             });
                         }
-                        
+
                         document.getElementById('medicalNotes').value = patient.medical_notes || '';
-                        
+
                         document.getElementById('patientModal').style.display = 'block';
                     } else {
                         showNotification('Error loading patient details', 'error');
@@ -1602,7 +1733,7 @@ function displayPatients(patients, searchTerm, pagination) {
         window.addEventListener('click', function(event) {
             const patientModal = document.getElementById('patientModal');
             const viewModal = document.getElementById('viewPatientModal');
-            
+
             if (event.target === patientModal) {
                 closePatientModal();
             }

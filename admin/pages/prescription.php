@@ -1158,6 +1158,25 @@ $allPatients = getAllPatients();
             color: #666;
             font-size: 13px;
         }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+        }
     </style>
 </head>
 
@@ -1346,32 +1365,29 @@ $allPatients = getAllPatients();
                                     </thead>
                                     <tbody id="prescriptionsTableBody">
                                         <?php
-                                        /* ----------  pagination  ---------- */
                                         $recordsPerPage = 10;
-                                        $page           = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-                                        $offset         = ($page - 1) * $recordsPerPage;
+                                        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+                                        $offset = ($page - 1) * $recordsPerPage;
 
-                                        /* ----------  base query (no LIMIT yet – we need the total) ---------- */
                                         $base = "FROM prescriptions p
-         INNER JOIN patient pt ON p.patient_id = pt.id
-         LEFT  JOIN appointment a ON p.appointment_id = a.id";
+             INNER JOIN patient pt ON p.patient_id = pt.id
+             LEFT  JOIN appointment a ON p.appointment_id = a.id";
 
-                                        /* ----------  total rows ---------- */
-                                        $totalRes  = Database::search("SELECT COUNT(*) AS total $base");
+                                        $totalRes = Database::search("SELECT COUNT(*) AS total $base");
                                         $totalRows = (int) $totalRes->fetch_assoc()['total'];
                                         $totalPages = ceil($totalRows / $recordsPerPage);
 
-                                        /* ----------  now pull only 4 rows ---------- */
                                         $prescriptionsQuery = "SELECT p.*,
-                              pt.title, pt.name, pt.mobile, pt.registration_number,
-                              a.appointment_number, a.appointment_date, a.appointment_time
-                       $base
-                       ORDER BY p.created_at DESC
-                       LIMIT $recordsPerPage OFFSET $offset";
+                          DATE(p.created_at) as prescription_date,
+                          TIME(p.created_at) as prescription_time,
+                          pt.title, pt.name, pt.mobile, pt.registration_number,
+                          a.appointment_number, a.appointment_date, a.appointment_time
+                   $base
+                   ORDER BY p.created_at DESC
+                   LIMIT $recordsPerPage OFFSET $offset";
 
                                         $prescriptions = Database::search($prescriptionsQuery);
 
-                                        /* ----------  render rows ---------- */
                                         if ($prescriptions && $prescriptions->num_rows):
                                             while ($row = $prescriptions->fetch_assoc()): ?>
                                                 <tr>
@@ -1405,7 +1421,10 @@ $allPatients = getAllPatients();
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="text-sm"><?= date('Y-m-d', strtotime($row['created_at'])) ?></span>
+                                                        <div class="d-flex flex-column">
+                                                            <span class="text-sm"><?= date('Y-m-d', strtotime($row['created_at'])) ?></span>
+                                                            <span class="text-xs text-primary"><?= date('h:i A', strtotime($row['created_at'])) ?></span>
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex gap-1">
@@ -1465,7 +1484,7 @@ $allPatients = getAllPatients();
                 </div>
 
                 <!-- Create Prescription Panel -->
-                <div class="col-lg-5">
+                <div class="col-lg-5 mt-5 mt-lg-0">
                     <div class="card prescription-card">
                         <div class="prescription-header">
                             <h5 class="mb-1 card--header--text">
@@ -1703,9 +1722,9 @@ Next visit: After 1 week" required></textarea>
             <div class="modal-body" style="padding: 25px;">
                 <div class="prescription-preview" id="prescriptionPreview">
                     <div class="prescription-header-print">
-                        <h2>Dr. Erundeniya Medical Center</h2>
-                        <p>Specialized Medical Consultation</p>
-                        <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+                        <h2>Erundeniya Ayurveda Hospital</h2>
+                        <p>Specialized Ayurvedic Medical Consultation</p>
+                        <p>Contact: +94 71 291 9408 | Email: info@erundeniyaayurveda.lk</p>
                     </div>
 
                     <div class="patient-info">
@@ -1728,8 +1747,8 @@ Next visit: After 1 week" required></textarea>
                     <div class="doctor-signature">
                         <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto;"></div>
                         <p class="mt-2 mb-0"><strong>Doctor's Signature</strong></p>
-                        <p class="mb-0">Dr. [Doctor Name]</p>
-                        <p class="mb-0">MBBS, MD</p>
+                        <p class="mb-0">Dr.H.D.P. Darshani</p>
+                        <p class="mb-0">Erundeniya Ayurveda Hospital</p>
                     </div>
                 </div>
 
@@ -2137,10 +2156,17 @@ Next visit: After 2 weeks with BP chart`
                 return;
             }
 
-            // Update preview modal
+            // Get current date and time
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
             document.getElementById('previewPatientName').textContent = patientName;
             document.getElementById('previewPatientMobile').textContent = patientMobile;
-            document.getElementById('previewDate').textContent = new Date().toISOString().split('T')[0];
+            document.getElementById('previewDate').textContent = `${formattedDate} @ ${formattedTime}`;
             document.getElementById('previewPrescriptionNo').textContent = 'PRES-PREVIEW';
             document.getElementById('previewPrescriptionContent').textContent = prescriptionText;
 
@@ -2161,7 +2187,16 @@ Next visit: After 2 weeks with BP chart`
                         document.getElementById('modalPrescriptionId').value = 'PRES' + String(data.prescription.id).padStart(3, '0');
                         document.getElementById('modalPatientName').value = data.prescription.title + ' ' + data.prescription.name;
                         document.getElementById('modalPatientMobile').value = data.prescription.mobile;
-                        document.getElementById('modalPrescriptionDate').value = data.prescription.created_at.split(' ')[0];
+
+                        // Format date and time
+                        const dateTime = new Date(data.prescription.created_at);
+                        const formattedDate = dateTime.toLocaleDateString();
+                        const formattedTime = dateTime.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        document.getElementById('modalPrescriptionDate').value = `${formattedDate} @ ${formattedTime}`;
                         document.getElementById('modalPrescriptionText').value = data.prescription.prescription_text;
                         document.getElementById('modalPrescriptionText').readOnly = true;
                         document.getElementById('modalPrescriptionText').style.background = '#f5f5f5';
@@ -2238,11 +2273,20 @@ Next visit: After 2 weeks with BP chart`
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // Format date and time
+                        const dateTime = new Date(data.prescription.created_at);
+                        const formattedDate = dateTime.toLocaleDateString();
+                        const formattedTime = dateTime.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
                         const prescriptionContent = createPrintContent(
                             'PRES' + String(data.prescription.id).padStart(3, '0'),
                             data.prescription.title + ' ' + data.prescription.name,
                             data.prescription.mobile,
-                            data.prescription.created_at.split(' ')[0],
+                            formattedDate,
+                            formattedTime,
                             data.prescription.prescription_text
                         );
                         printContent(prescriptionContent);
@@ -2259,11 +2303,17 @@ Next visit: After 2 weeks with BP chart`
 
         // Print from modal
         function printModalPrescription() {
+            const dateTimeText = document.getElementById('modalPrescriptionDate').value;
+            const parts = dateTimeText.split(' @ ');
+            const date = parts[0] || dateTimeText;
+            const time = parts[1] || '';
+
             const prescriptionContent = createPrintContent(
                 document.getElementById('modalPrescriptionId').value,
                 document.getElementById('modalPatientName').value,
                 document.getElementById('modalPatientMobile').value,
-                document.getElementById('modalPrescriptionDate').value,
+                date,
+                time,
                 document.getElementById('modalPrescriptionText').value
             );
 
@@ -2277,13 +2327,13 @@ Next visit: After 2 weeks with BP chart`
         }
 
         // Create print content
-        function createPrintContent(id, patient, mobile, date, text) {
+        function createPrintContent(id, patient, mobile, date, time, text) {
             return `
         <div style="font-family: 'Times New Roman', serif; max-width: 600px; margin: 0 auto;">
             <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
-                <h2>Dr. Erundeniya Medical Center</h2>
-                <p>Specialized Medical Consultation</p>
-                <p>Contact: +94-XX-XXXXXXX | Email: info@erundeniya.lk</p>
+                <h2>Erundeniya Ayurveda Hospital</h2>
+                <p>Specialized Ayurvedic Medical Consultation</p>
+                <p>Contact: +94 71 291 9408 | Email: info@erundeniyaayurveda.lk</p>
             </div>
             
             <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
@@ -2294,6 +2344,7 @@ Next visit: After 2 weeks with BP chart`
                     </div>
                     <div>
                         <strong>Date:</strong> ${date}<br>
+                        <strong>Time:</strong> ${time}<br>
                         <strong>Prescription No:</strong> ${id}
                     </div>
                 </div>
@@ -2306,8 +2357,8 @@ Next visit: After 2 weeks with BP chart`
             <div style="text-align: right; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
                 <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
                 <p style="margin: 5px 0;"><strong>Doctor's Signature</strong></p>
-                <p style="margin: 5px 0;">Dr. [Doctor Name]</p>
-                <p style="margin: 5px 0;">MBBS, MD</p>
+                <p style="margin: 5px 0;">Dr.H.D.P. Darshani</p>
+                <p style="margin: 5px 0;">Erundeniya Ayurveda Hospital</p>
             </div>
         </div>
     `;

@@ -60,6 +60,13 @@ $menuItems = [
         'icon' => 'local_hospital',
         'allowed_roles' => ['Admin', 'Receptionist'],
         'show_to_all' => true
+    ],
+    [
+        'title' => 'Reports',
+        'url' => 'reports.php',
+        'icon' => 'assessment',
+        'allowed_roles' => ['Admin'],
+        'show_to_all' => true
     ]
 ];
 
@@ -402,7 +409,10 @@ try {
 
 // Fetch existing bills - DYNAMIC
 try {
-    $billsQuery = "SELECT tb.*, u.user_name as created_by_name 
+    $billsQuery = "SELECT tb.*, 
+                   DATE(tb.created_at) as bill_date,
+                   TIME(tb.created_at) as bill_time,
+                   u.user_name as created_by_name 
                    FROM treatment_bills tb 
                    LEFT JOIN user u ON tb.created_by = u.id 
                    ORDER BY tb.created_at DESC 
@@ -1039,18 +1049,21 @@ try {
         }
 
         .badge-success {
-            background-color: #4CAF50 !important;
-            color: #fff !important;
+            background-color: #e8f5e8 !important;
+            color: #2e7d32 !important;
+            border-radius: 2rem;
         }
 
         .badge-warning {
-            background-color: #FFC107 !important;
-            color: #212529 !important;
+            background-color: #fff3e0 !important;
+            color: #f57c00 !important;
+            border-radius: 2rem;
         }
 
         .badge-secondary {
-            color: #fff !important;
-            background-color: #b62323ff;
+            color: #f44336 !important;
+            background-color: #ffebee;
+            border-radius: 2rem;
         }
 
         /* NEW: Patient search dropdown styling - matches appointment search */
@@ -1118,6 +1131,25 @@ try {
             text-align: center;
             color: #666;
             font-size: 13px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
         }
     </style>
 </head>
@@ -1450,7 +1482,7 @@ try {
                                 <div class="col-md-6">
                                     <h6 class="mb-0">Treatment Bills</h6>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 mt-md-0 mt-3">
                                     <div class="input-group input-group-outline" style="position: relative;">
                                         <input type="text" class="form-control" placeholder="Search bills..." id="billSearch" style="padding-right: 35px;">
                                         <button type="button" onclick="clearBillSearch()" class="search-clear-btn-opd" style="position: absolute; right: 8px; top: 60%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; z-index: 10; display: none; padding: 4px;">
@@ -1458,7 +1490,7 @@ try {
                                         </button>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 mt-md-0 mt-2">
                                     <div class="date-input-wrapper-opd" style="position: relative; display: inline-block; width: 100%;">
                                         <input type="date" class="form-control" id="dateFilterOPD" onchange="filterByDateOPD()" placeholder="Filter by date">
                                         <button type="button" onclick="clearDateFilterOPD()" class="date-clear-btn-opd" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; cursor: pointer; z-index: 5; display: none; width: 20px; height: 20px; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
@@ -1488,7 +1520,10 @@ try {
                                                 <td>
                                                     <div class="d-flex flex-column">
                                                         <h6 class="mb-0 text-sm font-weight-bold"><?php echo htmlspecialchars($bill['bill_number']); ?></h6>
-                                                        <p class="text-xs text-secondary mb-0"><?php echo date('Y-m-d', strtotime($bill['created_at'])); ?></p>
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            <?php echo date('Y-m-d', strtotime($bill['created_at'])); ?>
+                                                            <span class="text-primary">@ <?php echo date('h:i A', strtotime($bill['created_at'])); ?></span>
+                                                        </p>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -1620,8 +1655,8 @@ try {
                     </div>
 
                     <div class="total-section">
-                        <div>Total Amount: Rs. <span id="previewTotalAmount">0.00</span></div>
-                        <div style="color: #28a745; font-size: 16px;">Final Amount: Rs. <span id="previewFinalAmount">0.00</span></div>
+                        <div style="font-size: 16px;">Total Amount: Rs. <span id="previewTotalAmount">0.00</span></div>
+                        <div>Final Amount: Rs. <span id="previewFinalAmount">0.00</span></div>
                     </div>
                 </div>
 
@@ -1648,104 +1683,104 @@ try {
 
     <script>
         // Treatments data from PHP
-const treatments = <?php echo json_encode($treatments); ?>;
-const patients = <?php echo json_encode($patients); ?>;
+        const treatments = <?php echo json_encode($treatments); ?>;
+        const patients = <?php echo json_encode($patients); ?>;
 
-let treatmentRowCounter = 0;
-let currentEditingBill = null;
-let searchTimeout;
+        let treatmentRowCounter = 0;
+        let currentEditingBill = null;
+        let searchTimeout;
 
-// Add patients data for search
-const patients_search = <?php echo json_encode($patients_search); ?>;
+        // Add patients data for search
+        const patients_search = <?php echo json_encode($patients_search); ?>;
 
-// Patient search functions
-function searchPatients() {
-    const searchInput = document.getElementById('patientSearch');
-    const dropdown = document.getElementById('patientDropdown');
-    const searchTerm = searchInput.value.toLowerCase().trim();
+        // Patient search functions
+        function searchPatients() {
+            const searchInput = document.getElementById('patientSearch');
+            const dropdown = document.getElementById('patientDropdown');
+            const searchTerm = searchInput.value.toLowerCase().trim();
 
-    if (searchTerm.length < 2) {
-        dropdown.style.display = 'none';
-        return;
-    }
+            if (searchTerm.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
 
-    dropdown.innerHTML = '<div class="loading-results">Searching...</div>';
-    dropdown.style.display = 'block';
+            dropdown.innerHTML = '<div class="loading-results">Searching...</div>';
+            dropdown.style.display = 'block';
 
-    const filteredPatients = patients_search.filter(patient => {
-        const name = patient.name.toLowerCase();
-        const mobile = patient.mobile.toLowerCase();
-        const regNumber = patient.registration_number.toLowerCase();
+            const filteredPatients = patients_search.filter(patient => {
+                const name = patient.name.toLowerCase();
+                const mobile = patient.mobile.toLowerCase();
+                const regNumber = patient.registration_number.toLowerCase();
 
-        return name.includes(searchTerm) ||
-            mobile.includes(searchTerm) ||
-            regNumber.includes(searchTerm);
-    });
+                return name.includes(searchTerm) ||
+                    mobile.includes(searchTerm) ||
+                    regNumber.includes(searchTerm);
+            });
 
-    displayPatientResults(filteredPatients);
-}
+            displayPatientResults(filteredPatients);
+        }
 
-function displayPatientResults(filteredPatients) {
-    const dropdown = document.getElementById('patientDropdown');
+        function displayPatientResults(filteredPatients) {
+            const dropdown = document.getElementById('patientDropdown');
 
-    if (filteredPatients.length === 0) {
-        dropdown.innerHTML = '<div class="no-results">No patients found</div>';
-        return;
-    }
+            if (filteredPatients.length === 0) {
+                dropdown.innerHTML = '<div class="no-results">No patients found</div>';
+                return;
+            }
 
-    let html = '';
-    filteredPatients.forEach(patient => {
-        html += `
+            let html = '';
+            filteredPatients.forEach(patient => {
+                html += `
             <div class="appointment-search-result" onclick="selectPatient(${patient.id}, '${patient.registration_number}', '${patient.name}', '${patient.mobile}')">
                 <div class="appointment-result-number">${patient.registration_number}</div>
                 <div class="appointment-result-patient">${patient.name} - ${patient.mobile}</div>
             </div>
         `;
-    });
+            });
 
-    dropdown.innerHTML = html;
-}
+            dropdown.innerHTML = html;
+        }
 
-function showPatientDropdown() {
-    const searchInput = document.getElementById('patientSearch');
-    const searchTerm = searchInput.value.trim();
+        function showPatientDropdown() {
+            const searchInput = document.getElementById('patientSearch');
+            const searchTerm = searchInput.value.trim();
 
-    if (searchTerm.length > 0) {
-        searchPatients();
-    } else {
-        displayPatientResults(patients_search);
-    }
-}
+            if (searchTerm.length > 0) {
+                searchPatients();
+            } else {
+                displayPatientResults(patients_search);
+            }
+        }
 
-function selectPatient(patientId, regNumber, name, mobile) {
-    document.getElementById('patientSelect').value = patientId;
-    document.getElementById('patientSearch').value = `${regNumber} - ${name}`;
-    document.getElementById('patientName').value = name;
-    document.getElementById('patientMobile').value = mobile;
-    document.getElementById('patientDropdown').style.display = 'none';
-}
+        function selectPatient(patientId, regNumber, name, mobile) {
+            document.getElementById('patientSelect').value = patientId;
+            document.getElementById('patientSearch').value = `${regNumber} - ${name}`;
+            document.getElementById('patientName').value = name;
+            document.getElementById('patientMobile').value = mobile;
+            document.getElementById('patientDropdown').style.display = 'none';
+        }
 
-// Add new treatment row
-function addTreatmentRow() {
-    treatmentRowCounter++;
-    const treatmentSelection = document.getElementById('treatmentSelection');
+        // Add new treatment row
+        function addTreatmentRow() {
+            treatmentRowCounter++;
+            const treatmentSelection = document.getElementById('treatmentSelection');
 
-    if (!treatmentSelection) {
-        console.error('Treatment selection container not found');
-        return;
-    }
+            if (!treatmentSelection) {
+                console.error('Treatment selection container not found');
+                return;
+            }
 
-    const treatmentRow = document.createElement('div');
-    treatmentRow.className = 'treatment-row';
-    treatmentRow.id = `treatment-row-${treatmentRowCounter}`;
+            const treatmentRow = document.createElement('div');
+            treatmentRow.className = 'treatment-row';
+            treatmentRow.id = `treatment-row-${treatmentRowCounter}`;
 
-    // Build treatment options
-    let treatmentOptions = '<option value="">Select Treatment</option>';
-    treatments.forEach(t => {
-        treatmentOptions += `<option value="${t.id}" data-price="${t.price}">${t.name}</option>`;
-    });
+            // Build treatment options
+            let treatmentOptions = '<option value="">Select Treatment</option>';
+            treatments.forEach(t => {
+                treatmentOptions += `<option value="${t.id}" data-price="${t.price}">${t.name}</option>`;
+            });
 
-    treatmentRow.innerHTML = `
+            treatmentRow.innerHTML = `
         <div class="treatment-dropdown">
             <select onchange="updatePrice(${treatmentRowCounter})" id="treatment-select-${treatmentRowCounter}">
                 ${treatmentOptions}
@@ -1764,487 +1799,285 @@ function addTreatmentRow() {
         </button>
     `;
 
-    treatmentSelection.appendChild(treatmentRow);
-    console.log('Treatment row added:', treatmentRowCounter);
-}
-
-// Remove treatment row
-function removeTreatmentRow(rowId) {
-    const row = document.getElementById(`treatment-row-${rowId}`);
-    if (row) {
-        row.remove();
-        calculateTotal();
-        console.log('Treatment row removed:', rowId);
-    }
-}
-
-// Update price when treatment is selected
-function updatePrice(rowId) {
-    const select = document.getElementById(`treatment-select-${rowId}`);
-    const priceInput = document.getElementById(`price-${rowId}`);
-
-    if (!select || !priceInput) {
-        console.error('Select or price input not found for row:', rowId);
-        return;
-    }
-
-    if (select.value) {
-        const selectedOption = select.options[select.selectedIndex];
-        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-
-        if (price === 0) {
-            // For treatments with 0 price, enable price input for custom entry
-            priceInput.value = '';
-            priceInput.readOnly = false;
-            priceInput.className = 'custom-price-treatment';
-            priceInput.placeholder = 'Enter custom price';
-            priceInput.focus();
-        } else {
-            // For predefined treatments, set price and make readonly
-            priceInput.value = price.toFixed(2);
-            priceInput.readOnly = true;
-            priceInput.className = '';
-        }
-        calculateTotal();
-    } else {
-        priceInput.value = '';
-        priceInput.readOnly = true;
-        priceInput.className = '';
-        calculateTotal();
-    }
-}
-
-// Calculate total amount with discount
-function calculateTotal() {
-    let total = 0;
-    const treatmentRows = document.querySelectorAll('.treatment-row');
-
-    treatmentRows.forEach(row => {
-        const priceInput = row.querySelector('input[type="number"][step]');
-        const quantityInput = row.querySelector('input[type="number"][min="1"]');
-
-        if (priceInput && quantityInput) {
-            const price = parseFloat(priceInput.value) || 0;
-            const quantity = parseInt(quantityInput.value) || 0;
-            total += price * quantity;
-        }
-    });
-
-    const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
-    const discountAmount = (total * discountPercentage) / 100;
-    const finalAmount = total - discountAmount;
-
-    const totalAmountEl = document.getElementById('totalAmount');
-    const discountAmountInputEl = document.getElementById('discountAmountInput');
-    const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
-    const finalAmountEl = document.getElementById('finalAmount');
-
-    if (totalAmountEl) totalAmountEl.textContent = `Rs. ${total.toFixed(2)}`;
-    if (discountAmountInputEl) discountAmountInputEl.value = discountAmount.toFixed(2);
-    if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
-    if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
-
-    // Show/hide discount display
-    const discountDisplay = document.getElementById('discountDisplay');
-    if (discountDisplay) {
-        discountDisplay.style.display = (discountPercentage > 0 || discountAmount > 0) ? 'block' : 'none';
-    }
-}
-
-// Calculate discount from percentage
-function calculateFromPercentage() {
-    const totalAmountEl = document.getElementById('totalAmount');
-    const total = parseFloat(totalAmountEl?.textContent.replace('Rs. ', '')) || 0;
-    const discountPercentageEl = document.getElementById('discountPercentage');
-    const discountPercentage = parseFloat(discountPercentageEl?.value) || 0;
-
-    if (discountPercentage > 100) {
-        if (discountPercentageEl) discountPercentageEl.value = 100;
-        return;
-    }
-
-    const discountAmount = (total * discountPercentage) / 100;
-    const finalAmount = total - discountAmount;
-
-    const discountAmountInputEl = document.getElementById('discountAmountInput');
-    const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
-    const finalAmountEl = document.getElementById('finalAmount');
-
-    if (discountAmountInputEl) discountAmountInputEl.value = discountAmount.toFixed(2);
-    if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
-    if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
-
-    const discountDisplay = document.getElementById('discountDisplay');
-    if (discountDisplay) {
-        discountDisplay.style.display = discountPercentage > 0 ? 'block' : 'none';
-    }
-}
-
-// Calculate discount from amount
-function calculateFromAmount() {
-    const totalAmountEl = document.getElementById('totalAmount');
-    const total = parseFloat(totalAmountEl?.textContent.replace('Rs. ', '')) || 0;
-    const discountAmountInputEl = document.getElementById('discountAmountInput');
-    const discountAmount = parseFloat(discountAmountInputEl?.value) || 0;
-
-    if (discountAmount > total) {
-        alert('Discount amount cannot exceed total amount');
-        if (discountAmountInputEl) discountAmountInputEl.value = total.toFixed(2);
-        return;
-    }
-
-    const discountPercentage = total > 0 ? (discountAmount / total) * 100 : 0;
-    const finalAmount = total - discountAmount;
-
-    const discountPercentageEl = document.getElementById('discountPercentage');
-    const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
-    const finalAmountEl = document.getElementById('finalAmount');
-
-    if (discountPercentageEl) discountPercentageEl.value = discountPercentage.toFixed(2);
-    if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
-    if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
-
-    const discountDisplay = document.getElementById('discountDisplay');
-    if (discountDisplay) {
-        discountDisplay.style.display = discountAmount > 0 ? 'block' : 'none';
-    }
-}
-
-// Form submission
-const treatmentForm = document.getElementById('treatmentForm');
-if (treatmentForm) {
-    treatmentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const patientName = document.getElementById('patientName')?.value;
-        const patientMobile = document.getElementById('patientMobile')?.value;
-        const notes = document.getElementById('treatmentNotes')?.value || '';
-        const paymentStatus = document.getElementById('paymentStatus')?.value || 'Pending'; // ADDED THIS LINE
-
-        if (!patientName || !patientMobile) {
-            alert('Please enter patient name and mobile number');
-            return;
+            treatmentSelection.appendChild(treatmentRow);
+            console.log('Treatment row added:', treatmentRowCounter);
         }
 
-        // Collect selected treatments
-        const selectedTreatments = [];
-        const treatmentRows = document.querySelectorAll('.treatment-row');
-
-        treatmentRows.forEach(row => {
-            const select = row.querySelector('select');
-            const priceInput = row.querySelector('input[type="number"][step]');
-            const quantityInput = row.querySelector('input[type="number"][min="1"]');
-
-            if (select?.value && priceInput?.value && quantityInput?.value) {
-                const treatment = treatments.find(t => t.id == select.value);
-                if (treatment) {
-                    selectedTreatments.push({
-                        id: select.value,
-                        name: treatment.name,
-                        price: parseFloat(priceInput.value),
-                        quantity: parseInt(quantityInput.value)
-                    });
-                }
+        // Remove treatment row
+        function removeTreatmentRow(rowId) {
+            const row = document.getElementById(`treatment-row-${rowId}`);
+            if (row) {
+                row.remove();
+                calculateTotal();
+                console.log('Treatment row removed:', rowId);
             }
-        });
-
-        if (selectedTreatments.length === 0) {
-            alert('Please select at least one treatment');
-            return;
         }
 
-        // Get discount values
-        const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
-        const totalAmountEl = document.getElementById('totalAmount');
-        const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+        // Update price when treatment is selected
+        function updatePrice(rowId) {
+            const select = document.getElementById(`treatment-select-${rowId}`);
+            const priceInput = document.getElementById(`price-${rowId}`);
 
-        // Send data to server
-        fetch('', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'save_bill',
-                    patient_id: document.getElementById('patientSelect')?.value || '',
-                    patient_name: patientName,
-                    patient_mobile: patientMobile,
-                    treatments: JSON.stringify(selectedTreatments),
-                    notes: notes,
-                    total_amount: totalAmount,
-                    discount_percentage: discountPercentage,
-                    discount_reason: document.getElementById('discountReason')?.value || '',
-                    payment_status: paymentStatus // ADDED THIS LINE
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Treatment bill ${data.bill_number} saved successfully!`);
-                    resetForm();
-                    showNotification(data.message, 'success');
-                    setTimeout(() => location.reload(), 1500);
+            if (!select || !priceInput) {
+                console.error('Select or price input not found for row:', rowId);
+                return;
+            }
+
+            if (select.value) {
+                const selectedOption = select.options[select.selectedIndex];
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+
+                if (price === 0) {
+                    // For treatments with 0 price, enable price input for custom entry
+                    priceInput.value = '';
+                    priceInput.readOnly = false;
+                    priceInput.className = 'custom-price-treatment';
+                    priceInput.placeholder = 'Enter custom price';
+                    priceInput.focus();
                 } else {
-                    alert(data.message);
+                    // For predefined treatments, set price and make readonly
+                    priceInput.value = price.toFixed(2);
+                    priceInput.readOnly = true;
+                    priceInput.className = '';
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error saving bill. Please try again.');
-            });
-    });
-}
-
-// Update existing bill
-function updateBill() {
-    if (!currentEditingBill) {
-        alert('No bill is being edited');
-        return;
-    }
-
-    const patientName = document.getElementById('patientName')?.value.trim();
-    const patientMobile = document.getElementById('patientMobile')?.value.trim();
-    const paymentStatus = document.getElementById('paymentStatus')?.value || 'Pending'; // ADDED THIS LINE
-
-    if (!patientName || !patientMobile) {
-        alert('Please enter patient name and mobile number');
-        return;
-    }
-
-    // Collect treatments
-    const selectedTreatments = [];
-    document.querySelectorAll('.treatment-row').forEach(row => {
-        const select = row.querySelector('select');
-        const priceInput = row.querySelector('input[type="number"][step]');
-        const quantityInput = row.querySelector('input[type="number"][min="1"]');
-
-        if (select?.value && priceInput?.value && quantityInput?.value) {
-            const treatment = treatments.find(t => t.id == select.value);
-            if (treatment) {
-                selectedTreatments.push({
-                    id: select.value,
-                    name: treatment.name,
-                    price: parseFloat(priceInput.value),
-                    quantity: parseInt(quantityInput.value)
-                });
+                calculateTotal();
+            } else {
+                priceInput.value = '';
+                priceInput.readOnly = true;
+                priceInput.className = '';
+                calculateTotal();
             }
         }
-    });
 
-    if (selectedTreatments.length === 0) {
-        alert('Please select at least one treatment');
-        return;
-    }
+        // Calculate total amount with discount
+        function calculateTotal() {
+            let total = 0;
+            const treatmentRows = document.querySelectorAll('.treatment-row');
 
-    const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
-    const totalAmountEl = document.getElementById('totalAmount');
-    const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+            treatmentRows.forEach(row => {
+                const priceInput = row.querySelector('input[type="number"][step]');
+                const quantityInput = row.querySelector('input[type="number"][min="1"]');
 
-    // ADDED payment_status to the params
-    const params = new URLSearchParams({
-        bill_id: currentEditingBill,
-        patient_id: document.getElementById('patientSelect')?.value || '',
-        patient_name: patientName,
-        patient_mobile: patientMobile,
-        treatments: JSON.stringify(selectedTreatments),
-        notes: document.getElementById('treatmentNotes')?.value || '',
-        total_amount: totalAmount,
-        discount_percentage: discountPercentage,
-        discount_reason: document.getElementById('discountReason')?.value || '',
-        payment_status: paymentStatus // ADDED THIS LINE
-    });
+                if (priceInput && quantityInput) {
+                    const price = parseFloat(priceInput.value) || 0;
+                    const quantity = parseInt(quantityInput.value) || 0;
+                    total += price * quantity;
+                }
+            });
 
-    fetch('update_treatment_bill.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: params
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Treatment bill updated successfully!');
-                resetForm();
-                showNotification(data.message, 'success');
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                alert('Update failed: ' + data.message);
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
+            const discountAmount = (total * discountPercentage) / 100;
+            const finalAmount = total - discountAmount;
+
+            const totalAmountEl = document.getElementById('totalAmount');
+            const discountAmountInputEl = document.getElementById('discountAmountInput');
+            const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
+            const finalAmountEl = document.getElementById('finalAmount');
+
+            if (totalAmountEl) totalAmountEl.textContent = `Rs. ${total.toFixed(2)}`;
+            if (discountAmountInputEl) discountAmountInputEl.value = discountAmount.toFixed(2);
+            if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
+
+            // Show/hide discount display
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountDisplay) {
+                discountDisplay.style.display = (discountPercentage > 0 || discountAmount > 0) ? 'block' : 'none';
             }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alert('Error updating bill: ' + err.message);
-        });
-}
+        }
 
-// Reset form
-function resetForm() {
-    const form = document.getElementById('treatmentForm');
-    if (form) form.reset();
+        // Calculate discount from percentage
+        function calculateFromPercentage() {
+            const totalAmountEl = document.getElementById('totalAmount');
+            const total = parseFloat(totalAmountEl?.textContent.replace('Rs. ', '')) || 0;
+            const discountPercentageEl = document.getElementById('discountPercentage');
+            const discountPercentage = parseFloat(discountPercentageEl?.value) || 0;
 
-    const treatmentSelection = document.getElementById('treatmentSelection');
-    if (treatmentSelection) treatmentSelection.innerHTML = '';
+            if (discountPercentage > 100) {
+                if (discountPercentageEl) discountPercentageEl.value = 100;
+                return;
+            }
 
-    const totalAmountEl = document.getElementById('totalAmount');
-    if (totalAmountEl) totalAmountEl.textContent = 'Rs. 0.00';
+            const discountAmount = (total * discountPercentage) / 100;
+            const finalAmount = total - discountAmount;
 
-    const discountDisplay = document.getElementById('discountDisplay');
-    if (discountDisplay) discountDisplay.style.display = 'none';
+            const discountAmountInputEl = document.getElementById('discountAmountInput');
+            const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
+            const finalAmountEl = document.getElementById('finalAmount');
 
-    const discountPercentageEl = document.getElementById('discountPercentage');
-    if (discountPercentageEl) discountPercentageEl.value = '0';
+            if (discountAmountInputEl) discountAmountInputEl.value = discountAmount.toFixed(2);
+            if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
 
-    const discountAmountInputEl = document.getElementById('discountAmountInput');
-    if (discountAmountInputEl) discountAmountInputEl.value = '0';
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountDisplay) {
+                discountDisplay.style.display = discountPercentage > 0 ? 'block' : 'none';
+            }
+        }
 
-    const discountReasonEl = document.getElementById('discountReason');
-    if (discountReasonEl) discountReasonEl.value = '';
+        // Calculate discount from amount
+        function calculateFromAmount() {
+            const totalAmountEl = document.getElementById('totalAmount');
+            const total = parseFloat(totalAmountEl?.textContent.replace('Rs. ', '')) || 0;
+            const discountAmountInputEl = document.getElementById('discountAmountInput');
+            const discountAmount = parseFloat(discountAmountInputEl?.value) || 0;
 
-    const billIdEl = document.getElementById('billId');
-    if (billIdEl) billIdEl.value = '';
+            if (discountAmount > total) {
+                alert('Discount amount cannot exceed total amount');
+                if (discountAmountInputEl) discountAmountInputEl.value = total.toFixed(2);
+                return;
+            }
 
-    const saveBtn = document.getElementById('saveBtn');
-    const updateBtn = document.getElementById('updateBtn');
-    if (saveBtn) saveBtn.style.display = 'flex';
-    if (updateBtn) updateBtn.style.display = 'none';
+            const discountPercentage = total > 0 ? (discountAmount / total) * 100 : 0;
+            const finalAmount = total - discountAmount;
 
-    currentEditingBill = null;
-    treatmentRowCounter = 0;
-    addTreatmentRow();
-}
+            const discountPercentageEl = document.getElementById('discountPercentage');
+            const discountAmountDisplayEl = document.getElementById('discountAmountDisplay');
+            const finalAmountEl = document.getElementById('finalAmount');
 
-// Edit bill
-function editBill(billNumber) {
-    fetch(`?action=get_bill&bill_number=${encodeURIComponent(billNumber)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const bill = data.bill;
-                currentEditingBill = bill.id;
+            if (discountPercentageEl) discountPercentageEl.value = discountPercentage.toFixed(2);
+            if (discountAmountDisplayEl) discountAmountDisplayEl.textContent = `Rs. ${discountAmount.toFixed(2)}`;
+            if (finalAmountEl) finalAmountEl.textContent = `Rs. ${finalAmount.toFixed(2)}`;
 
-                // Populate form fields
-                const patientNameEl = document.getElementById('patientName');
-                const patientMobileEl = document.getElementById('patientMobile');
-                const treatmentNotesEl = document.getElementById('treatmentNotes');
-                const discountPercentageEl = document.getElementById('discountPercentage');
-                const discountReasonEl = document.getElementById('discountReason');
-                const paymentStatusEl = document.getElementById('paymentStatus'); // ADDED THIS LINE
-                const billIdEl = document.getElementById('billId');
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountDisplay) {
+                discountDisplay.style.display = discountAmount > 0 ? 'block' : 'none';
+            }
+        }
 
-                if (patientNameEl) patientNameEl.value = bill.patient_name;
-                if (patientMobileEl) patientMobileEl.value = bill.patient_mobile;
-                if (treatmentNotesEl) treatmentNotesEl.value = bill.notes || '';
-                if (discountPercentageEl) discountPercentageEl.value = bill.discount_percentage || 0;
-                if (discountReasonEl) discountReasonEl.value = bill.discount_reason || '';
-                if (paymentStatusEl) paymentStatusEl.value = bill.payment_status || 'Pending'; // ADDED THIS LINE
-                if (billIdEl) billIdEl.value = bill.id;
+        // Form submission
+        const treatmentForm = document.getElementById('treatmentForm');
+        if (treatmentForm) {
+            treatmentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-                const discountAmt = parseFloat(bill.discount_amount) || 0;
-                const discountAmountInputEl = document.getElementById('discountAmountInput');
-                if (discountAmountInputEl) discountAmountInputEl.value = discountAmt.toFixed(2);
+                const patientName = document.getElementById('patientName')?.value;
+                const patientMobile = document.getElementById('patientMobile')?.value;
+                const notes = document.getElementById('treatmentNotes')?.value || '';
+                const paymentStatus = document.getElementById('paymentStatus')?.value || 'Pending'; // ADDED THIS LINE
 
-                // Set patient selection if patient_id exists
-                if (bill.patient_id) {
-                    const patientSelectEl = document.getElementById('patientSelect');
-                    if (patientSelectEl) patientSelectEl.value = bill.patient_id;
+                if (!patientName || !patientMobile) {
+                    alert('Please enter patient name and mobile number');
+                    return;
                 }
 
-                // Clear existing treatment rows
-                const treatmentSelection = document.getElementById('treatmentSelection');
-                if (treatmentSelection) treatmentSelection.innerHTML = '';
-                treatmentRowCounter = 0;
+                // Collect selected treatments
+                const selectedTreatments = [];
+                const treatmentRows = document.querySelectorAll('.treatment-row');
 
-                // Add treatment rows from bill data
-                bill.treatments_data.forEach((treatment, index) => {
-                    addTreatmentRow();
-                    const rowId = treatmentRowCounter;
+                treatmentRows.forEach(row => {
+                    const select = row.querySelector('select');
+                    const priceInput = row.querySelector('input[type="number"][step]');
+                    const quantityInput = row.querySelector('input[type="number"][min="1"]');
 
-                    const select = document.querySelector(`#treatment-row-${rowId} select`);
-                    const priceInput = document.getElementById(`price-${rowId}`);
-                    const quantityInput = document.getElementById(`quantity-${rowId}`);
-
-                    if (select) select.value = treatment.id;
-                    if (priceInput) {
-                        priceInput.value = treatment.price;
-                        if (treatment.price === 0) {
-                            priceInput.readOnly = false;
-                            priceInput.className = 'custom-price-treatment';
+                    if (select?.value && priceInput?.value && quantityInput?.value) {
+                        const treatment = treatments.find(t => t.id == select.value);
+                        if (treatment) {
+                            selectedTreatments.push({
+                                id: select.value,
+                                name: treatment.name,
+                                price: parseFloat(priceInput.value),
+                                quantity: parseInt(quantityInput.value)
+                            });
                         }
                     }
-                    if (quantityInput) quantityInput.value = treatment.quantity;
                 });
 
-                calculateTotal();
+                if (selectedTreatments.length === 0) {
+                    alert('Please select at least one treatment');
+                    return;
+                }
 
-                const saveBtn = document.getElementById('saveBtn');
-                const updateBtn = document.getElementById('updateBtn');
-                if (saveBtn) saveBtn.style.display = 'none';
-                if (updateBtn) updateBtn.style.display = 'flex';
+                // Get discount values
+                const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
+                const totalAmountEl = document.getElementById('totalAmount');
+                const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
 
-                document.querySelector('.treatment-card')?.scrollIntoView({
-                    behavior: 'smooth'
-                });
-
-                showNotification('Bill loaded for editing', 'success');
-            } else {
-                alert('Error loading bill: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error loading bill for editing. Please try again.');
-        });
-}
-
-// Save and print
-function saveAndPrint() {
-    const patientName = document.getElementById('patientName')?.value;
-    const patientMobile = document.getElementById('patientMobile')?.value;
-
-    if (!patientName || !patientMobile) {
-        alert('Please enter patient name and mobile number');
-        return;
-    }
-
-    // Collect selected treatments
-    const selectedTreatments = [];
-    const treatmentRows = document.querySelectorAll('.treatment-row');
-
-    treatmentRows.forEach(row => {
-        const select = row.querySelector('select');
-        const priceInput = row.querySelector('input[type="number"][step]');
-        const quantityInput = row.querySelector('input[type="number"][min="1"]');
-
-        if (select?.value && priceInput?.value && quantityInput?.value) {
-            const treatment = treatments.find(t => t.id == select.value);
-            if (treatment) {
-                selectedTreatments.push({
-                    id: select.value,
-                    name: treatment.name,
-                    price: parseFloat(priceInput.value),
-                    quantity: parseInt(quantityInput.value)
-                });
-            }
+                // Send data to server
+                fetch('', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'save_bill',
+                            patient_id: document.getElementById('patientSelect')?.value || '',
+                            patient_name: patientName,
+                            patient_mobile: patientMobile,
+                            treatments: JSON.stringify(selectedTreatments),
+                            notes: notes,
+                            total_amount: totalAmount,
+                            discount_percentage: discountPercentage,
+                            discount_reason: document.getElementById('discountReason')?.value || '',
+                            payment_status: paymentStatus // ADDED THIS LINE
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`Treatment bill ${data.bill_number} saved successfully!`);
+                            resetForm();
+                            showNotification(data.message, 'success');
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error saving bill. Please try again.');
+                    });
+            });
         }
-    });
 
-    if (selectedTreatments.length === 0) {
-        alert('Please select at least one treatment');
-        return;
-    }
+        // Update existing bill
+        function updateBill() {
+            if (!currentEditingBill) {
+                alert('No bill is being edited');
+                return;
+            }
 
-    const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
-    const totalAmountEl = document.getElementById('totalAmount');
-    const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+            const patientName = document.getElementById('patientName')?.value.trim();
+            const patientMobile = document.getElementById('patientMobile')?.value.trim();
+            const paymentStatus = document.getElementById('paymentStatus')?.value || 'Pending'; // ADDED THIS LINE
 
-    fetch('', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                action: 'save_bill',
+            if (!patientName || !patientMobile) {
+                alert('Please enter patient name and mobile number');
+                return;
+            }
+
+            // Collect treatments
+            const selectedTreatments = [];
+            document.querySelectorAll('.treatment-row').forEach(row => {
+                const select = row.querySelector('select');
+                const priceInput = row.querySelector('input[type="number"][step]');
+                const quantityInput = row.querySelector('input[type="number"][min="1"]');
+
+                if (select?.value && priceInput?.value && quantityInput?.value) {
+                    const treatment = treatments.find(t => t.id == select.value);
+                    if (treatment) {
+                        selectedTreatments.push({
+                            id: select.value,
+                            name: treatment.name,
+                            price: parseFloat(priceInput.value),
+                            quantity: parseInt(quantityInput.value)
+                        });
+                    }
+                }
+            });
+
+            if (selectedTreatments.length === 0) {
+                alert('Please select at least one treatment');
+                return;
+            }
+
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
+            const totalAmountEl = document.getElementById('totalAmount');
+            const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+
+            // ADDED payment_status to the params
+            const params = new URLSearchParams({
+                bill_id: currentEditingBill,
                 patient_id: document.getElementById('patientSelect')?.value || '',
                 patient_name: patientName,
                 patient_mobile: patientMobile,
@@ -2253,108 +2086,310 @@ function saveAndPrint() {
                 total_amount: totalAmount,
                 discount_percentage: discountPercentage,
                 discount_reason: document.getElementById('discountReason')?.value || '',
-                payment_status: document.getElementById('paymentStatus')?.value || 'Pending' // ADDED THIS LINE
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('Treatment bill saved successfully! Opening print preview...', 'success');
+                payment_status: paymentStatus // ADDED THIS LINE
+            });
 
-                fetch(`get_bill_details.php?bill_number=${data.bill_number}`)
-                    .then(response => response.json())
-                    .then(billData => {
-                        if (billData.success) {
-                            printBillContent(billData.bill);
-                            resetForm();
-                            setTimeout(() => location.reload(), 2000);
-                        } else {
-                            alert('Bill saved but error loading for print: ' + billData.message);
-                            setTimeout(() => location.reload(), 1500);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading bill for print:', error);
-                        alert('Bill saved but error opening print preview');
+            fetch('update_treatment_bill.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Treatment bill updated successfully!');
+                        resetForm();
+                        showNotification(data.message, 'success');
                         setTimeout(() => location.reload(), 1500);
-                    });
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error saving bill. Please try again.');
-        });
-}
-
-// Preview bill
-function previewBill() {
-    const patientName = document.getElementById('patientName')?.value;
-    const patientMobile = document.getElementById('patientMobile')?.value;
-    const notes = document.getElementById('treatmentNotes')?.value || '';
-
-    if (!patientName || !patientMobile) {
-        alert('Please enter patient name and mobile number');
-        return;
-    }
-
-    const selectedTreatments = [];
-    const treatmentRows = document.querySelectorAll('.treatment-row');
-
-    treatmentRows.forEach(row => {
-        const select = row.querySelector('select');
-        const priceInput = row.querySelector('input[type="number"][step]');
-        const quantityInput = row.querySelector('input[type="number"][min="1"]');
-
-        if (select?.value && priceInput?.value && quantityInput?.value) {
-            const treatment = treatments.find(t => t.id == select.value);
-            if (treatment) {
-                selectedTreatments.push({
-                    id: select.value,
-                    name: treatment.name,
-                    price: parseFloat(priceInput.value),
-                    quantity: parseInt(quantityInput.value)
+                    } else {
+                        alert('Update failed: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Error updating bill: ' + err.message);
                 });
-            }
         }
-    });
 
-    if (selectedTreatments.length === 0) {
-        alert('Please select at least one treatment');
-        return;
-    }
+        // Reset form
+        function resetForm() {
+            const form = document.getElementById('treatmentForm');
+            if (form) form.reset();
 
-    const modalTitle = document.getElementById('modalTitle');
-    if (modalTitle) modalTitle.textContent = 'Preview Treatment Bill';
+            const treatmentSelection = document.getElementById('treatmentSelection');
+            if (treatmentSelection) treatmentSelection.innerHTML = '';
 
-    const previewPatientName = document.getElementById('previewPatientName');
-    const previewPatientMobile = document.getElementById('previewPatientMobile');
-    const previewDate = document.getElementById('previewDate');
-    const previewBillNo = document.getElementById('previewBillNo');
+            const totalAmountEl = document.getElementById('totalAmount');
+            if (totalAmountEl) totalAmountEl.textContent = 'Rs. 0.00';
 
-    if (previewPatientName) previewPatientName.textContent = patientName;
-    if (previewPatientMobile) previewPatientMobile.textContent = patientMobile;
-    if (previewDate) previewDate.textContent = new Date().toISOString().split('T')[0];
-    if (previewBillNo) previewBillNo.textContent = 'PREVIEW';
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountDisplay) discountDisplay.style.display = 'none';
 
-    const totalAmountEl = document.getElementById('totalAmount');
-    const currentTotal = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
-    const previewDiscountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
-    const previewDiscountAmount = parseFloat(document.getElementById('discountAmountInput')?.value) || 0;
-    const currentFinal = currentTotal - previewDiscountAmount;
+            const discountPercentageEl = document.getElementById('discountPercentage');
+            if (discountPercentageEl) discountPercentageEl.value = '0';
 
-    const previewTotalAmount = document.getElementById('previewTotalAmount');
-    const previewFinalAmount = document.getElementById('previewFinalAmount');
-    if (previewTotalAmount) previewTotalAmount.textContent = currentTotal.toFixed(2);
-    if (previewFinalAmount) previewFinalAmount.textContent = currentFinal.toFixed(2);
+            const discountAmountInputEl = document.getElementById('discountAmountInput');
+            if (discountAmountInputEl) discountAmountInputEl.value = '0';
 
-    // Build treatment list
-    let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
-    treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
+            const discountReasonEl = document.getElementById('discountReason');
+            if (discountReasonEl) discountReasonEl.value = '';
 
-    selectedTreatments.forEach(treatment => {
-        treatmentListHtml += `
+            const billIdEl = document.getElementById('billId');
+            if (billIdEl) billIdEl.value = '';
+
+            const saveBtn = document.getElementById('saveBtn');
+            const updateBtn = document.getElementById('updateBtn');
+            if (saveBtn) saveBtn.style.display = 'flex';
+            if (updateBtn) updateBtn.style.display = 'none';
+
+            currentEditingBill = null;
+            treatmentRowCounter = 0;
+            addTreatmentRow();
+        }
+
+        // Edit bill
+        function editBill(billNumber) {
+            fetch(`?action=get_bill&bill_number=${encodeURIComponent(billNumber)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const bill = data.bill;
+                        currentEditingBill = bill.id;
+
+                        // Populate form fields
+                        const patientNameEl = document.getElementById('patientName');
+                        const patientMobileEl = document.getElementById('patientMobile');
+                        const treatmentNotesEl = document.getElementById('treatmentNotes');
+                        const discountPercentageEl = document.getElementById('discountPercentage');
+                        const discountReasonEl = document.getElementById('discountReason');
+                        const paymentStatusEl = document.getElementById('paymentStatus'); // ADDED THIS LINE
+                        const billIdEl = document.getElementById('billId');
+
+                        if (patientNameEl) patientNameEl.value = bill.patient_name;
+                        if (patientMobileEl) patientMobileEl.value = bill.patient_mobile;
+                        if (treatmentNotesEl) treatmentNotesEl.value = bill.notes || '';
+                        if (discountPercentageEl) discountPercentageEl.value = bill.discount_percentage || 0;
+                        if (discountReasonEl) discountReasonEl.value = bill.discount_reason || '';
+                        if (paymentStatusEl) paymentStatusEl.value = bill.payment_status || 'Pending'; // ADDED THIS LINE
+                        if (billIdEl) billIdEl.value = bill.id;
+
+                        const discountAmt = parseFloat(bill.discount_amount) || 0;
+                        const discountAmountInputEl = document.getElementById('discountAmountInput');
+                        if (discountAmountInputEl) discountAmountInputEl.value = discountAmt.toFixed(2);
+
+                        // Set patient selection if patient_id exists
+                        if (bill.patient_id) {
+                            const patientSelectEl = document.getElementById('patientSelect');
+                            if (patientSelectEl) patientSelectEl.value = bill.patient_id;
+                        }
+
+                        // Clear existing treatment rows
+                        const treatmentSelection = document.getElementById('treatmentSelection');
+                        if (treatmentSelection) treatmentSelection.innerHTML = '';
+                        treatmentRowCounter = 0;
+
+                        // Add treatment rows from bill data
+                        bill.treatments_data.forEach((treatment, index) => {
+                            addTreatmentRow();
+                            const rowId = treatmentRowCounter;
+
+                            const select = document.querySelector(`#treatment-row-${rowId} select`);
+                            const priceInput = document.getElementById(`price-${rowId}`);
+                            const quantityInput = document.getElementById(`quantity-${rowId}`);
+
+                            if (select) select.value = treatment.id;
+                            if (priceInput) {
+                                priceInput.value = treatment.price;
+                                if (treatment.price === 0) {
+                                    priceInput.readOnly = false;
+                                    priceInput.className = 'custom-price-treatment';
+                                }
+                            }
+                            if (quantityInput) quantityInput.value = treatment.quantity;
+                        });
+
+                        calculateTotal();
+
+                        const saveBtn = document.getElementById('saveBtn');
+                        const updateBtn = document.getElementById('updateBtn');
+                        if (saveBtn) saveBtn.style.display = 'none';
+                        if (updateBtn) updateBtn.style.display = 'flex';
+
+                        document.querySelector('.treatment-card')?.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+
+                        showNotification('Bill loaded for editing', 'success');
+                    } else {
+                        alert('Error loading bill: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading bill for editing. Please try again.');
+                });
+        }
+
+        // Save and print
+        function saveAndPrint() {
+            const patientName = document.getElementById('patientName')?.value;
+            const patientMobile = document.getElementById('patientMobile')?.value;
+
+            if (!patientName || !patientMobile) {
+                alert('Please enter patient name and mobile number');
+                return;
+            }
+
+            // Collect selected treatments
+            const selectedTreatments = [];
+            const treatmentRows = document.querySelectorAll('.treatment-row');
+
+            treatmentRows.forEach(row => {
+                const select = row.querySelector('select');
+                const priceInput = row.querySelector('input[type="number"][step]');
+                const quantityInput = row.querySelector('input[type="number"][min="1"]');
+
+                if (select?.value && priceInput?.value && quantityInput?.value) {
+                    const treatment = treatments.find(t => t.id == select.value);
+                    if (treatment) {
+                        selectedTreatments.push({
+                            id: select.value,
+                            name: treatment.name,
+                            price: parseFloat(priceInput.value),
+                            quantity: parseInt(quantityInput.value)
+                        });
+                    }
+                }
+            });
+
+            if (selectedTreatments.length === 0) {
+                alert('Please select at least one treatment');
+                return;
+            }
+
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
+            const totalAmountEl = document.getElementById('totalAmount');
+            const totalAmount = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+
+            fetch('', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'save_bill',
+                        patient_id: document.getElementById('patientSelect')?.value || '',
+                        patient_name: patientName,
+                        patient_mobile: patientMobile,
+                        treatments: JSON.stringify(selectedTreatments),
+                        notes: document.getElementById('treatmentNotes')?.value || '',
+                        total_amount: totalAmount,
+                        discount_percentage: discountPercentage,
+                        discount_reason: document.getElementById('discountReason')?.value || '',
+                        payment_status: document.getElementById('paymentStatus')?.value || 'Pending' // ADDED THIS LINE
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Treatment bill saved successfully! Opening print preview...', 'success');
+
+                        fetch(`get_bill_details.php?bill_number=${data.bill_number}`)
+                            .then(response => response.json())
+                            .then(billData => {
+                                if (billData.success) {
+                                    printBillContent(billData.bill);
+                                    resetForm();
+                                    setTimeout(() => location.reload(), 2000);
+                                } else {
+                                    alert('Bill saved but error loading for print: ' + billData.message);
+                                    setTimeout(() => location.reload(), 1500);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error loading bill for print:', error);
+                                alert('Bill saved but error opening print preview');
+                                setTimeout(() => location.reload(), 1500);
+                            });
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving bill. Please try again.');
+                });
+        }
+
+        // Preview bill
+        function previewBill() {
+            const patientName = document.getElementById('patientName')?.value;
+            const patientMobile = document.getElementById('patientMobile')?.value;
+            const notes = document.getElementById('treatmentNotes')?.value || '';
+
+            if (!patientName || !patientMobile) {
+                alert('Please enter patient name and mobile number');
+                return;
+            }
+
+            const selectedTreatments = [];
+            const treatmentRows = document.querySelectorAll('.treatment-row');
+
+            treatmentRows.forEach(row => {
+                const select = row.querySelector('select');
+                const priceInput = row.querySelector('input[type="number"][step]');
+                const quantityInput = row.querySelector('input[type="number"][min="1"]');
+
+                if (select?.value && priceInput?.value && quantityInput?.value) {
+                    const treatment = treatments.find(t => t.id == select.value);
+                    if (treatment) {
+                        selectedTreatments.push({
+                            id: select.value,
+                            name: treatment.name,
+                            price: parseFloat(priceInput.value),
+                            quantity: parseInt(quantityInput.value)
+                        });
+                    }
+                }
+            });
+
+            if (selectedTreatments.length === 0) {
+                alert('Please select at least one treatment');
+                return;
+            }
+
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) modalTitle.textContent = 'Preview Treatment Bill';
+
+            const previewPatientName = document.getElementById('previewPatientName');
+            const previewPatientMobile = document.getElementById('previewPatientMobile');
+            const previewDate = document.getElementById('previewDate').textContent = `${formattedDate} @ ${formattedTime}`;
+            const previewBillNo = document.getElementById('previewBillNo');
+
+            if (previewPatientName) previewPatientName.textContent = patientName;
+            if (previewPatientMobile) previewPatientMobile.textContent = patientMobile;
+            if (previewDate) previewDate.textContent = new Date().toISOString().split('T')[0];
+            if (previewBillNo) previewBillNo.textContent = 'PREVIEW';
+
+            const totalAmountEl = document.getElementById('totalAmount');
+            const currentTotal = parseFloat(totalAmountEl?.textContent.replace('Rs. ', ''));
+            const previewDiscountPercentage = parseFloat(document.getElementById('discountPercentage')?.value) || 0;
+            const previewDiscountAmount = parseFloat(document.getElementById('discountAmountInput')?.value) || 0;
+            const currentFinal = currentTotal - previewDiscountAmount;
+
+            const previewTotalAmount = document.getElementById('previewTotalAmount');
+            const previewFinalAmount = document.getElementById('previewFinalAmount');
+            if (previewTotalAmount) previewTotalAmount.textContent = currentTotal.toFixed(2);
+            if (previewFinalAmount) previewFinalAmount.textContent = currentFinal.toFixed(2);
+
+            // Build treatment list
+            let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
+            treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
+
+            selectedTreatments.forEach(treatment => {
+                treatmentListHtml += `
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 8px;">${treatment.name}</td>
                 <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
@@ -2362,91 +2397,101 @@ function previewBill() {
                 <td style="text-align: right; padding: 8px;">Rs. ${(treatment.price * treatment.quantity).toFixed(2)}</td>
             </tr>
         `;
-    });
-    treatmentListHtml += '</table>';
+            });
+            treatmentListHtml += '</table>';
 
-    const previewTreatmentList = document.getElementById('previewTreatmentList');
-    if (previewTreatmentList) previewTreatmentList.innerHTML = treatmentListHtml;
+            const previewTreatmentList = document.getElementById('previewTreatmentList');
+            if (previewTreatmentList) previewTreatmentList.innerHTML = treatmentListHtml;
 
-    // Show/hide discount section
-    const previewDiscountSection = document.getElementById('previewDiscountSection');
-    if (previewDiscountPercentage > 0 || previewDiscountAmount > 0) {
-        if (previewDiscountSection) previewDiscountSection.style.display = 'block';
+            // Show/hide discount section
+            const previewDiscountSection = document.getElementById('previewDiscountSection');
+            if (previewDiscountPercentage > 0 || previewDiscountAmount > 0) {
+                if (previewDiscountSection) previewDiscountSection.style.display = 'block';
 
-        const previewDiscountPercentageEl = document.getElementById('previewDiscountPercentage');
-        const previewDiscountAmountEl = document.getElementById('previewDiscountAmount');
+                const previewDiscountPercentageEl = document.getElementById('previewDiscountPercentage');
+                const previewDiscountAmountEl = document.getElementById('previewDiscountAmount');
 
-        if (previewDiscountPercentageEl) previewDiscountPercentageEl.textContent = previewDiscountPercentage + '%';
-        if (previewDiscountAmountEl) previewDiscountAmountEl.textContent = 'Rs. ' + previewDiscountAmount.toFixed(2);
+                if (previewDiscountPercentageEl) previewDiscountPercentageEl.textContent = previewDiscountPercentage + '%';
+                if (previewDiscountAmountEl) previewDiscountAmountEl.textContent = 'Rs. ' + previewDiscountAmount.toFixed(2);
 
-        const previewDiscountReason = document.getElementById('discountReason')?.value;
-        const previewDiscountReasonEl = document.getElementById('previewDiscountReason');
-        if (previewDiscountReason && previewDiscountReasonEl) {
-            previewDiscountReasonEl.innerHTML = '<small><strong>Reason:</strong> ' + previewDiscountReason + '</small>';
-        } else if (previewDiscountReasonEl) {
-            previewDiscountReasonEl.innerHTML = '';
+                const previewDiscountReason = document.getElementById('discountReason')?.value;
+                const previewDiscountReasonEl = document.getElementById('previewDiscountReason');
+                if (previewDiscountReason && previewDiscountReasonEl) {
+                    previewDiscountReasonEl.innerHTML = '<small><strong>Reason:</strong> ' + previewDiscountReason + '</small>';
+                } else if (previewDiscountReasonEl) {
+                    previewDiscountReasonEl.innerHTML = '';
+                }
+            } else {
+                if (previewDiscountSection) previewDiscountSection.style.display = 'none';
+            }
+
+            // Show/hide notes section
+            const previewNotesSection = document.getElementById('previewNotesSection');
+            const previewNotesEl = document.getElementById('previewNotes');
+            if (notes.trim()) {
+                if (previewNotesSection) previewNotesSection.style.display = 'block';
+                if (previewNotesEl) previewNotesEl.textContent = notes;
+            } else {
+                if (previewNotesSection) previewNotesSection.style.display = 'none';
+            }
+
+            // Show the modal
+            const billModal = document.getElementById('billModal');
+            if (billModal) billModal.style.display = 'block';
         }
-    } else {
-        if (previewDiscountSection) previewDiscountSection.style.display = 'none';
-    }
 
-    // Show/hide notes section
-    const previewNotesSection = document.getElementById('previewNotesSection');
-    const previewNotesEl = document.getElementById('previewNotes');
-    if (notes.trim()) {
-        if (previewNotesSection) previewNotesSection.style.display = 'block';
-        if (previewNotesEl) previewNotesEl.textContent = notes;
-    } else {
-        if (previewNotesSection) previewNotesSection.style.display = 'none';
-    }
+        // View bill details
+        function viewBill(billNumber) {
+            console.log('Viewing bill:', billNumber);
+            const modal = document.getElementById('billModal');
 
-    // Show the modal
-    const billModal = document.getElementById('billModal');
-    if (billModal) billModal.style.display = 'block';
-}
+            if (!modal) {
+                console.error('Bill modal not found');
+                return;
+            }
 
-// View bill details
-function viewBill(billNumber) {
-    console.log('Viewing bill:', billNumber);
-    const modal = document.getElementById('billModal');
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) modalTitle.textContent = 'Loading...';
+            modal.style.display = 'block';
 
-    if (!modal) {
-        console.error('Bill modal not found');
-        return;
-    }
+            fetch(`get_bill_details.php?bill_number=${encodeURIComponent(billNumber)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const bill = data.bill;
 
-    const modalTitle = document.getElementById('modalTitle');
-    if (modalTitle) modalTitle.textContent = 'Loading...';
-    modal.style.display = 'block';
+                        if (modalTitle) modalTitle.textContent = 'View Treatment Bill';
 
-    fetch(`get_bill_details.php?bill_number=${encodeURIComponent(billNumber)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const bill = data.bill;
+                        const previewPatientName = document.getElementById('previewPatientName');
+                        const previewPatientMobile = document.getElementById('previewPatientMobile');
+                        const previewBillNo = document.getElementById('previewBillNo');
 
-                if (modalTitle) modalTitle.textContent = 'View Treatment Bill';
+                        if (previewPatientName) previewPatientName.textContent = bill.patient_name;
+                        if (previewPatientMobile) previewPatientMobile.textContent = bill.patient_mobile;
 
-                const previewPatientName = document.getElementById('previewPatientName');
-                const previewPatientMobile = document.getElementById('previewPatientMobile');
-                const previewDate = document.getElementById('previewDate');
-                const previewBillNo = document.getElementById('previewBillNo');
+                        // Add time to the display
+                        const dateTime = new Date(bill.created_at);
+                        const formattedDate = dateTime.toLocaleDateString();
+                        const formattedTime = dateTime.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
 
-                if (previewPatientName) previewPatientName.textContent = bill.patient_name;
-                if (previewPatientMobile) previewPatientMobile.textContent = bill.patient_mobile;
-                if (previewDate) previewDate.textContent = bill.created_at.split(' ')[0];
-                if (previewBillNo) previewBillNo.textContent = bill.bill_number;
+                        // ✅ Now safe to use
+                        const previewDate = document.getElementById('previewDate');
+                        if (previewDate) previewDate.textContent = `${formattedDate} @ ${formattedTime}`;
+                        if (previewBillNo) previewBillNo.textContent = bill.bill_number;
 
-                // Build treatment list table
-                let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
-                treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
+                        // Build treatment list table
+                        let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
+                        treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
 
-                bill.treatments_data.forEach(treatment => {
-                    const price = parseFloat(treatment.price);
-                    const quantity = parseInt(treatment.quantity);
-                    const total = price * quantity;
+                        bill.treatments_data.forEach(treatment => {
+                            const price = parseFloat(treatment.price);
+                            const quantity = parseInt(treatment.quantity);
+                            const total = price * quantity;
 
-                    treatmentListHtml += `
+                            treatmentListHtml += `
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 8px;">${treatment.name}</td>
                             <td style="text-align: center; padding: 8px;">${quantity}</td>
@@ -2454,109 +2499,117 @@ function viewBill(billNumber) {
                             <td style="text-align: right; padding: 8px;">Rs. ${total.toFixed(2)}</td>
                         </tr>
                     `;
-                });
-                treatmentListHtml += '</table>';
+                        });
+                        treatmentListHtml += '</table>';
 
-                const previewTreatmentList = document.getElementById('previewTreatmentList');
-                if (previewTreatmentList) previewTreatmentList.innerHTML = treatmentListHtml;
+                        const previewTreatmentList = document.getElementById('previewTreatmentList');
+                        if (previewTreatmentList) previewTreatmentList.innerHTML = treatmentListHtml;
 
-                // Update amounts
-                const previewTotalAmount = document.getElementById('previewTotalAmount');
-                const previewFinalAmount = document.getElementById('previewFinalAmount');
-                if (previewTotalAmount) previewTotalAmount.textContent = parseFloat(bill.total_amount).toFixed(2);
-                if (previewFinalAmount) previewFinalAmount.textContent = parseFloat(bill.final_amount).toFixed(2);
+                        // Update amounts
+                        const previewTotalAmount = document.getElementById('previewTotalAmount');
+                        const previewFinalAmount = document.getElementById('previewFinalAmount');
+                        if (previewTotalAmount) previewTotalAmount.textContent = parseFloat(bill.total_amount).toFixed(2);
+                        if (previewFinalAmount) previewFinalAmount.textContent = parseFloat(bill.final_amount).toFixed(2);
 
-                // Show/hide discount section
-                const discountSection = document.getElementById('previewDiscountSection');
-                if (bill.discount_percentage > 0 || bill.discount_amount > 0) {
-                    if (discountSection) discountSection.style.display = 'block';
+                        // Show/hide discount section
+                        const discountSection = document.getElementById('previewDiscountSection');
+                        if (bill.discount_percentage > 0 || bill.discount_amount > 0) {
+                            if (discountSection) discountSection.style.display = 'block';
 
-                    const previewDiscountPercentage = document.getElementById('previewDiscountPercentage');
-                    const previewDiscountAmount = document.getElementById('previewDiscountAmount');
-                    const previewDiscountReason = document.getElementById('previewDiscountReason');
+                            const previewDiscountPercentage = document.getElementById('previewDiscountPercentage');
+                            const previewDiscountAmount = document.getElementById('previewDiscountAmount');
+                            const previewDiscountReason = document.getElementById('previewDiscountReason');
 
-                    if (previewDiscountPercentage) previewDiscountPercentage.textContent = bill.discount_percentage + '%';
-                    if (previewDiscountAmount) previewDiscountAmount.textContent = 'Rs. ' + parseFloat(bill.discount_amount).toFixed(2);
+                            if (previewDiscountPercentage) previewDiscountPercentage.textContent = bill.discount_percentage + '%';
+                            if (previewDiscountAmount) previewDiscountAmount.textContent = 'Rs. ' + parseFloat(bill.discount_amount).toFixed(2);
 
-                    if (bill.discount_reason && bill.discount_reason.trim() && previewDiscountReason) {
-                        previewDiscountReason.innerHTML = '<small><strong>Reason:</strong> ' + bill.discount_reason + '</small>';
-                    } else if (previewDiscountReason) {
-                        previewDiscountReason.innerHTML = '';
+                            if (bill.discount_reason && bill.discount_reason.trim() && previewDiscountReason) {
+                                previewDiscountReason.innerHTML = '<small><strong>Reason:</strong> ' + bill.discount_reason + '</small>';
+                            } else if (previewDiscountReason) {
+                                previewDiscountReason.innerHTML = '';
+                            }
+                        } else {
+                            if (discountSection) discountSection.style.display = 'none';
+                        }
+
+                        // Show/hide notes section
+                        const notesSection = document.getElementById('previewNotesSection');
+                        const previewNotes = document.getElementById('previewNotes');
+                        if (bill.notes && bill.notes.trim()) {
+                            if (notesSection) notesSection.style.display = 'block';
+                            if (previewNotes) previewNotes.textContent = bill.notes;
+                        } else {
+                            if (notesSection) notesSection.style.display = 'none';
+                        }
+
+                    } else {
+                        closeBillModal();
+                        alert('Error loading bill details: ' + data.message);
                     }
-                } else {
-                    if (discountSection) discountSection.style.display = 'none';
-                }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    closeBillModal();
+                    alert('Error loading bill details. Please try again.');
+                });
+        }
 
-                // Show/hide notes section
-                const notesSection = document.getElementById('previewNotesSection');
-                const previewNotes = document.getElementById('previewNotes');
-                if (bill.notes && bill.notes.trim()) {
-                    if (notesSection) notesSection.style.display = 'block';
-                    if (previewNotes) previewNotes.textContent = bill.notes;
-                } else {
-                    if (notesSection) notesSection.style.display = 'none';
-                }
+        // Search bills
+        function searchBills() {
+            const searchTerm = document.getElementById('billSearch')?.value.toLowerCase() || '';
+            const rows = document.querySelectorAll('#billsTableBody tr');
 
-            } else {
-                closeBillModal();
-                alert('Error loading bill details: ' + data.message);
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Print functions
+        function printBill(billId) {
+            fetch(`?action=get_bill&bill_number=${billId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        printBillContent(data.bill);
+                    } else {
+                        alert('Error loading bill for printing: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading bill for printing. Please try again.');
+                });
+        }
+
+        function printBillModal() {
+            const billContent = document.getElementById('billPreview')?.innerHTML;
+            if (billContent) {
+                printContent(billContent);
             }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            closeBillModal();
-            alert('Error loading bill details. Please try again.');
-        });
-}
+        }
 
-// Search bills
-function searchBills() {
-    const searchTerm = document.getElementById('billSearch')?.value.toLowerCase() || '';
-    const rows = document.querySelectorAll('#billsTableBody tr');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-}
-
-// Print functions
-function printBill(billId) {
-    fetch(`?action=get_bill&bill_number=${billId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                printBillContent(data.bill);
-            } else {
-                alert('Error loading bill for printing: ' + data.message);
+        function printPreview() {
+            const billContent = document.getElementById('treatmentBillPreview')?.innerHTML;
+            if (billContent) {
+                printContent(billContent);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error loading bill for printing. Please try again.');
-        });
-}
+        }
 
-function printBillModal() {
-    const billContent = document.getElementById('billPreview')?.innerHTML;
-    if (billContent) {
-        printContent(billContent);
-    }
-}
+        function printBillContent(bill) {
+            // Format date and time
+            const dateTime = new Date(bill.created_at);
+            const formattedDate = dateTime.toLocaleDateString();
+            const formattedTime = dateTime.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-function printPreview() {
-    const billContent = document.getElementById('treatmentBillPreview')?.innerHTML;
-    if (billContent) {
-        printContent(billContent);
-    }
-}
+            let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
+            treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
 
-function printBillContent(bill) {
-    let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
-    treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
-
-    bill.treatments_data.forEach(treatment => {
-        treatmentListHtml += `
+            bill.treatments_data.forEach(treatment => {
+                treatmentListHtml += `
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 8px;">${treatment.name}</td>
                 <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
@@ -2564,12 +2617,12 @@ function printBillContent(bill) {
                 <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
             </tr>
         `;
-    });
-    treatmentListHtml += '</table>';
+            });
+            treatmentListHtml += '</table>';
 
-    let discountSection = '';
-    if (bill.discount_percentage > 0) {
-        discountSection = `
+            let discountSection = '';
+            if (bill.discount_percentage > 0) {
+                discountSection = `
             <div style="margin-bottom: 20px;">
                 <h6>Discount Details:</h6>
                 <div class="row">
@@ -2583,9 +2636,9 @@ function printBillContent(bill) {
                 ${bill.discount_reason ? `<div style="margin-top: 5px;"><small><strong>Reason:</strong> ${bill.discount_reason}</small></div>` : ''}
             </div>
         `;
-    }
+            }
 
-    const billHtml = `
+            const billHtml = `
         <div class="bill-preview">
             <div class="bill-header">
                 <h2>Erundeniya Ayurveda Hospital</h2>
@@ -2600,7 +2653,8 @@ function printBillContent(bill) {
                         <strong>Mobile:</strong> ${bill.patient_mobile}
                     </div>
                     <div class="col-md-6 text-end">
-                        <strong>Date:</strong> ${bill.created_at.split(' ')[0]}<br>
+                        <strong>Date:</strong> ${formattedDate}<br>
+                        <strong>Time:</strong> ${formattedTime}<br>
                         <strong>Bill No:</strong> ${bill.bill_number}
                     </div>
                 </div>
@@ -2622,12 +2676,12 @@ function printBillContent(bill) {
         </div>
     `;
 
-    printContent(billHtml);
-}
+            printContent(billHtml);
+        }
 
-function printContent(content) {
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write(`
+        function printContent(content) {
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write(`
         <html>
         <head>
             <title>Print Treatment Bill</title>
@@ -2650,188 +2704,188 @@ function printContent(content) {
         </body>
         </html>
     `);
-    printWindow.document.close();
-    printWindow.print();
-}
+            printWindow.document.close();
+            printWindow.print();
+        }
 
-// Modal functions
-function closeBillModal() {
-    const modal = document.getElementById('billModal');
-    if (modal) modal.style.display = 'none';
-}
+        // Modal functions
+        function closeBillModal() {
+            const modal = document.getElementById('billModal');
+            if (modal) modal.style.display = 'none';
+        }
 
-function closePreviewModal() {
-    const modal = document.getElementById('previewModal');
-    if (modal) modal.style.display = 'none';
-}
+        function closePreviewModal() {
+            const modal = document.getElementById('previewModal');
+            if (modal) modal.style.display = 'none';
+        }
 
-// Utility functions
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
-    notification.style.zIndex = '9999';
-    notification.innerHTML = `
+        // Utility functions
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
         <div class="d-flex align-items-center">
             <i class="material-symbols-rounded me-2">${type === 'success' ? 'check_circle' : 'info'}</i>
             ${message}
         </div>
     `;
 
-    document.body.appendChild(notification);
+            document.body.appendChild(notification);
 
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-function toggleNotifications() {
-    showNotification('Notifications feature coming soon!', 'info');
-}
-
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '?logout=1';
-    }
-}
-
-// Global search
-const globalSearchEl = document.getElementById('globalSearch');
-if (globalSearchEl) {
-    globalSearchEl.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#billsTableBody tr');
-
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
-}
-
-// Enhanced search and date filter for OPD bills
-function searchBillsEnhanced() {
-    applyCombinedFilters();
-}
-
-function filterByDateOPD() {
-    applyCombinedFilters();
-}
-
-function clearDateFilterOPD() {
-    const dateFilter = document.getElementById('dateFilterOPD');
-    if (dateFilter) {
-        const wrapper = dateFilter.parentElement;
-        const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
-
-        dateFilter.value = '';
-        wrapper.classList.remove('has-date');
-        if (clearBtn) clearBtn.style.display = 'none';
-
-        applyCombinedFilters();
-        dateFilter.focus();
-    }
-}
-
-// Combined filter - searches both text and date
-function applyCombinedFilters() {
-    const searchTerm = document.getElementById('billSearch')?.value.toLowerCase() || '';
-    const selectedDate = document.getElementById('dateFilterOPD')?.value || '';
-    const rows = document.querySelectorAll('#billsTableBody tr');
-
-    rows.forEach(row => {
-        const billNumber = row.querySelector('td:nth-child(1) h6')?.textContent.toLowerCase() || '';
-        const patientName = row.querySelector('td:nth-child(2) span:first-child')?.textContent.toLowerCase() || '';
-        const patientMobile = row.querySelector('td:nth-child(2) span:last-child')?.textContent.toLowerCase() || '';
-        const billDate = row.querySelector('td:nth-child(1) p')?.textContent.toLowerCase() || '';
-        const dateCell = row.querySelector('td:nth-child(1) p')?.textContent.trim() || '';
-
-        const matchesSearch = billNumber.includes(searchTerm) ||
-            patientName.includes(searchTerm) ||
-            patientMobile.includes(searchTerm) ||
-            billDate.includes(searchTerm);
-
-        const matchesDate = !selectedDate || dateCell === selectedDate;
-
-        row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
-    });
-}
-
-function toggleSearchClearButton() {
-    const searchInput = document.getElementById('billSearch');
-    const clearBtn = searchInput?.parentElement.querySelector('.search-clear-btn-opd');
-
-    if (searchInput && clearBtn) {
-        clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
-    }
-}
-
-function clearBillSearch() {
-    const searchInput = document.getElementById('billSearch');
-    if (searchInput) {
-        searchInput.value = '';
-
-        const clearBtn = searchInput.parentElement.querySelector('.search-clear-btn-opd');
-        if (clearBtn) clearBtn.style.display = 'none';
-
-        applyCombinedFilters();
-        searchInput.focus();
-    }
-}
-
-// Close modals when clicking outside
-window.addEventListener('click', function(event) {
-    const modals = ['billModal', 'previewModal'];
-    modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (event.target === modal) {
-            modal.style.display = 'none';
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
-    });
-});
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('OPD page initializing...');
-    console.log('Treatments available:', treatments.length);
-    console.log('Patients available:', patients.length);
+        function toggleNotifications() {
+            showNotification('Notifications feature coming soon!', 'info');
+        }
 
-    // Add one treatment row by default
-    addTreatmentRow();
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '?logout=1';
+            }
+        }
 
-    // Setup search listeners
-    const billSearchInput = document.getElementById('billSearch');
-    if (billSearchInput) {
-        billSearchInput.addEventListener('input', function() {
-            searchBillsEnhanced();
-            toggleSearchClearButton();
-        });
-        toggleSearchClearButton();
-    }
+        // Global search
+        const globalSearchEl = document.getElementById('globalSearch');
+        if (globalSearchEl) {
+            globalSearchEl.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#billsTableBody tr');
 
-    // Setup date filter listener
-    const dateFilter = document.getElementById('dateFilterOPD');
-    if (dateFilter) {
-        dateFilter.addEventListener('change', function() {
-            const wrapper = this.parentElement;
-            const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        }
 
-            if (this.value) {
-                wrapper.classList.add('has-date');
-                if (clearBtn) {
-                    clearBtn.style.display = 'flex';
-                    clearBtn.style.alignItems = 'center';
-                    clearBtn.style.justifyContent = 'center';
-                }
-            } else {
+        // Enhanced search and date filter for OPD bills
+        function searchBillsEnhanced() {
+            applyCombinedFilters();
+        }
+
+        function filterByDateOPD() {
+            applyCombinedFilters();
+        }
+
+        function clearDateFilterOPD() {
+            const dateFilter = document.getElementById('dateFilterOPD');
+            if (dateFilter) {
+                const wrapper = dateFilter.parentElement;
+                const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
+
+                dateFilter.value = '';
                 wrapper.classList.remove('has-date');
                 if (clearBtn) clearBtn.style.display = 'none';
-            }
-            applyCombinedFilters();
-        });
-    }
 
-    console.log('OPD page initialized successfully');
-});
+                applyCombinedFilters();
+                dateFilter.focus();
+            }
+        }
+
+        // Combined filter - searches both text and date
+        function applyCombinedFilters() {
+            const searchTerm = document.getElementById('billSearch')?.value.toLowerCase() || '';
+            const selectedDate = document.getElementById('dateFilterOPD')?.value || '';
+            const rows = document.querySelectorAll('#billsTableBody tr');
+
+            rows.forEach(row => {
+                const billNumber = row.querySelector('td:nth-child(1) h6')?.textContent.toLowerCase() || '';
+                const patientName = row.querySelector('td:nth-child(2) span:first-child')?.textContent.toLowerCase() || '';
+                const patientMobile = row.querySelector('td:nth-child(2) span:last-child')?.textContent.toLowerCase() || '';
+                const billDate = row.querySelector('td:nth-child(1) p')?.textContent.toLowerCase() || '';
+                const dateCell = row.querySelector('td:nth-child(1) p')?.textContent.trim() || '';
+
+                const matchesSearch = billNumber.includes(searchTerm) ||
+                    patientName.includes(searchTerm) ||
+                    patientMobile.includes(searchTerm) ||
+                    billDate.includes(searchTerm);
+
+                const matchesDate = !selectedDate || dateCell === selectedDate;
+
+                row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
+            });
+        }
+
+        function toggleSearchClearButton() {
+            const searchInput = document.getElementById('billSearch');
+            const clearBtn = searchInput?.parentElement.querySelector('.search-clear-btn-opd');
+
+            if (searchInput && clearBtn) {
+                clearBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+            }
+        }
+
+        function clearBillSearch() {
+            const searchInput = document.getElementById('billSearch');
+            if (searchInput) {
+                searchInput.value = '';
+
+                const clearBtn = searchInput.parentElement.querySelector('.search-clear-btn-opd');
+                if (clearBtn) clearBtn.style.display = 'none';
+
+                applyCombinedFilters();
+                searchInput.focus();
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = ['billModal', 'previewModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('OPD page initializing...');
+            console.log('Treatments available:', treatments.length);
+            console.log('Patients available:', patients.length);
+
+            // Add one treatment row by default
+            addTreatmentRow();
+
+            // Setup search listeners
+            const billSearchInput = document.getElementById('billSearch');
+            if (billSearchInput) {
+                billSearchInput.addEventListener('input', function() {
+                    searchBillsEnhanced();
+                    toggleSearchClearButton();
+                });
+                toggleSearchClearButton();
+            }
+
+            // Setup date filter listener
+            const dateFilter = document.getElementById('dateFilterOPD');
+            if (dateFilter) {
+                dateFilter.addEventListener('change', function() {
+                    const wrapper = this.parentElement;
+                    const clearBtn = wrapper.querySelector('.date-clear-btn-opd');
+
+                    if (this.value) {
+                        wrapper.classList.add('has-date');
+                        if (clearBtn) {
+                            clearBtn.style.display = 'flex';
+                            clearBtn.style.alignItems = 'center';
+                            clearBtn.style.justifyContent = 'center';
+                        }
+                    } else {
+                        wrapper.classList.remove('has-date');
+                        if (clearBtn) clearBtn.style.display = 'none';
+                    }
+                    applyCombinedFilters();
+                });
+            }
+
+            console.log('OPD page initialized successfully');
+        });
     </script>
 
 </body>
