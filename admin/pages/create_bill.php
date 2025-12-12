@@ -2008,78 +2008,140 @@ try {
         }
 
         function printBillData(bill) {
-            const printWindow = window.open('', '', 'height=600,width=800');
-            const emailSection = bill.patient_email ? '<p>' + bill.patient_email + '</p>' : '';
-            const regSection = bill.patient_reg_number ? '<p>Reg: ' + bill.patient_reg_number + '</p>' : '';
-            const discountSection = bill.discount_amount > 0 ?
-                '<div class="d-flex">' +
-                '<span>Discount (' + bill.discount_percentage + '%)</span>' +
-                '<span>- Rs. ' + parseFloat(bill.discount_amount).toFixed(2) + '</span>' +
-                '</div>' : '';
+            const printWindow = window.open('', '', 'height=auto,width=400');
+            
+            // Calculate values dynamically
+            const doctorFee = parseFloat(bill.doctor_fee) || 0;
+            const medicineCost = parseFloat(bill.medicine_cost) || 0;
+            const otherCharges = parseFloat(bill.other_charges) || 0;
+            const discountAmount = parseFloat(bill.discount_amount) || 0;
+            const discountPercentage = parseFloat(bill.discount_percentage) || 0;
+            const totalAmount = parseFloat(bill.total_amount) || 0;
+            const subtotal = doctorFee + medicineCost + otherCharges;
+            
+            // Build items dynamically
+            let itemsHtml = '';
+            let itemCount = 0;
+            
+            if (doctorFee > 0) {
+                itemCount++;
+                itemsHtml += '<tr><td class="item">Doctor Fee</td><td class="qty">1</td><td class="amount">' + doctorFee.toFixed(2) + '</td><td class="amount">' + doctorFee.toFixed(2) + '</td></tr>';
+            }
+            
+            if (medicineCost > 0) {
+                itemCount++;
+                itemsHtml += '<tr><td class="item">Medicine Cost</td><td class="qty">1</td><td class="amount">' + medicineCost.toFixed(2) + '</td><td class="amount">' + medicineCost.toFixed(2) + '</td></tr>';
+            }
+            
+            if (otherCharges > 0) {
+                itemCount++;
+                itemsHtml += '<tr><td class="item">Other Charges</td><td class="qty">1</td><td class="amount">' + otherCharges.toFixed(2) + '</td><td class="amount">' + otherCharges.toFixed(2) + '</td></tr>';
+            }
+            
+            // Discount section
+            const discountSection = discountAmount > 0 ?
+                '<tr><td>Discount (' + discountPercentage.toFixed(2) + '%):</td><td class="amount">- Rs. ' + discountAmount.toFixed(2) + '</td></tr>' : '';
+            
+            // Discount reason
+            const discountReasonSection = bill.discount_reason && discountAmount > 0 ?
+                '<tr><td colspan="2" style="font-size:10px; font-style:italic;">Reason: ' + bill.discount_reason + '</td></tr>' : '';
+            
+            // Calculate payment details (assuming paid amount is equal to or greater than total)
+            const paidAmount = Math.ceil(totalAmount / 100) * 100; // Round up to nearest 100
+            const changeAmount = paidAmount - totalAmount;
+            
+            // Get current user/cashier name from session
+            const cashierName = '<?php echo htmlspecialchars($_SESSION["username"] ?? "Cashier"); ?>';
+            
+            // Format date
+            const billDate = new Date(bill.created_at).toLocaleString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
 
             printWindow.document.write(
                 '<html>' +
                 '<head>' +
                 '<title>Print Bill - ' + bill.bill_number + '</title>' +
                 '<style>' +
-                'body { font-family: Arial, sans-serif; padding: 20px; }' +
-                '.bill-summary { max-width: 600px; margin: 0 auto; }' +
-                '.text-center { text-align: center; }' +
-                '.mb-4 { margin-bottom: 1.5rem; }' +
-                '.row { display: flex; margin-bottom: 20px; }' +
-                '.col-md-6 { flex: 0 0 50%; max-width: 50%; }' +
-                'hr { border: 1px solid #eee; margin: 20px 0; }' +
-                '.d-flex { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }' +
-                '.bill-total { border-top: 2px solid #333 !important; font-weight: bold; font-size: 18px; color: #2e7d32; margin-top: 10px; padding-top: 10px !important; }' +
-                '.paid-status { color: #4CAF50; font-weight: bold; font-size: 16px; }' +
-                '@media print { body { padding: 0; } }' +
+                '@page { size: 80mm auto; margin: 0; }' +
+                'body { font-family: "Courier New", monospace; font-size: 12px; margin: 0 auto; padding: 10px; width: 80mm; max-width: 80mm; }' +
+                '.receipt { width: 100%; margin: 0 auto; }' +
+                '.header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }' +
+                '.header h2 { margin: 5px 0; font-size: 16px; font-weight: bold; }' +
+                '.header p { margin: 2px 0; font-size: 10px; }' +
+                '.info-section { margin: 10px 0; font-size: 11px; }' +
+                '.info-row { display: flex; justify-content: space-between; margin: 3px 0; }' +
+                '.divider { border-top: 1px dashed #000; margin: 8px 0; }' +
+                '.items-table { width: 100%; margin: 10px 0; border-collapse: collapse; }' +
+                '.items-table td { padding: 5px 2px;  font-size: 13px;}' +
+                '.items-table th { padding: 5px 2px; text-align: left; border-bottom: 1px solid #000; }' +
+                '.items-table .item { font-weight: normal; text-align: left; }' +
+                '.items-table .qty { text-align: center; padding: 0 5px; }' +
+                '.items-table .amount { text-align: right; }' +
+                '.subtotal-section { margin-top: 10px; width: 100%; }' +
+                '.subtotal-section td { padding: 3px 0;  font-size: 13px;}' +
+                '.subtotal-section td:first-child { text-align: left; }' +
+                '.subtotal-section td:last-child { text-align: right; }' +
+                '.total-row { border-top: 2px solid #000; font-weight: bold;}' +
+                '.total-row td { padding: 8px 0 5px 0; font-size: 15px;}' +
+                '.payment-info { margin: 10px 0; font-size: 11px; }' +
+                '.footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #000; font-size: 10px; }' +
+                '.status-paid { font-weight: bold; }' +
+                '@media print { body { width: 80mm; margin: 0 auto; } }' +
                 '</style>' +
                 '</head>' +
                 '<body>' +
-                '<div class="bill-summary">' +
-                '<div class="text-center mb-4">' +
+                '<div class="receipt">' +
+                '<div class="header">' +
                 '<h2>Erundeniya Ayurveda Hospital</h2>' +
-                '<p>Medical Bill</p>' +
-                '<h3>' + bill.bill_number + '</h3>' +
-                '<p class="paid-status">PAID</p>' +
+                '<p>A/55 Wedagedara, Erundeniya,</p>' +
+                '<p>Amithirigala, North.</p>' +
+                '<p>Tel: +94 71 291 9408</p>' +
+                '<p>Email: info@erundeniyaayurveda.lk</p>' +
                 '</div>' +
-                '<div class="row">' +
-                '<div class="col-md-6">' +
-                '<strong>Patient Information:</strong>' +
-                '<div>' +
-                '<p>' + bill.title + ' ' + bill.patient_name + '</p>' +
-                '<p>' + bill.patient_mobile + '</p>' +
-                regSection +
-                emailSection +
+                '<div class="divider"></div>' +
+                '<div class="info-section">' +
+                '<div class="info-row"><span>Receipt No:</span><span>#' + bill.bill_number + '</span></div>' +
+                '<div class="info-row"><span>Date:</span><span>' + billDate + '</span></div>' +
+                '<div class="info-row"><span>Appointment:</span><span>' + (bill.appointment_number || 'N/A') + '</span></div>' +
+                '<div class="info-row"><span>Patient:</span><span>' + (bill.title || '') + ' ' + (bill.patient_name || 'Walk-in') + '</span></div>' +
+                '<div class="info-row"><span>Cashier:</span><span>' + cashierName + '</span></div>' +
+                '<div class="info-row"><span>Payment:</span><span class="status-paid">CASH</span></div>' +
                 '</div>' +
-                '</div>' +
-                '<div class="col-md-6">' +
-                '<strong>Bill Information:</strong>' +
-                '<div>' +
-                '<p>Date: ' + bill.created_at + '</p>' +
-                '<p>Appointment: ' + bill.appointment_number + '</p>' +
-                '<p>Status: <span class="paid-status">PAID</span></p>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<hr>' +
-                '<div>' +
-                '<div class="d-flex">' +
-                '<span>Doctor Consultation Fee</span>' +
-                '<span>Rs. ' + parseFloat(doctorFee).toFixed(2) + '</span>' +
-                '</div>' +
-                '<div class="d-flex">' +
-                '<span>Medicine Cost</span>' +
-                '<span>Rs. ' + parseFloat(medicineCost).toFixed(2) + '</span>' +
-                '</div>' +
-                '<div class="d-flex">' +
-                '<span>Other Charges</span>' +
-                '<span>Rs. ' + parseFloat(otherCharges).toFixed(2) + '</span>' +
-                '</div>' +
+                '<div class="divider"></div>' +
+                '<table class="items-table">' +
+                '<tr><th>Item</th><th class="qty">Qty</th><th class="amount">Price</th><th class="amount">Total</th></tr>' +
+                itemsHtml +
+                '</table>' +
+                '<div class="divider"></div>' +
+                '<table class="items-table subtotal-section">' +
+                '<tr><td>Subtotal:</td><td class="amount">Rs. ' + subtotal.toFixed(2) + '</td></tr>' +
                 discountSection +
-                '<div class="d-flex bill-total">' +
-                '<span>Total Amount</span>' +
-                '<span>Rs. ' + parseFloat(totalAmount).toFixed(2) + '</span>' +
+                discountReasonSection +
+                '<tr class="total-row"><td>TOTAL:</td><td class="amount">Rs. ' + totalAmount.toFixed(2) + '</td></tr>' +
+                '</table>' +
+                '<div class="divider"></div>' +
+                '<div class="payment-info">' +
+                '<div class="info-row"><span>Paid:</span><span>Rs. ' + paidAmount.toFixed(2) + '</span></div>' +
+                '<div class="info-row"><span>Change:</span><span>Rs. ' + changeAmount.toFixed(2) + '</span></div>' +
+                '</div>' +
+                '<div class="divider"></div>' +
+                '<div style="text-align:center; margin: 10px 0;">Total Items: ' + itemCount + '</div>' +
+                '<div style="text-align:center; margin: 10px 0; font-size:16px; font-weight:bold;">*' + bill.bill_number + '*</div>' +
+                '<div class="footer">' +
+                '<p>Thank You for Your Coming!</p>' +
+                '<p>For inquiries: info@erundeniyaayurveda.lk</p>' +
+                '<span>Tel: +94 71 291 9408</span>' +
+                '<div style="margin-top:10px; font-size:9px;">' +
+                '<p>© 2025 Erundeniya Ayurveda Hospital</p>' +
+                '<span>All rights reserved</span>' +
+                '<span>All payments made to Erundeniya Ayurveda Hospital are non-refundable.</span>' +
+                '<p>Powered By www.evontech.lk</p>' +
                 '</div>' +
                 '</div>' +
                 '</div>' +

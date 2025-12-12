@@ -142,7 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
                         p.title,
                         p.name as patient_name,
                         p.id as patient_id,
-                        p.mobile as patient_mobile
+                        p.mobile as patient_mobile,
+                        p.registration_number
                       FROM appointment a
                       INNER JOIN patient p ON a.patient_id = p.id
                       WHERE a.status = 'Attended'
@@ -280,7 +281,7 @@ function getAttendedAppointments()
         Database::setUpConnection();
 
         $query = "SELECT a.id, a.appointment_number, a.appointment_date, a.appointment_time, 
-                  pt.title, pt.name, pt.mobile, pt.id as patient_id 
+                  pt.title, pt.name, pt.mobile, pt.id as patient_id, pt.registration_number 
                   FROM appointment a 
                   INNER JOIN patient pt ON a.patient_id = pt.id 
                   WHERE a.status = 'Attended' 
@@ -623,7 +624,7 @@ $allPatients = getAllPatients();
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg  ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg   ' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 12px center;
             background-repeat: no-repeat;
             background-size: 16px;
@@ -1676,6 +1677,8 @@ Next visit: After 1 week" required></textarea>
                             <label>Date</label>
                             <input type="text" id="modalPrescriptionDate" readonly style="background: #f5f5f5;">
                         </div>
+                        <!-- Add this hidden field for registration number -->
+                        <input type="hidden" id="modalPatientRegNumber" value="">
                     </div>
                     <div class="col-md-8">
                         <div class="form-group">
@@ -1731,7 +1734,8 @@ Next visit: After 1 week" required></textarea>
                         <div class="row">
                             <div class="col-md-6">
                                 <strong>Patient:</strong> <span id="previewPatientName">-</span><br>
-                                <strong>Mobile:</strong> <span id="previewPatientMobile">-</span>
+                                <strong>Mobile:</strong> <span id="previewPatientMobile">-</span><br>
+                                <strong>Reg. No:</strong> <span id="previewPatientRegNumber">-</span>
                             </div>
                             <div class="col-md-6 text-end">
                                 <strong>Date:</strong> <span id="previewDate">-</span><br>
@@ -1888,7 +1892,7 @@ Next visit: After 2 weeks with BP chart`
             let html = '';
             appointments.forEach(appointment => {
                 html += `
-            <div class="search-result" onclick="selectAppointment('${appointment.id}', '${appointment.appointment_number}', '${appointment.patient_id}', '${escapeHtml(appointment.title)} ${escapeHtml(appointment.patient_name)}', '${appointment.patient_mobile}')">
+            <div class="search-result" onclick="selectAppointment('${appointment.id}', '${appointment.appointment_number}', '${appointment.patient_id}', '${escapeHtml(appointment.title)} ${escapeHtml(appointment.patient_name)}', '${appointment.patient_mobile}', '${appointment.registration_number || ''}')">
                 <div class="search-result-number">${appointment.appointment_number}</div>
                 <div class="search-result-patient">${appointment.title} ${appointment.patient_name} - ${appointment.patient_mobile}</div>
                 <div class="search-result-date">${appointment.appointment_date} ${appointment.appointment_time}</div>
@@ -1899,13 +1903,16 @@ Next visit: After 2 weeks with BP chart`
             resultsDiv.innerHTML = html;
         }
 
-        function selectAppointment(id, number, patientId, name, mobile) {
+        function selectAppointment(id, number, patientId, name, mobile, regNumber = '') {
             document.getElementById('selectedAppointmentId').value = id;
             document.getElementById('selectedPatientId').value = patientId;
             document.getElementById('appointmentNumberSearch').value = number;
             document.getElementById('patientName').value = name;
             document.getElementById('patientMobile').value = mobile;
             document.getElementById('appointmentSearchResults').style.display = 'none';
+
+            // Store registration number in dataset for later use
+            document.getElementById('appointmentNumberSearch').dataset.regNumber = regNumber;
 
             // Visual feedback
             document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
@@ -1979,6 +1986,9 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('patientName').value = name;
             document.getElementById('patientMobile').value = mobile;
             document.getElementById('patientSearchResults').style.display = 'none';
+
+            // Store registration number in dataset for later use
+            document.getElementById('walkinPatientSearch').dataset.regNumber = regNumber;
 
             // Visual feedback
             document.getElementById('patientName').style.backgroundColor = '#e8f5e8';
@@ -2156,6 +2166,14 @@ Next visit: After 2 weeks with BP chart`
                 return;
             }
 
+            // Get registration number from the search input dataset
+            let regNumber = 'N/A';
+            if (currentMode === 'appointment') {
+                regNumber = document.getElementById('appointmentNumberSearch').dataset.regNumber || 'N/A';
+            } else {
+                regNumber = document.getElementById('walkinPatientSearch').dataset.regNumber || 'N/A';
+            }
+
             // Get current date and time
             const now = new Date();
             const formattedDate = now.toLocaleDateString();
@@ -2166,6 +2184,7 @@ Next visit: After 2 weeks with BP chart`
 
             document.getElementById('previewPatientName').textContent = patientName;
             document.getElementById('previewPatientMobile').textContent = patientMobile;
+            document.getElementById('previewPatientRegNumber').textContent = regNumber;
             document.getElementById('previewDate').textContent = `${formattedDate} @ ${formattedTime}`;
             document.getElementById('previewPrescriptionNo').textContent = 'PRES-PREVIEW';
             document.getElementById('previewPrescriptionContent').textContent = prescriptionText;
@@ -2187,6 +2206,12 @@ Next visit: After 2 weeks with BP chart`
                         document.getElementById('modalPrescriptionId').value = 'PRES' + String(data.prescription.id).padStart(3, '0');
                         document.getElementById('modalPatientName').value = data.prescription.title + ' ' + data.prescription.name;
                         document.getElementById('modalPatientMobile').value = data.prescription.mobile;
+                        
+                        // Safely set registration number with fallback
+                        const regNumberField = document.getElementById('modalPatientRegNumber');
+                        if (regNumberField) {
+                            regNumberField.value = data.prescription.registration_number || 'N/A';
+                        }
 
                         // Format date and time
                         const dateTime = new Date(data.prescription.created_at);
@@ -2285,6 +2310,7 @@ Next visit: After 2 weeks with BP chart`
                             'PRES' + String(data.prescription.id).padStart(3, '0'),
                             data.prescription.title + ' ' + data.prescription.name,
                             data.prescription.mobile,
+                            data.prescription.registration_number || 'N/A',
                             formattedDate,
                             formattedTime,
                             data.prescription.prescription_text
@@ -2308,10 +2334,19 @@ Next visit: After 2 weeks with BP chart`
             const date = parts[0] || dateTimeText;
             const time = parts[1] || '';
 
+            // Get registration number from the patient data (safely)
+            const patientName = document.getElementById('modalPatientName').value;
+            const patientMobile = document.getElementById('modalPatientMobile').value;
+            
+            // Safely get registration number with fallback
+            const regNumberField = document.getElementById('modalPatientRegNumber');
+            const regNumber = regNumberField ? regNumberField.value : 'N/A';
+
             const prescriptionContent = createPrintContent(
                 document.getElementById('modalPrescriptionId').value,
-                document.getElementById('modalPatientName').value,
-                document.getElementById('modalPatientMobile').value,
+                patientName,
+                patientMobile,
+                regNumber,
                 date,
                 time,
                 document.getElementById('modalPrescriptionText').value
@@ -2327,7 +2362,7 @@ Next visit: After 2 weeks with BP chart`
         }
 
         // Create print content
-        function createPrintContent(id, patient, mobile, date, time, text) {
+        function createPrintContent(id, patient, mobile, regNumber, date, time, text) {
             return `
         <div style="font-family: 'Times New Roman', serif; max-width: 600px; margin: 0 auto;">
             <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
@@ -2340,7 +2375,8 @@ Next visit: After 2 weeks with BP chart`
                 <div style="display: flex; justify-content: space-between;">
                     <div>
                         <strong>Patient:</strong> ${patient}<br>
-                        <strong>Mobile:</strong> ${mobile}
+                        <strong>Mobile:</strong> ${mobile}<br>
+                        <strong>Reg. No:</strong> ${regNumber || 'N/A'}
                     </div>
                     <div>
                         <strong>Date:</strong> ${date}<br>
@@ -2355,7 +2391,7 @@ Next visit: After 2 weeks with BP chart`
             </div>
             
             <div style="text-align: right; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
-                <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
+                <div style="border-bottom: 1px dashed #333; width: 200px; margin-left: auto; margin-bottom: 10px;"></div>
                 <p style="margin: 5px 0;"><strong>Doctor's Signature</strong></p>
                 <p style="margin: 5px 0;">Dr.H.D.P. Darshani</p>
                 <p style="margin: 5px 0;">Erundeniya Ayurveda Hospital</p>
@@ -2366,7 +2402,7 @@ Next visit: After 2 weeks with BP chart`
 
         // Print content
         function printContent(content) {
-            const printWindow = window.open('', '', 'height=600,width=800');
+            const printWindow = window.open('', '', 'height=auto,width=800');
             printWindow.document.write(`
         <html>
         <head>
@@ -2434,6 +2470,9 @@ Next visit: After 2 weeks with BP chart`
             document.getElementById('prescriptionHistoryAlert').style.display = 'none';
             document.getElementById('appointmentNumberSearch').value = '';
             document.getElementById('walkinPatientSearch').value = '';
+            // Clear registration number datasets
+            document.getElementById('appointmentNumberSearch').dataset.regNumber = '';
+            document.getElementById('walkinPatientSearch').dataset.regNumber = '';
         }
 
         function showNotification(message, type) {
@@ -2532,7 +2571,6 @@ Next visit: After 2 weeks with BP chart`
         }
 
         function highlightSearchTerm(text, searchTerm) {
-            if (!searchTerm || !text) return text;
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             return text.replace(regex, '<mark>$1</mark>');
         }
