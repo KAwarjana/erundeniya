@@ -274,31 +274,42 @@
                 <div class="col-lg-6 mb-n5 wow fadeIn" data-wow-delay="0.5s">
                     <div class="bg-white p-5">
                         <div class="owl-carousel testimonial-carousel wow fadeIn" data-wow-delay="0.1s">
-                            <!-- <div class="testimonial-item">
-                                <div class="icon-box-primary mb-4">
-                                    <i class="bi bi-chat-left-quote text-dark"></i>
-                                </div>
-                                <p class="fs-5 mb-4">
-                                    This place is one of the best privet ayurvedic hospitals in srilanka , gives
-                                    traditional ayurvedic treatments for curing incurable illnesses like cancer ,
-                                    diabetes , kidney or liver problems ..etc
-                                </p>
-                                <div class="d-flex align-items-center">
-                                    <img class="flex-shrink-0" src="img/testimonial-2.jpg" alt="">
-                                    <div class="ps-3">
-                                        <h5 class="mb-1">Dr. Olinsing A.A.</h5>
-                                        <span class="text-primary">Sri Lanka</span>
-                                    </div>
-                                </div>
-                            </div> -->
                             <div class="testimonial-item">
                                 <div class="icon-box-primary mb-4">
                                     <i class="bi bi-chat-left-quote text-dark"></i>
                                 </div>
                                 <p class="fs-5 mb-4">
-                                    ඉතාම දක්ෂ වෛද්‍ර්‍යවරියක්.බටහිර වෛද්‍ය ක්‍රමයට සොයා ගැනිමට අපහසු සුව කිරිමට අපහසු
-                                    බොහොමයක් රෝග මෙ වෛද්‍යතුමිය නාඩි බලා සොයාගනි. යල් පැන ගිය කල් ගතවු රෝග ඇය සුව
-                                    කරනවා..මෙය මගේ පුද්ගලික අත්දැකිමයි..දිර්ඝායු වෙවා වෛද්‍යතුමියනි.
+                                    Ayurveda is an alternative medicine system with historical roots in the Ceylon subcontinent. The theory and practice of Ayurveda is pseudoscientific. The Ceylon Medical Association characterises the practice of modern medicine by Ayurvedic practitioners as quackery
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <img class="flex-shrink-0" src="img/testimonial-2.jpg" alt="">
+                                    <div class="ps-3">
+                                        <h5 class="mb-1">Malan Rodrigo</h5>
+                                        <span class="text-primary">Sri Lanka</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="testimonial-item">
+                                <div class="icon-box-primary mb-4">
+                                    <i class="bi bi-chat-left-quote text-dark"></i>
+                                </div>
+                                <p class="fs-5 mb-4">
+                                    I know this place a long period of time ago. There are so many facilities here. This hospital is running under a good staff and a good management.
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <img class="flex-shrink-0" src="img/testimonial-2.jpg" alt="">
+                                    <div class="ps-3">
+                                        <h5 class="mb-1">Dinesh</h5>
+                                        <span class="text-primary">Sri Lanka</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="testimonial-item">
+                                <div class="icon-box-primary mb-4">
+                                    <i class="bi bi-chat-left-quote text-dark"></i>
+                                </div>
+                                <p class="fs-5 mb-4">
+                                    A very talented doctor. This doctor diagnoses many diseases that are difficult to diagnose and cure in Western medicine by looking at the pulse. She cures old and outdated diseases. This is my personal experience. Long live the doctor.
                                 </p>
                                 <div class="d-flex align-items-center">
                                     <img class="flex-shrink-0" src="img/testimonial-1.jpg" alt="">

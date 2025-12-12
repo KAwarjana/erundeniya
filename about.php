@@ -318,7 +318,7 @@
                         practitioner, continuing a respected family legacy of healing that spans over five generations.
                         With over 30 years of professional experience, she serves as the Chief Consultant at the
                         Erundeniya Deshiya Paramparika Ayurveda Hospital, where she practices as a fully qualified
-                        Sammuthiya Weda Mahattmaya (licensed indigenous physician).
+                        Punchiliyes Weda Mahattmaya (licensed indigenous physician).
                     </p>
                     <div class="d-flex">
                         <a class="btn btn-lg-square btn-primary me-2" href="https://www.facebook.com/profile.php?id=100059604372833"><i class="fab fa-facebook-f"></i></a>

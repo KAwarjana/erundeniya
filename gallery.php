@@ -43,7 +43,7 @@
     </div>
     <!-- Spinner End -->
 
-        <!-- Topbar Start -->
+    <!-- Topbar Start -->
     <div class="container-fluid bg-dark text-light px-0 py-2">
         <div class="row gx-0 d-none d-lg-flex">
             <div class="col-lg-7 px-5 text-start">
@@ -175,155 +175,470 @@
                 <p class="mb-0">Step into the world of authentic healing through our gallery. At Erundeniya Ayurveda, every picture tells a story of tradition, wellness, and natural harmony. Browse through our collection to experience the serene environment of our hospital, the time-tested Ayurvedic treatments we offer, and the peaceful lifestyle we promote.
                 </p>
             </div>
-           <div class="row g-4">
-            <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery1.jpg">
-                    <img src="img/gallery/gallery1.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
+            <div class="row g-4">
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery1.jpg">
+                        <img src="img/gallery/gallery1.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 wow fadeInUp" data-wow-delay="0.4s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery2.jpg">
-                    <img src="img/gallery/gallery2.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery2.jpg">
+                        <img src="img/gallery/gallery2.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery3.jpg">
-                    <img src="img/gallery/gallery3.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.2s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery4.jpg">
-                    <img src="img/gallery/gallery4.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery5.jpg">
-                    <img src="img/gallery/gallery5.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery6.jpg">
-                    <img src="img/gallery/gallery6.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery7.jpg">
-                    <img src="img/gallery/gallery7.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery8.jpg">
-                    <img src="img/gallery/gallery8.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-7 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery9.jpg">
-                    <img src="img/gallery/gallery9.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery10.jpg">
-                    <img src="img/gallery/gallery10.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery11.jpg">
-                    <img src="img/gallery/gallery11.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery12.jpg">
-                    <img src="img/gallery/gallery12.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="gallery-item" data-popup-image="img/gallery/gallery13.jpg">
-                    <img src="img/gallery/gallery13.jpg" class="img-fluid rounded w-100 h-100" alt="">
-                    <div class="search-icon">
-                        <button class="btn btn-light btn-lg-square rounded-circle">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-<!-- Custom Popup Modal -->
-    <div class="image-popup" id="imagePopup">
-        <div class="popup-content">
-            <button class="popup-close" id="closePopup">
-                <i class="fas fa-times"></i>
-            </button>
-            <button class="popup-nav popup-prev" id="prevImage">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="popup-nav popup-next" id="nextImage">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <img src="" alt="Popup Image" id="popupImage">
-            <div class="popup-counter" id="popupCounter">1 / 13</div>
-        </div>
-    </div>
+
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal2.jpg">
+                        <img src="img/gallery/gal2.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal3.jpg">
+                        <img src="img/gallery/gal3.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal4.jpg">
+                        <img src="img/gallery/gal4.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal5.jpg">
+                        <img src="img/gallery/gal5.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal7.jpg">
+                        <img src="img/gallery/gal7.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal8.jpg">
+                        <img src="img/gallery/gal8.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal1.jpg">
+                        <img src="img/gallery/gal1.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal11.jpg">
+                        <img src="img/gallery/gal11.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal14.jpg">
+                        <img src="img/gallery/gal14.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal15.jpg">
+                        <img src="img/gallery/gal15.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal16.jpg">
+                        <img src="img/gallery/gal16.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal17.jpg">
+                        <img src="img/gallery/gal17.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal18.jpg">
+                        <img src="img/gallery/gal18.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal19.jpg">
+                        <img src="img/gallery/gal19.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal20.jpg">
+                        <img src="img/gallery/gal20.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal39.jpg">
+                        <img src="img/gallery/gal39.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal21.jpg">
+                        <img src="img/gallery/gal21.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal25.jpg">
+                        <img src="img/gallery/gal25.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal26.jpg">
+                        <img src="img/gallery/gal26.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal27.jpg">
+                        <img src="img/gallery/gal27.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal22.jpg">
+                        <img src="img/gallery/gal22.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal23.jpg">
+                        <img src="img/gallery/gal23.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal24.jpg">
+                        <img src="img/gallery/gal24.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal28.jpg">
+                        <img src="img/gallery/gal28.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal29.jpg">
+                        <img src="img/gallery/gal29.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal30.jpg">
+                        <img src="img/gallery/gal30.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal31.jpg">
+                        <img src="img/gallery/gal31.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gal32.jpg">
+                        <img src="img/gallery/gal32.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery3.jpg">
+                        <img src="img/gallery/gallery3.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery4.jpg">
+                        <img src="img/gallery/gallery4.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery5.jpg">
+                        <img src="img/gallery/gallery5.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery6.jpg">
+                        <img src="img/gallery/gallery6.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery7.jpg">
+                        <img src="img/gallery/gallery7.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery8.jpg">
+                        <img src="img/gallery/gallery8.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery9.jpg">
+                        <img src="img/gallery/gallery9.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery10.jpg">
+                        <img src="img/gallery/gallery10.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery11.jpg">
+                        <img src="img/gallery/gallery11.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery12.jpg">
+                        <img src="img/gallery/gallery12.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="gallery-item" data-popup-image="img/gallery/gallery13.jpg">
+                        <img src="img/gallery/gallery13.jpg" class="img-fluid rounded w-100 h-100" alt="">
+                        <div class="search-icon">
+                            <button class="btn btn-light btn-lg-square rounded-circle">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Popup Modal -->
+            <div class="image-popup" id="imagePopup">
+                <div class="popup-content">
+                    <button class="popup-close" id="closePopup">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="popup-nav popup-prev" id="prevImage">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="popup-nav popup-next" id="nextImage">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <img src="" alt="Popup Image" id="popupImage">
+                    <div class="popup-counter" id="popupCounter">1 / 13</div>
+                </div>
+            </div>
 
 
 
@@ -331,7 +646,7 @@
     </div>
     <!-- Gallery End -->
 
-   <!-- Footer Start -->
+    <!-- Footer Start -->
     <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-0">
             <div class="row g-5">
@@ -419,7 +734,7 @@
 
 
     <!-- JavaScript Libraries -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="lib/wow/wow.min.js"></script>
