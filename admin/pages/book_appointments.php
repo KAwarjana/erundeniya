@@ -17,7 +17,14 @@ $menuItems = [
     ['title' => 'Patients', 'url' => 'patients.php', 'icon' => 'people', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
     ['title' => 'Bills', 'url' => 'create_bill.php', 'icon' => 'receipt', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
     ['title' => 'Prescriptions', 'url' => 'prescription.php', 'icon' => 'medication', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
-    ['title' => 'OPD Treatments', 'url' => 'opd.php', 'icon' => 'local_hospital', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true]
+    ['title' => 'OPD Treatments', 'url' => 'opd.php', 'icon' => 'local_hospital', 'allowed_roles' => ['Admin', 'Receptionist'], 'show_to_all' => true],
+    [
+        'title' => 'Reports',
+        'url' => 'reports.php',
+        'icon' => 'assessment',
+        'allowed_roles' => ['Admin'],
+        'show_to_all' => true
+    ]
 ];
 
 function hasAccessToPage($allowedRoles)
@@ -476,13 +483,15 @@ $currentUser = AuthManager::getCurrentUser();
         }
 
         .badge-warning {
-            background: #ff9800;
-            color: white;
+           background-color: #fff3e0 !important;
+            color: #f57c00 !important;
+            border-radius: 2rem;
         }
 
         .badge-info {
-            background: #2196F3;
-            color: white;
+            background-color: #e3f2fd !important;
+            color: #1976d2 !important;
+            border-radius: 2rem;
         }
 
         .btn-sm {
@@ -619,7 +628,7 @@ $currentUser = AuthManager::getCurrentUser();
                                     <input type="text" id="consultationDate" class="form-control book--appointment--input" placeholder="Click to select date" readonly>
                                     <small class="text-muted">Only Wednesdays and Sundays are available</small>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 mt-md-0 mt-sm-3">
                                     <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                                         <span class="material-symbols-rounded" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">edit_note</span>
                                         <span>Reason for Blocking (Optional)</span>

@@ -25,7 +25,14 @@ $menuItems = [
     ['title' => 'Patients',      'url' => 'patients.php',      'icon' => 'people',           'allowed_roles' => ['Admin', 'Receptionist']],
     ['title' => 'Bills',         'url' => 'create_bill.php',   'icon' => 'receipt',          'allowed_roles' => ['Admin', 'Receptionist']],
     ['title' => 'Prescriptions', 'url' => 'prescription.php',  'icon' => 'medication',       'allowed_roles' => ['Admin', 'Receptionist']],
-    ['title' => 'OPD Treatments', 'url' => 'opd.php',           'icon' => 'local_hospital',   'allowed_roles' => ['Admin', 'Receptionist']]
+    ['title' => 'OPD Treatments', 'url' => 'opd.php',           'icon' => 'local_hospital',   'allowed_roles' => ['Admin', 'Receptionist']],
+    [
+        'title' => 'Reports',
+        'url' => 'reports.php',
+        'icon' => 'assessment',
+        'allowed_roles' => ['Admin'],
+        'show_to_all' => true
+    ]
 ];
 
 function hasAccessToPage($allowedRoles)
@@ -776,6 +783,133 @@ try {
             color: #666;
             font-size: 13px;
         }
+
+        /* Modal responsive adjustments for medium-large screens */
+        @media (min-width: 1200px) and (max-width: 1510px) {
+
+            /* Adjust modal positioning and sizing */
+            .modal {
+                padding-left: 0px !important;
+            }
+
+            .modal-content {
+                max-width: calc(100vw - 300px) !important;
+                margin: 2% auto !important;
+                width: 95% !important;
+            }
+
+            /* Ensure sidebar stays in place */
+            .sidenav {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                z-index: 1040 !important;
+            }
+
+            /* Prevent sidebar from moving down */
+            .main-content {
+                margin-left: 250px !important;
+                width: calc(100% - 250px) !important;
+            }
+
+            /* Adjust modal header for better fit */
+            .modal-header {
+                padding: 15px 20px !important;
+            }
+
+            /* Ensure modal body scrolls properly */
+            .modal-body {
+                max-height: calc(90vh - 120px) !important;
+                overflow-y: auto !important;
+            }
+        }
+
+        /* Additional adjustments for better responsiveness */
+        @media (min-width: 1200px) and (max-width: 1400px) {
+
+            /* Reduce modal padding for smaller screens in this range */
+            .modal-content {
+                padding: 0 !important;
+            }
+
+            /* Adjust form elements */
+            .form-group {
+                margin-bottom: 15px !important;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+
+            /* Smaller buttons */
+            .btn-primary,
+            .btn-secondary,
+            .print-btn {
+                /* padding: 8px 20px !important; */
+                font-size: 14px !important;
+                /* min-height: 40px !important; */
+            }
+        }
+
+        /* Ensure proper stacking order */
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        .sidenav {
+            z-index: 1040 !important;
+        }
+
+        /* Fix for modal backdrop */
+        .modal-backdrop {
+            z-index: 1049 !important;
+        }
+
+        /* Ensure modal doesn't push sidebar down */
+        @media (min-width: 1200px) {
+            body.modal-open {
+                overflow: hidden !important;
+            }
+
+            body.modal-open .sidenav {
+                position: fixed !important;
+            }
+        }
+
+        /* Additional fix for modal positioning */
+        .modal-dialog {
+            margin: 1.75rem auto !important;
+        }
+
+        @media (min-width: 1200px) and (max-width: 1510px) {
+            .modal-dialog {
+                margin: 1rem auto !important;
+                max-width: calc(100vw - 280px) !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+        }
     </style>
 </head>
 
@@ -953,7 +1087,7 @@ try {
                     <div id="billPagination" class="mt-3"></div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6 mt-lg-0 mt-5">
                     <div class="card create-bill-card">
                         <div class="create-bill-header">
                             <h5 class="mb-1 card--header--text">
@@ -1146,9 +1280,9 @@ try {
             const doctorFee = parseFloat(document.getElementById('doctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('medicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
-            
+
             const subtotal = doctorFee + medicineCost + otherCharges;
-            
+
             if (!isUpdatingFromAmount) {
                 const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
                 const discountAmount = (subtotal * discountPercentage) / 100;
@@ -1170,19 +1304,19 @@ try {
         function updateDiscountFromAmount() {
             if (isUpdatingFromPercentage) return;
             isUpdatingFromAmount = true;
-            
+
             const doctorFee = parseFloat(document.getElementById('doctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('medicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
             const subtotal = doctorFee + medicineCost + otherCharges;
-            
+
             const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
-            
+
             if (subtotal > 0) {
                 const discountPercentage = (discountAmount / subtotal) * 100;
                 document.getElementById('discountPercentage').value = discountPercentage.toFixed(2);
             }
-            
+
             calculateTotal();
             isUpdatingFromAmount = false;
         }
@@ -1190,7 +1324,7 @@ try {
         // Real-time appointment search
         function searchAppointments(searchTerm) {
             const resultsDiv = document.getElementById('appointmentSearchResults');
-            
+
             if (searchTerm.length < 2) {
                 resultsDiv.style.display = 'none';
                 return;
@@ -1222,7 +1356,7 @@ try {
 
         function displaySearchResults(appointments) {
             const resultsDiv = document.getElementById('appointmentSearchResults');
-            
+
             if (appointments.length === 0) {
                 resultsDiv.innerHTML = '<div class="no-results">No appointments found</div>';
                 return;
@@ -1238,7 +1372,7 @@ try {
                     </div>
                 `;
             });
-            
+
             resultsDiv.innerHTML = html;
         }
 
@@ -1766,9 +1900,9 @@ try {
             const doctorFee = parseFloat(document.getElementById('editDoctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('editMedicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('editOtherCharges').value) || 0;
-            
+
             const subtotal = doctorFee + medicineCost + otherCharges;
-            
+
             if (!isEditUpdatingFromAmount) {
                 const discountPercentage = parseFloat(document.getElementById('editDiscountPercentage').value) || 0;
                 const discountAmount = (subtotal * discountPercentage) / 100;
@@ -1790,19 +1924,19 @@ try {
         function updateEditDiscountFromAmount() {
             if (isEditUpdatingFromPercentage) return;
             isEditUpdatingFromAmount = true;
-            
+
             const doctorFee = parseFloat(document.getElementById('editDoctorFee').value) || 0;
             const medicineCost = parseFloat(document.getElementById('editMedicineCost').value) || 0;
             const otherCharges = parseFloat(document.getElementById('editOtherCharges').value) || 0;
             const subtotal = doctorFee + medicineCost + otherCharges;
-            
+
             const discountAmount = parseFloat(document.getElementById('editDiscountAmount').value) || 0;
-            
+
             if (subtotal > 0) {
                 const discountPercentage = (discountAmount / subtotal) * 100;
                 document.getElementById('editDiscountPercentage').value = discountPercentage.toFixed(2);
             }
-            
+
             calculateEditTotal();
             isEditUpdatingFromAmount = false;
         }

@@ -122,18 +122,31 @@ function renderSidebarMenu($menuItems, $currentPage)
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../../img/logof1.png">
   <title>Reports - Erundeniya Ayurveda Hospital</title>
-  
+
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
   <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
-  
+
   <!-- SheetJS for Excel Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
+    .notification-badge {
+      position: relative;
+      background: #f44336;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 10px;
+      margin-top: -30px;
+      margin-left: 10px;
+      display: flex;
+      flex-direction: row;
+    }
+
     .report-card {
       transition: all 0.3s ease;
       cursor: pointer;
@@ -142,7 +155,7 @@ function renderSidebarMenu($menuItems, $currentPage)
 
     .report-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       border-color: #4CAF50;
     }
 
@@ -156,7 +169,7 @@ function renderSidebarMenu($menuItems, $currentPage)
       padding: 20px;
       border-radius: 10px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .date-filter-btn {
@@ -214,14 +227,45 @@ function renderSidebarMenu($menuItems, $currentPage)
       font-weight: 500;
     }
 
-    .status-paid { background: #e8f5e8; color: #2e7d32; }
-    .status-pending { background: #fff3e0; color: #f57c00; }
-    .status-partial { background: #e3f2fd; color: #1976d2; }
-    .status-booked { background: #e3f2fd; color: #1976d2; }
-    .status-confirmed { background: #e8f5e8; color: #2e7d32; }
-    .status-attended { background: #e8f5e8; color: #4CAF50; }
-    .status-cancelled { background: #ffebee; color: #f44336; }
-    .status-no-show { background: #fff3e0; color: #f57c00; }
+    .status-paid {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-pending {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .status-partial {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status-booked {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status-confirmed {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-attended {
+      background: #e8f5e8;
+      color: #4CAF50;
+    }
+
+    .status-cancelled {
+      background: #ffebee;
+      color: #f44336;
+    }
+
+    .status-no-show {
+      background: #fff3e0;
+      color: #f57c00;
+    }
 
     .sidenav-footer .nav-link:hover {
       background-color: #ff001910 !important;
@@ -244,6 +288,25 @@ function renderSidebarMenu($menuItems, $currentPage)
 
     .loading-spinner.active {
       display: block;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
     }
   </style>
 </head>
@@ -296,6 +359,12 @@ function renderSidebarMenu($menuItems, $currentPage)
                   <i class="sidenav-toggler-line"></i>
                   <i class="sidenav-toggler-line"></i>
                 </div>
+              </a>
+            </li>
+            <li class="nav-item dropdown pe-3 d-flex align-items-center">
+              <a href="#" class="nav-link text-body p-0" onclick="toggleNotifications()">
+                <img src="../../img/bell.png" width="20" height="20">
+                <span class="notification-badge">5</span>
               </a>
             </li>
             <li class="nav-item d-flex align-items-center">
@@ -452,7 +521,9 @@ function renderSidebarMenu($menuItems, $currentPage)
         <div class="row align-items-center justify-content-lg-between">
           <div class="mb-lg-0 mb-4">
             <div class="copyright text-center text-sm text-muted text-lg-start">
-              © <script>document.write(new Date().getFullYear())</script>,
+              © <script>
+                document.write(new Date().getFullYear())
+              </script>,
               design and develop by
               <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Evon Technologies Software Solution (PVT) Ltd.</a>
               All rights received.
@@ -476,31 +547,31 @@ function renderSidebarMenu($menuItems, $currentPage)
 
     function selectReport(type) {
       currentReportType = type;
-      
+
       // Update UI
       document.querySelectorAll('.report-card').forEach(card => {
         card.classList.remove('active');
       });
       event.currentTarget.classList.add('active');
-      
+
       // Show filter section
       document.getElementById('filterSection').style.display = 'block';
-      
+
       // Reset filters
       setDateFilter('all');
-      
+
       // Generate report
       generateReport();
     }
 
     function setDateFilter(filter) {
       currentDateFilter = filter;
-      
+
       // Update button states
       document.querySelectorAll('.date-filter-btn').forEach(btn => {
         btn.classList.remove('active');
       });
-      
+
       if (filter !== 'custom') {
         event.target.classList.add('active');
         generateReport();
@@ -578,24 +649,33 @@ function renderSidebarMenu($menuItems, $currentPage)
 
       // Update summary
       document.getElementById('totalRecords').textContent = data.summary.totalRecords;
-      
+
       if (data.summary.totalAmount !== undefined) {
         document.getElementById('totalAmountSection').style.display = 'block';
-        document.getElementById('totalAmount').textContent = 'Rs. ' + parseFloat(data.summary.totalAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('totalAmount').textContent = 'Rs. ' + parseFloat(data.summary.totalAmount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
       } else {
         document.getElementById('totalAmountSection').style.display = 'none';
       }
 
       if (data.summary.paidAmount !== undefined) {
         document.getElementById('paidAmountSection').style.display = 'block';
-        document.getElementById('paidAmount').textContent = 'Rs. ' + parseFloat(data.summary.paidAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('paidAmount').textContent = 'Rs. ' + parseFloat(data.summary.paidAmount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
       } else {
         document.getElementById('paidAmountSection').style.display = 'none';
       }
 
       if (data.summary.pendingAmount !== undefined) {
         document.getElementById('pendingAmountSection').style.display = 'block';
-        document.getElementById('pendingAmount').textContent = 'Rs. ' + parseFloat(data.summary.pendingAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('pendingAmount').textContent = 'Rs. ' + parseFloat(data.summary.pendingAmount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
       } else {
         document.getElementById('pendingAmountSection').style.display = 'none';
       }
@@ -613,9 +693,9 @@ function renderSidebarMenu($menuItems, $currentPage)
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(reportData);
-      
+
       XLSX.utils.book_append_sheet(wb, ws, currentReportType);
-      
+
       const fileName = `${currentReportType}_report_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, fileName);
     }
