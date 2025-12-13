@@ -2583,11 +2583,75 @@ try {
         }
 
         function printBillModal() {
-            const billContent = document.getElementById('billPreview')?.innerHTML;
-            if (billContent) {
-                printContent(billContent);
-            }
+    const billPreview = document.getElementById('billPreview');
+    if (!billPreview) return;
+
+    // Get bill data from preview
+    const billNumber = document.getElementById('previewBillNo')?.textContent || 'PREVIEW';
+    const patientName = document.getElementById('previewPatientName')?.textContent || '-';
+    const patientMobile = document.getElementById('previewPatientMobile')?.textContent || '-';
+    const dateText = document.getElementById('previewDate')?.textContent || '';
+    
+    // Parse date and time
+    const [dateStr, timeStr] = dateText.split(' @ ');
+    
+    // Get treatments
+    const treatmentRows = document.querySelectorAll('#previewTreatmentList table tr');
+    const treatments = [];
+    
+    treatmentRows.forEach((row, index) => {
+        if (index === 0) return; // Skip header
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 4) {
+            treatments.push({
+                name: cells[0].textContent,
+                quantity: parseInt(cells[1].textContent),
+                price: parseFloat(cells[2].textContent.replace('Rs. ', '')),
+            });
         }
+    });
+    
+    // Get amounts
+    const totalAmount = parseFloat(document.getElementById('previewTotalAmount')?.textContent || '0');
+    const finalAmount = parseFloat(document.getElementById('previewFinalAmount')?.textContent || '0');
+    const discountAmount = totalAmount - finalAmount;
+    const discountPercentage = totalAmount > 0 ? (discountAmount / totalAmount) * 100 : 0;
+    
+    // Get discount reason if visible
+    const discountSection = document.getElementById('previewDiscountSection');
+    let discountReason = '';
+    if (discountSection && discountSection.style.display !== 'none') {
+        const reasonElement = document.getElementById('previewDiscountReason');
+        if (reasonElement) {
+            discountReason = reasonElement.textContent.replace('Reason:', '').trim();
+        }
+    }
+    
+    // Get notes
+    const notesSection = document.getElementById('previewNotesSection');
+    let notes = '';
+    if (notesSection && notesSection.style.display !== 'none') {
+        notes = document.getElementById('previewNotes')?.textContent || '';
+    }
+    
+    // Build bill object
+    const billData = {
+        bill_number: billNumber,
+        patient_name: patientName,
+        patient_mobile: patientMobile,
+        created_at: new Date().toISOString(),
+        treatments_data: treatments,
+        total_amount: totalAmount,
+        final_amount: finalAmount,
+        discount_amount: discountAmount,
+        discount_percentage: discountPercentage,
+        discount_reason: discountReason,
+        notes: notes,
+        payment_status: 'Paid'
+    };
+    
+    printBillContent(billData);
+}
 
         function printPreview() {
             const billContent = document.getElementById('treatmentBillPreview')?.innerHTML;
@@ -2597,116 +2661,185 @@ try {
         }
 
         function printBillContent(bill) {
-            // Format date and time
-            const dateTime = new Date(bill.created_at);
-            const formattedDate = dateTime.toLocaleDateString();
-            const formattedTime = dateTime.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+    // Format date and time
+    const dateTime = new Date(bill.created_at);
+    const formattedDate = dateTime.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+    const formattedTime = dateTime.toLocaleString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
 
-            let treatmentListHtml = '<table style="width: 100%; border-collapse: collapse;">';
-            treatmentListHtml += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Treatment</th><th style="text-align: center; padding: 8px;">Qty</th><th style="text-align: right; padding: 8px;">Price</th><th style="text-align: right; padding: 8px;">Total</th></tr>';
+    // Build treatment items dynamically
+    let treatmentItemsHtml = '';
+    let itemCount = 0;
+    
+    if (bill.treatments_data && Array.isArray(bill.treatments_data)) {
+        bill.treatments_data.forEach(treatment => {
+            itemCount++;
+            const price = parseFloat(treatment.price);
+            const quantity = parseInt(treatment.quantity);
+            const itemTotal = price * quantity;
+            
+            treatmentItemsHtml += '<tr>' +
+                '<td class="item">' + treatment.name + '</td>' +
+                '<td class="qty">' + quantity + '</td>' +
+                '<td class="amount">' + price.toFixed(2) + '</td>' +
+                '<td class="amount">' + itemTotal.toFixed(2) + '</td>' +
+                '</tr>';
+        });
+    }
 
-            bill.treatments_data.forEach(treatment => {
-                treatmentListHtml += `
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 8px;">${treatment.name}</td>
-                <td style="text-align: center; padding: 8px;">${treatment.quantity}</td>
-                <td style="text-align: right; padding: 8px;">Rs. ${parseFloat(treatment.price).toFixed(2)}</td>
-                <td style="text-align: right; padding: 8px;">Rs. ${(parseFloat(treatment.price) * treatment.quantity).toFixed(2)}</td>
-            </tr>
-        `;
-            });
-            treatmentListHtml += '</table>';
+    // Discount section
+    const discountSection = bill.discount_percentage > 0 ? 
+        '<tr>' +
+            '<td colspan="3">Discount (' + parseFloat(bill.discount_percentage).toFixed(2) + '%):</td>' +
+            '<td class="amount">- Rs. ' + parseFloat(bill.discount_amount).toFixed(2) + '</td>' +
+        '</tr>' +
+        (bill.discount_reason ? '<tr><td colspan="4" style="font-size:10px; font-style:italic; padding: 2px 0;">Reason: ' + bill.discount_reason + '</td></tr>' : '')
+        : '';
 
-            let discountSection = '';
-            if (bill.discount_percentage > 0) {
-                discountSection = `
-            <div style="margin-bottom: 20px;">
-                <h6>Discount Details:</h6>
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Discount:</strong> ${bill.discount_percentage}%
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Discount Amount:</strong> Rs. ${parseFloat(bill.discount_amount).toFixed(2)}
-                    </div>
-                </div>
-                ${bill.discount_reason ? `<div style="margin-top: 5px;"><small><strong>Reason:</strong> ${bill.discount_reason}</small></div>` : ''}
-            </div>
-        `;
-            }
+    // Notes section
+    const notesSection = bill.notes && bill.notes.trim() ? 
+        '<div class="divider"></div>' +
+        '<div class="notes-section">' +
+            '<strong>Notes:</strong>' +
+            '<div style="margin-top: 5px; font-size: 11px; line-height: 1.4;">' + bill.notes + '</div>' +
+        '</div>'
+        : '';
 
-            const billHtml = `
-        <div class="bill-preview">
-            <div class="bill-header">
-                <h2>Erundeniya Ayurveda Hospital</h2>
-                <p>OPD Treatment Bill</p>
-                <p>Contact: +94 71 291 9408 | Email: info@erundeniyaayurveda.lk</p>
-            </div>
+    // Payment status badge
+    let statusColor = '#4CAF50';
+    let statusText = 'PAID';
+    if (bill.payment_status === 'Pending') {
+        statusColor = '#f57c00';
+        statusText = 'PENDING';
+    } else if (bill.payment_status === 'Partial') {
+        statusColor = '#1976d2';
+        statusText = 'PARTIAL';
+    }
 
-            <div class="patient-info">
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Patient:</strong> ${bill.patient_name}<br>
-                        <strong>Mobile:</strong> ${bill.patient_mobile}
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <strong>Date:</strong> ${formattedDate}<br>
-                        <strong>Time:</strong> ${formattedTime}<br>
-                        <strong>Bill No:</strong> ${bill.bill_number}
-                    </div>
-                </div>
-            </div>
+    // Get cashier name - using session username
+    const cashierName = '<?php echo htmlspecialchars($_SESSION["username"] ?? "Cashier"); ?>';
 
-            <div class="treatment-list">
-                <h6>Treatments:</h6>
-                <div>${treatmentListHtml}</div>
-            </div>
+    const printHtml = '<!DOCTYPE html>' +
+        '<html>' +
+        '<head>' +
+            '<title>Print OPD Bill - ' + bill.bill_number + '</title>' +
+            '<style>' +
+                '@page { size: 80mm auto; margin: 0; }' +
+                'body { font-family: "Courier New", monospace; font-size: 12px; margin: 0 auto; padding: 10px; width: 80mm; max-width: 80mm; }' +
+                '.receipt { width: 100%; margin: 0 auto; }' +
+                '.header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 8px; }' +
+                '.header h2 { margin: 5px 0; font-size: 16px; font-weight: bold; }' +
+                '.header p { margin: 2px 0; font-size: 10px; }' +
+                '.info-section { margin: 10px 0; font-size: 11px; }' +
+                '.info-row { display: flex; justify-content: space-between; margin: 3px 0; }' +
+                '.divider { border-top: 1px dashed #000; margin: 8px 0; }' +
+                '.items-table { width: 100%; margin: 10px 0; border-collapse: collapse; }' +
+                '.items-table td { padding: 5px 2px; font-size: 11px; }' +
+                '.items-table th { padding: 5px 2px; text-align: left; border-bottom: 1px solid #000; font-size: 11px; }' +
+                '.items-table .item { text-align: left; }' +
+                '.items-table .qty { text-align: center; padding: 0 5px; }' +
+                '.items-table .amount { text-align: right; }' +
+                '.subtotal-section { margin-top: 10px; width: 100%; }' +
+                '.subtotal-section td { padding: 3px 0; font-size: 11px; }' +
+                '.subtotal-section td:first-child { text-align: left; }' +
+                '.subtotal-section td:last-child { text-align: right; }' +
+                '.total-row { border-top: 2px solid #000; font-weight: bold; font-size: 13px; }' +
+                '.total-row td { padding: 8px 0 5px 0; }' +
+                '.status-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-weight: bold; font-size: 11px; background-color: ' + statusColor + '; color: white; }' +
+                '.notes-section { margin: 10px 0; font-size: 11px; line-height: 1.4; padding: 8px; background: #f5f5f5; border-radius: 4px; }' +
+                '.footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #000; font-size: 10px; }' +
+                '@media print { body { width: 80mm; margin: 0 auto; } }' +
+            '</style>' +
+        '</head>' +
+        '<body>' +
+            '<div class="receipt">' +
+                '<div class="header">' +
+                    '<h2>Erundeniya Ayurveda Hospital</h2>' +
+                    '<p>A/55 Wedagedara, Erundeniya,</p>' +
+                    '<p>Amithirigala, North.</p>' +
+                    '<p>Tel: +94 71 291 9408</p>' +
+                    '<p>Email: info@erundeniyaayurveda.lk</p>' +
+                    '<p style="margin-top: 5px; font-weight: bold;">OPD TREATMENT BILL</p>' +
+                '</div>' +
+                '<div class="divider"></div>' +
+                '<div class="info-section">' +
+                    '<div class="info-row"><span>Bill No:</span><span>#' + bill.bill_number + '</span></div>' +
+                    '<div class="info-row"><span>Date:</span><span>' + formattedDate + '</span></div>' +
+                    '<div class="info-row"><span>Time:</span><span>' + formattedTime + '</span></div>' +
+                    '<div class="info-row"><span>Patient:</span><span>' + bill.patient_name + '</span></div>' +
+                    '<div class="info-row"><span>Mobile:</span><span>' + bill.patient_mobile + '</span></div>' +
+                    '<div class="info-row"><span>Cashier:</span><span>' + cashierName + '</span></div>' +
+                    '<div class="info-row"><span>Status:</span><span>' + statusText + '</span></div>' +
+                '</div>' +
+                '<div class="divider"></div>' +
+                '<table class="items-table">' +
+                    '<tr>' +
+                        '<th>Treatment</th>' +
+                        '<th class="qty">Qty</th>' +
+                        '<th class="amount">Price</th>' +
+                        '<th class="amount">Total</th>' +
+                    '</tr>' +
+                    treatmentItemsHtml +
+                '</table>' +
+                '<div class="divider"></div>' +
+                '<table class="items-table subtotal-section">' +
+                    '<tr>' +
+                        '<td colspan="3">Subtotal:</td>' +
+                        '<td class="amount">Rs. ' + parseFloat(bill.total_amount).toFixed(2) + '</td>' +
+                    '</tr>' +
+                    discountSection +
+                    '<tr class="total-row">' +
+                        '<td colspan="3">TOTAL:</td>' +
+                        '<td class="amount">Rs. ' + parseFloat(bill.final_amount).toFixed(2) + '</td>' +
+                    '</tr>' +
+                '</table>' +
+                notesSection +
+                '<div class="divider"></div>' +
+                '<div style="text-align:center; margin: 10px 0;">Total Treatment(s): ' + itemCount + '</div>' +
+                '<div style="text-align:center; margin: 10px 0; font-size:16px; font-weight:bold;">*' + bill.bill_number + '*</div>' +
+                '<div class="footer">' +
+                    '<p>Thank You for Your Visit!</p>' +
+                    '<span>For inquiries: info@erundeniyaayurveda.lk</span>' +
+                    '<br/>' +
+                    '<span>Tel: +94 71 291 9408</span>' +
+                    '<div style="margin-top:10px; font-size:9px;">' +
+                        '<span>© 2025 Erundeniya Ayurveda Hospital</span>' +
+                        '<br/>' +
+                        '<span>All rights reserved</span>' +
+                        '<br/>' +
+                        '<span>All payments made to Erundeniya Ayurveda Hospital are non-refundable.</span>' +
+                        '<br/>' +
+                        '<br/>' +
+                        '<span>Powered By <strong>www.evotech.lk</strong></span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<script>' +
+                'window.onload = function() {' +
+                    'window.print();' +
+                    'window.onafterprint = function() { window.close(); }' +
+                '}' +
+            '<\/script>' +
+        '</body>' +
+        '</html>';
 
-            ${discountSection}
-
-            ${bill.notes ? `<div style="margin-bottom: 20px;"><h6>Notes:</h6><p>${bill.notes}</p></div>` : ''}
-
-            <div class="total-section">
-                <div>Total Amount: Rs. ${parseFloat(bill.total_amount).toFixed(2)}</div>
-                <div style="color: #28a745; font-size: 16px;">Final Amount: Rs. ${parseFloat(bill.final_amount).toFixed(2)}</div>
-            </div>
-        </div>
-    `;
-
-            printContent(billHtml);
-        }
+    const printWindow = window.open('', '', 'height=auto,width=400');
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+}
 
         function printContent(content) {
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.write(`
-        <html>
-        <head>
-            <title>Print Treatment Bill</title>
-            <style>
-                body { font-family: 'Times New Roman', serif; margin: 20px; max-width: 600px; margin: 0 auto;}
-                table { width: 100%; border-collapse: collapse; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                .bill-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
-                .patient-info { margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
-                .treatment-list { min-height: 200px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-                .total-section { text-align: right; border-top: 2px solid #333; padding-top: 15px; margin-top: 20px; font-weight: bold; font-size: 18px; }
-                @media print {
-                    body { margin: 0; }
-                }
-            </style>
-        </head>
-        <body>
-            ${content}
-        </body>
-        </html>
-    `);
-            printWindow.document.close();
-            printWindow.print();
-        }
+    const printWindow = window.open('', '', 'height=auto,width=400');
+    printWindow.document.write(content);
+    printWindow.document.close();
+}
 
         // Modal functions
         function closeBillModal() {

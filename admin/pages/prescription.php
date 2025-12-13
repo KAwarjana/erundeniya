@@ -1751,7 +1751,8 @@ Next visit: After 1 week" required></textarea>
                     <div class="doctor-signature">
                         <div style="border-bottom: 1px solid #333; width: 200px; margin-left: auto;"></div>
                         <p class="mt-2 mb-0"><strong>Doctor's Signature</strong></p>
-                        <p class="mb-0">Dr.H.D.P. Darshani</p>
+                        <p class="mb-0">Dr H.D.P Dharshani</p>
+                        <p class="mb-0">REG NO 13467</p>
                         <p class="mb-0">Erundeniya Ayurveda Hospital</p>
                     </div>
                 </div>

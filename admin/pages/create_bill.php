@@ -2134,15 +2134,20 @@ try {
                 '<div style="text-align:center; margin: 10px 0;">Total Items: ' + itemCount + '</div>' +
                 '<div style="text-align:center; margin: 10px 0; font-size:16px; font-weight:bold;">*' + bill.bill_number + '*</div>' +
                 '<div class="footer">' +
-                '<p>Thank You for Your Coming!</p>' +
-                '<p>For inquiries: info@erundeniyaayurveda.lk</p>' +
-                '<span>Tel: +94 71 291 9408</span>' +
-                '<div style="margin-top:10px; font-size:9px;">' +
-                '<p>© 2025 Erundeniya Ayurveda Hospital</p>' +
-                '<span>All rights reserved</span>' +
-                '<span>All payments made to Erundeniya Ayurveda Hospital are non-refundable.</span>' +
-                '<p>Powered By www.evontech.lk</p>' +
-                '</div>' +
+                    '<p>Thank You for Your Visit!</p>' +
+                    '<span>For inquiries: info@erundeniyaayurveda.lk</span>' +
+                    '<br/>' +
+                    '<span>Tel: +94 71 291 9408</span>' +
+                    '<div style="margin-top:10px; font-size:9px;">' +
+                        '<span>© 2025 Erundeniya Ayurveda Hospital</span>' +
+                        '<br/>' +
+                        '<span>All rights reserved</span>' +
+                        '<br/>' +
+                        '<span>All payments made to Erundeniya Ayurveda Hospital are non-refundable.</span>' +
+                        '<br/>' +
+                        '<br/>' +
+                        '<span>Powered By <strong>www.evotech.lk</strong></span>' +
+                    '</div>' +
                 '</div>' +
                 '</div>' +
                 '<script>' +
