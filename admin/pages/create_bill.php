@@ -40,20 +40,40 @@ function hasAccessToPage($allowedRoles)
     return AuthManager::isLoggedIn() && in_array($_SESSION['role'], $allowedRoles);
 }
 
-function renderSidebarMenu($items, $cur)
+function renderSidebarMenu($menuItems, $currentPageFile)
 {
-    foreach ($items as $i) {
-        $active = ($cur === $i['url']) ? 'active bg-gradient-dark text-white' : 'text-dark';
-        $ok     = hasAccessToPage($i['allowed_roles']);
-        $href   = $ok ? $i['url'] : '#';
-        $click  = $ok ? '' : 'event.preventDefault(); alert(\'Access denied\');';
-        $lock   = $ok ? '' : '<i class=\'fas fa-lock\' style=\'font-size:10px;margin-left:5px;\'></i>';
-        echo '<li class="nav-item mt-3">
-                <a class="nav-link ' . $active . '" href="' . $href . '" onclick="' . $click . '">
-                  <i class="material-symbols-rounded opacity-5">' . $i['icon'] . '</i>
-                  <span class="nav-link-text ms-1">' . $i['title'] . $lock . '</span>
-                </a>
-              </li>';
+    $currentRole = $_SESSION['role'] ?? 'Guest';
+
+    foreach ($menuItems as $item) {
+        $isActive = ($currentPageFile === $item['url']);
+        $hasAccess = hasAccessToPage($item['allowed_roles']);
+
+        if ($hasAccess) {
+            $linkClass = $isActive ? 'nav-link active bg-gradient-dark text-white' : 'nav-link text-dark';
+            $href = $item['url'];
+            $onclick = '';
+            $style = '';
+            $tooltip = '';
+        } else {
+            $linkClass = 'nav-link text-muted';
+            $href = '#';
+            $onclick = 'event.preventDefault(); showAccessDenied(\'' . $item['title'] . '\');';
+            $style = 'opacity: 0.6; cursor: default;';
+            $tooltip = 'title="Access Restricted to Admin only" data-bs-toggle="tooltip"';
+        }
+
+        echo '<li class="nav-item mt-3">';
+        echo '<a class="' . $linkClass . '" href="' . $href . '" onclick="' . $onclick . '" style="' . $style . '" ' . $tooltip . '>';
+        echo '<i class="material-symbols-rounded opacity-5">' . $item['icon'] . '</i>';
+        echo '<span class="nav-link-text ms-1">' . $item['title'];
+
+        if (!$hasAccess) {
+            echo ' <i class="fas fa-lock" style="font-size: 10px; margin-left: 5px;"></i>';
+        }
+
+        echo '</span>';
+        echo '</a>';
+        echo '</li>';
     }
 }
 
