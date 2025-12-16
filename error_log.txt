@@ -2229,3 +2229,48 @@ Stack trace:
 [11-Dec-2025 19:54:30 Europe/Berlin] Request: {"time":"2025-12-11 19:54:30","method":"POST","action":"get_time_slots","ip":"::1"}
 [11-Dec-2025 19:54:30 Europe/Berlin] Processing action: get_time_slots
 [11-Dec-2025 19:54:30 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:46 Europe/Berlin] Request: {"time":"2025-12-15 12:02:46","method":"POST","action":"get_all_available_dates","ip":"::1"}
+[15-Dec-2025 12:02:46 Europe/Berlin] Processing action: get_all_available_dates
+[15-Dec-2025 12:02:46 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:46 Europe/Berlin] Request: {"time":"2025-12-15 12:02:46","method":"POST","action":"get_time_slots","ip":"::1"}
+[15-Dec-2025 12:02:46 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:02:46 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:50 Europe/Berlin] Request: {"time":"2025-12-15 12:02:50","method":"POST","action":"get_date_info","ip":"::1"}
+[15-Dec-2025 12:02:50 Europe/Berlin] Processing action: get_date_info
+[15-Dec-2025 12:02:50 Europe/Berlin] Request: {"time":"2025-12-15 12:02:50","method":"POST","action":"get_time_slots","ip":"::1"}
+[15-Dec-2025 12:02:50 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:02:50 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:50 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:52 Europe/Berlin] Request: {"time":"2025-12-15 12:02:52","method":"POST","action":"get_time_slots","ip":"::1"}
+[15-Dec-2025 12:02:52 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:02:52 Europe/Berlin] Request: {"time":"2025-12-15 12:02:52","method":"POST","action":"get_date_info","ip":"::1"}
+[15-Dec-2025 12:02:52 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:52 Europe/Berlin] Processing action: get_date_info
+[15-Dec-2025 12:02:52 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:59 Europe/Berlin] Request: {"time":"2025-12-15 12:02:59","method":"POST","action":"book_appointment","ip":"::1"}
+[15-Dec-2025 12:02:59 Europe/Berlin] Processing action: book_appointment
+[15-Dec-2025 12:02:59 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:02:59 Europe/Berlin] Appointment created: APT20251215001
+[15-Dec-2025 12:03:01 Europe/Berlin] Request: {"time":"2025-12-15 12:03:01","method":"POST","action":"get_time_slots","ip":"::1"}
+[15-Dec-2025 12:03:01 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:03:01 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:03:48 Europe/Berlin] Processing action: get_all_available_dates
+[15-Dec-2025 12:03:48 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:03:48 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:03:48 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:03:51 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:03:51 Europe/Berlin] Processing action: get_date_info
+[15-Dec-2025 12:03:51 Europe/Berlin] Error: Invalid action: get_date_info
+[15-Dec-2025 12:03:51 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:03:51 Europe/Berlin] Database search error: Table 'erundeniya.appointment_requests' doesn't exist
+[15-Dec-2025 12:03:51 Europe/Berlin] Error getting slots: Table 'erundeniya.appointment_requests' doesn't exist
+[15-Dec-2025 12:03:57 Europe/Berlin] Processing action: get_time_slots
+[15-Dec-2025 12:03:57 Europe/Berlin] Processing action: get_date_info
+[15-Dec-2025 12:03:57 Europe/Berlin] Error: Invalid action: get_date_info
+[15-Dec-2025 12:03:57 Europe/Berlin] Database connection established successfully
+[15-Dec-2025 12:03:57 Europe/Berlin] Database search error: Table 'erundeniya.appointment_requests' doesn't exist
+[15-Dec-2025 12:03:57 Europe/Berlin] Error getting slots: Table 'erundeniya.appointment_requests' doesn't exist
+[16-Dec-2025 19:54:35 Europe/Berlin] Processing action: get_all_available_dates
+[16-Dec-2025 19:54:35 Europe/Berlin] Database connection established successfully
+[16-Dec-2025 19:54:35 Europe/Berlin] Processing action: get_time_slots
+[16-Dec-2025 19:54:35 Europe/Berlin] Database connection established successfully

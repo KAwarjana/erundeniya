@@ -1136,143 +1136,141 @@ function getPageUrl($page)
     <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
 
     <script>
-        // All your existing JavaScript code remains exactly the same
-        // Replace the entire <script> section in appointments.php with this code
 
-        let searchTimeout;
-        let isRealTimeSearch = true;
+let searchTimeout;
+let isRealTimeSearch = true;
 
-        const searchInput = document.getElementById('searchInput');
-        const clearSearchBtn = document.getElementById('clearSearchBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const appointmentsTableBody = document.getElementById('appointmentsTableBody');
-        const appointmentsTable = document.getElementById('appointmentsTable');
+const searchInput = document.getElementById('searchInput');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+const appointmentsTable = document.getElementById('appointmentsTable');
 
-        function initializeSearch() {
-            if (!searchInput || !clearSearchBtn) {
-                console.error('Search elements not found');
-                return;
-            }
+function initializeSearch() {
+    if (!searchInput || !clearSearchBtn) {
+        console.error('Search elements not found');
+        return;
+    }
+    
+    searchInput.addEventListener('input', handleSearchInput);
+    searchInput.addEventListener('keypress', handleSearchKeypress);
+    clearSearchBtn.addEventListener('click', clearSearch);
+    searchInput.addEventListener('input', toggleClearButton);
+    toggleClearButton();
+}
 
-            searchInput.addEventListener('input', handleSearchInput);
-            searchInput.addEventListener('keypress', handleSearchKeypress);
-            clearSearchBtn.addEventListener('click', clearSearch);
-            searchInput.addEventListener('input', toggleClearButton);
-            toggleClearButton();
-        }
+function handleSearchInput(e) {
+    const searchTerm = e.target.value.trim();
+    toggleClearButton();
 
-        function handleSearchInput(e) {
-            const searchTerm = e.target.value.trim();
-            toggleClearButton();
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
 
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-
-            searchTimeout = setTimeout(() => {
-                if (isRealTimeSearch && searchTerm.length > 0) {
-                    performRealTimeSearch(searchTerm);
-                } else if (searchTerm.length === 0) {
-                    reloadCurrentPage();
-                }
-            }, 300);
-        }
-
-        function handleSearchKeypress(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const searchTerm = e.target.value.trim();
-                if (searchTerm.length > 0) {
-                    performRealTimeSearch(searchTerm);
-                } else {
-                    reloadCurrentPage();
-                }
-            }
-        }
-
-        function toggleClearButton() {
-            if (searchInput && clearSearchBtn) {
-                if (searchInput.value.trim().length > 0) {
-                    clearSearchBtn.classList.add('show');
-                } else {
-                    clearSearchBtn.classList.remove('show');
-                }
-            }
-        }
-
-        function clearSearch() {
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            if (clearSearchBtn) {
-                clearSearchBtn.classList.remove('show');
-            }
+    searchTimeout = setTimeout(() => {
+        if (isRealTimeSearch && searchTerm.length > 0) {
+            performRealTimeSearch(searchTerm);
+        } else if (searchTerm.length === 0) {
             reloadCurrentPage();
         }
+    }, 300);
+}
 
-        function reloadCurrentPage() {
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.delete('search');
-            window.location.href = currentUrl.toString();
+function handleSearchKeypress(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length > 0) {
+            performRealTimeSearch(searchTerm);
+        } else {
+            reloadCurrentPage();
         }
+    }
+}
 
-        function performRealTimeSearch(searchTerm) {
-            const currentUrl = new URL(window.location.href);
-            const status = currentUrl.searchParams.get('status') || 'all';
-            const date = currentUrl.searchParams.get('date') || '';
-            const page = currentUrl.searchParams.get('page') || '1';
-
-            showLoading();
-
-            fetch('search_appointments_ajax.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        search: searchTerm,
-                        status: status,
-                        date: date,
-                        page: page
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        updateAppointmentsTable(data.appointments);
-                        updateStatistics(data.statistics);
-                        if (typeof updatePagination === 'function') {
-                            updatePagination(data.pagination);
-                        }
-                        showNotification(`Found ${data.total_records} appointment(s)`, 'success');
-                    } else {
-                        showNotification('Search failed: ' + data.message, 'error');
-                        displayNoResults();
-                    }
-                    hideLoading();
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    showNotification('Search request failed', 'error');
-                    displayNoResults();
-                    hideLoading();
-                });
+function toggleClearButton() {
+    if (searchInput && clearSearchBtn) {
+        if (searchInput.value.trim().length > 0) {
+            clearSearchBtn.classList.add('show');
+        } else {
+            clearSearchBtn.classList.remove('show');
         }
+    }
+}
 
-        function showLoading() {
-            if (appointmentsTable) appointmentsTable.style.display = 'none';
-            if (loadingSpinner) loadingSpinner.classList.add('show');
-        }
+function clearSearch() {
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    if (clearSearchBtn) {
+        clearSearchBtn.classList.remove('show');
+    }
+    reloadCurrentPage();
+}
 
-        function hideLoading() {
-            if (loadingSpinner) loadingSpinner.classList.remove('show');
-            if (appointmentsTable) appointmentsTable.style.display = 'table';
-        }
+function reloadCurrentPage() {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete('search');
+    window.location.href = currentUrl.toString();
+}
 
-        function displayNoResults() {
-            if (!appointmentsTableBody) return;
+function performRealTimeSearch(searchTerm) {
+    const currentUrl = new URL(window.location.href);
+    const status = currentUrl.searchParams.get('status') || 'all';
+    const date = currentUrl.searchParams.get('date') || '';
+    const page = currentUrl.searchParams.get('page') || '1';
 
-            appointmentsTableBody.innerHTML = `
+    showLoading();
+
+    fetch('search_appointments_ajax.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                search: searchTerm,
+                status: status,
+                date: date,
+                page: page
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateAppointmentsTable(data.appointments);
+                updateStatistics(data.statistics);
+                if (typeof updatePagination === 'function') {
+                    updatePagination(data.pagination);
+                }
+                showNotification(`Found ${data.total_records} appointment(s)`, 'success');
+            } else {
+                showNotification('Search failed: ' + data.message, 'error');
+                displayNoResults();
+            }
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            showNotification('Search request failed', 'error');
+            displayNoResults();
+            hideLoading();
+        });
+}
+
+function showLoading() {
+    if (appointmentsTable) appointmentsTable.style.display = 'none';
+    if (loadingSpinner) loadingSpinner.classList.add('show');
+}
+
+function hideLoading() {
+    if (loadingSpinner) loadingSpinner.classList.remove('show');
+    if (appointmentsTable) appointmentsTable.style.display = 'table';
+}
+
+function displayNoResults() {
+    if (!appointmentsTableBody) return;
+    
+    appointmentsTableBody.innerHTML = `
         <tr>
             <td colspan="6" class="text-center py-4">
                 <div class="d-flex flex-column align-items-center">
@@ -1285,24 +1283,24 @@ function getPageUrl($page)
             </td>
         </tr>
     `;
-        }
+}
 
-        function updateAppointmentsTable(appointments) {
-            if (!appointmentsTableBody) return;
+function updateAppointmentsTable(appointments) {
+    if (!appointmentsTableBody) return;
+    
+    if (appointments.length === 0) {
+        displayNoResults();
+        return;
+    }
 
-            if (appointments.length === 0) {
-                displayNoResults();
-                return;
-            }
+    let html = '';
+    appointments.forEach(appointment => {
+        const statusClass = getStatusBadgeClass(appointment.status);
+        const paymentColor = getPaymentStatusColor(appointment.payment_status);
+        const formattedDate = formatDate(appointment.appointment_date);
+        const formattedTime = formatTime(appointment.appointment_time);
 
-            let html = '';
-            appointments.forEach(appointment => {
-                const statusClass = getStatusBadgeClass(appointment.status);
-                const paymentColor = getPaymentStatusColor(appointment.payment_status);
-                const formattedDate = formatDate(appointment.appointment_date);
-                const formattedTime = formatTime(appointment.appointment_time);
-
-                html += `
+        html += `
             <tr data-status="${appointment.status.toLowerCase()}">
                 <td>
                     <div class="d-flex px-2 py-1">
@@ -1359,86 +1357,86 @@ function getPageUrl($page)
                 </td>
             </tr>
         `;
-            });
+    });
 
-            appointmentsTableBody.innerHTML = html;
-        }
+    appointmentsTableBody.innerHTML = html;
+}
 
-        function updateStatistics(statistics) {
-            const updates = {
-                'todayCount': statistics.today_count,
-                'confirmedCount': statistics.confirmed_count,
-                'attendedCount': statistics.attended_count,
-                'noShowCount': statistics.no_show_count,
-                'notificationCount': statistics.pending_count
-            };
+function updateStatistics(statistics) {
+    const updates = {
+        'todayCount': statistics.today_count,
+        'confirmedCount': statistics.confirmed_count,
+        'attendedCount': statistics.attended_count,
+        'noShowCount': statistics.no_show_count,
+        'notificationCount': statistics.pending_count
+    };
 
-            Object.keys(updates).forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = updates[id];
-            });
-        }
+    Object.keys(updates).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = updates[id];
+    });
+}
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
-        }
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
 
-        function formatTime(timeString) {
-            const [hours, minutes] = timeString.split(':');
-            const hour = parseInt(hours);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            const displayHour = hour % 12 || 12;
-            return `${displayHour}:${minutes} ${ampm}`;
-        }
+function formatTime(timeString) {
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+}
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
-        function capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-        function formatCurrency(amount) {
-            return 'Rs. ' + parseFloat(amount).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
+function formatCurrency(amount) {
+    return 'Rs. ' + parseFloat(amount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
 
-        function getStatusBadgeClass(status) {
-            const classes = {
-                'Booked': 'status-booked',
-                'Confirmed': 'status-confirmed',
-                'Attended': 'status-attended',
-                'No-Show': 'status-no-show',
-                'Cancelled': 'status-cancelled'
-            };
-            return classes[status] || 'status-booked';
-        }
+function getStatusBadgeClass(status) {
+    const classes = {
+        'Booked': 'status-booked',
+        'Confirmed': 'status-confirmed',
+        'Attended': 'status-attended',
+        'No-Show': 'status-no-show',
+        'Cancelled': 'status-cancelled'
+    };
+    return classes[status] || 'status-booked';
+}
 
-        function getPaymentStatusColor(status) {
-            const colors = {
-                'Paid': 'text-success',
-                'Pending': 'text-warning',
-                'Failed': 'text-danger',
-                'Refunded': 'text-info'
-            };
-            return colors[status] || 'text-secondary';
-        }
+function getPaymentStatusColor(status) {
+    const colors = {
+        'Paid': 'text-success',
+        'Pending': 'text-warning',
+        'Failed': 'text-danger',
+        'Refunded': 'text-info'
+    };
+    return colors[status] || 'text-secondary';
+}
 
-        function getActionButtons(appointment) {
-            let buttons = '';
+function getActionButtons(appointment) {
+    let buttons = '';
 
-            if (appointment.status === 'Booked' || appointment.status === 'Confirmed') {
-                buttons += `
+    if (appointment.status === 'Booked' || appointment.status === 'Confirmed') {
+        buttons += `
             <button class="btn btn-sm btn-outline-success" onclick="markAttendance('${appointment.appointment_number}', 'Attended')">
                 <i class="material-symbols-rounded text-sm">check</i>
                 <span class="d-none d-xl-inline">Attended</span>
@@ -1448,16 +1446,16 @@ function getPageUrl($page)
                 <span class="d-none d-xl-inline">No Show</span>
             </button>
         `;
-                if (appointment.status === 'Booked') {
-                    buttons += `
+        if (appointment.status === 'Booked') {
+            buttons += `
                 <button class="btn btn-sm btn-outline-danger d-none d-md-inline-block" onclick="cancelAppointment('${appointment.appointment_number}')">
                     <i class="material-symbols-rounded text-sm">cancel</i>
                     <span class="d-none d-xl-inline">Cancel</span>
                 </button>
             `;
-                }
-            } else if (appointment.status === 'Attended') {
-                buttons += `
+        }
+    } else if (appointment.status === 'Attended') {
+        buttons += `
             <button class="btn btn-sm btn-dark" onclick="createBill('${appointment.appointment_number}')">
                 <i class="material-symbols-rounded text-sm">receipt</i>
                 <span class="d-none d-xl-inline">Create Bill</span>
@@ -1467,8 +1465,8 @@ function getPageUrl($page)
                 <span class="d-none d-xl-inline">View</span>
             </button>
         `;
-            } else if (appointment.status === 'No-Show') {
-                buttons += `
+    } else if (appointment.status === 'No-Show') {
+        buttons += `
             <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment('${appointment.appointment_number}')">
                 <i class="material-symbols-rounded text-sm">schedule</i>
                 <span class="d-none d-xl-inline">Reschedule</span>
@@ -1478,36 +1476,36 @@ function getPageUrl($page)
                 <span class="d-none d-xl-inline">View</span>
             </button>
         `;
-            } else {
-                buttons += `
+    } else {
+        buttons += `
             <button class="btn btn-sm btn-outline-info" onclick="viewDetails('${appointment.appointment_number}')">
                 <i class="material-symbols-rounded text-sm">visibility</i>
                 <span class="d-none d-xl-inline">View</span>
             </button>
         `;
-            }
+    }
 
-            return buttons;
-        }
+    return buttons;
+}
 
-        function showNotification(message, type = 'info') {
-            const colors = {
-                success: '#4caf50',
-                info: '#2196f3',
-                warning: '#ff9800',
-                error: '#f44336'
-            };
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: '#4caf50',
+        info: '#2196f3',
+        warning: '#ff9800',
+        error: '#f44336'
+    };
 
-            const icons = {
-                success: 'check_circle',
-                info: 'info',
-                warning: 'warning',
-                error: 'error'
-            };
+    const icons = {
+        success: 'check_circle',
+        info: 'info',
+        warning: 'warning',
+        error: 'error'
+    };
 
-            const toast = document.createElement('div');
-            toast.className = 'custom-toast';
-            toast.style.cssText = `
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast';
+    toast.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -1528,22 +1526,22 @@ function getPageUrl($page)
         font-weight: 500;
     `;
 
-            const iconElement = document.createElement('span');
-            iconElement.className = 'material-symbols-rounded';
-            iconElement.style.cssText = 'font-size: 24px; flex-shrink: 0;';
-            iconElement.textContent = icons[type] || icons.info;
+    const iconElement = document.createElement('span');
+    iconElement.className = 'material-symbols-rounded';
+    iconElement.style.cssText = 'font-size: 24px; flex-shrink: 0;';
+    iconElement.textContent = icons[type] || icons.info;
 
-            const messageElement = document.createElement('span');
-            messageElement.style.cssText = 'flex: 1; line-height: 1.4;';
-            messageElement.textContent = message;
+    const messageElement = document.createElement('span');
+    messageElement.style.cssText = 'flex: 1; line-height: 1.4;';
+    messageElement.textContent = message;
 
-            toast.appendChild(iconElement);
-            toast.appendChild(messageElement);
+    toast.appendChild(iconElement);
+    toast.appendChild(messageElement);
 
-            if (!document.getElementById('toast-animations')) {
-                const style = document.createElement('style');
-                style.id = 'toast-animations';
-                style.textContent = `
+    if (!document.getElementById('toast-animations')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animations';
+        style.textContent = `
             @keyframes slideIn {
                 from { transform: translateX(400px); opacity: 0; }
                 to { transform: translateX(0); opacity: 1; }
@@ -1558,151 +1556,180 @@ function getPageUrl($page)
                 transition: all 0.2s ease;
             }
         `;
-                document.head.appendChild(style);
-            }
+        document.head.appendChild(style);
+    }
 
-            document.body.appendChild(toast);
+    document.body.appendChild(toast);
 
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (toast.parentNode) toast.remove();
+        }, 300);
+    }, 3000);
+
+    toast.addEventListener('click', () => {
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (toast.parentNode) toast.remove();
+        }, 300);
+    });
+}
+
+function markAttendance(appointmentId, status) {
+    if (confirm(`Mark ${appointmentId} as ${status}?`)) {
+        fetch('update_appointment_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appointment_number: appointmentId,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`Appointment ${appointmentId} marked as ${status}`, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showNotification('Failed to update appointment status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+    }
+}
+
+// UPDATED: Create Bill function now registers patient first
+function createBill(appointmentId) {
+    // Show loading
+    showNotification('Registering patient and preparing bill...', 'info');
+    
+    // First register the patient
+    fetch('register_patient_from_appointment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            appointment_number: appointmentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            // Redirect to create bill page
             setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease-in';
-                setTimeout(() => {
-                    if (toast.parentNode) toast.remove();
-                }, 300);
-            }, 3000);
+                window.location.href = data.redirect;
+            }, 1000);
+        } else {
+            showNotification('Registration failed: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred during patient registration', 'error');
+    });
+}
 
-            toast.addEventListener('click', () => {
-                toast.style.animation = 'slideOut 0.3s ease-in';
-                setTimeout(() => {
-                    if (toast.parentNode) toast.remove();
-                }, 300);
+function cancelAppointment(appointmentId) {
+    if (confirm('Are you sure you want to cancel this appointment?')) {
+        markAttendance(appointmentId, 'Cancelled');
+    }
+}
+
+function rescheduleAppointment(appointmentId) {
+    window.location.href = `book_appointments.php?reschedule=${appointmentId}`;
+}
+
+function viewDetails(appointmentId) {
+    window.location.href = `appointment_single_view.php?appointment=${appointmentId}`;
+}
+
+function exportAppointments() {
+    const u = new URL(window.location.href);
+    const params = new URLSearchParams(u.search);
+    const exportUrl = `export_appointments.php?${params.toString()}`;
+
+    showNotification('Preparing Excel file...', 'info');
+
+    const a = document.createElement('a');
+    a.href = exportUrl;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => showNotification('Excel file downloaded!', 'success'), 1500);
+}
+
+function toggleNotifications() {
+    showNotification('Notifications feature coming soon!', 'info');
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '?logout=1';
+    }
+}
+
+function filterAppointments(status) {
+    const currentUrl = new URL(window.location.href);
+    if (status === 'all') {
+        currentUrl.searchParams.delete('status');
+    } else {
+        currentUrl.searchParams.set('status', status);
+    }
+    window.location.href = currentUrl.toString();
+}
+
+function getPageUrl(page) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('page', page);
+    return currentUrl.toString();
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing...');
+    
+    // Initialize search functionality
+    initializeSearch();
+    
+    // Export button - with null check
+    const exportBtn = document.getElementById('btnExportExcel');
+    if (exportBtn) {
+        console.log('Export button found, attaching listener');
+        exportBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            exportAppointments();
+        });
+    } else {
+        console.warn('Export button not found');
+    }
+    
+    // Global search - only if element exists (this is in navbar)
+    const globalSearch = document.getElementById('globalSearch');
+    if (globalSearch) {
+        console.log('Global search found');
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            globalSearch.addEventListener('input', function() {
+                searchInput.value = this.value;
+                if (this.value.trim().length > 2 || this.value.trim().length === 0) {
+                    performRealTimeSearch(this.value.trim());
+                }
             });
         }
-
-        function markAttendance(appointmentId, status) {
-            if (confirm(`Mark ${appointmentId} as ${status}?`)) {
-                fetch('update_appointment_status.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            appointment_number: appointmentId,
-                            status: status
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showNotification(`Appointment ${appointmentId} marked as ${status}`, 'success');
-                            setTimeout(() => location.reload(), 1500);
-                        } else {
-                            showNotification('Failed to update appointment status', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showNotification('An error occurred', 'error');
-                    });
-            }
-        }
-
-        function createBill(appointmentId) {
-            window.location.href = `create_bill.php?appointment=${appointmentId}`;
-        }
-
-        function cancelAppointment(appointmentId) {
-            if (confirm('Are you sure you want to cancel this appointment?')) {
-                markAttendance(appointmentId, 'Cancelled');
-            }
-        }
-
-        function rescheduleAppointment(appointmentId) {
-            window.location.href = `book_appointments.php?reschedule=${appointmentId}`;
-        }
-
-        function viewDetails(appointmentId) {
-            window.location.href = `appointment_single_view.php?appointment=${appointmentId}`;
-        }
-
-        function exportAppointments() {
-            const u = new URL(window.location.href);
-            const params = new URLSearchParams(u.search);
-            const exportUrl = `export_appointments.php?${params.toString()}`;
-
-            showNotification('Preparing Excel file...', 'info');
-
-            const a = document.createElement('a');
-            a.href = exportUrl;
-            a.download = '';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            setTimeout(() => showNotification('Excel file downloaded!', 'success'), 1500);
-        }
-
-        function toggleNotifications() {
-            showNotification('Notifications feature coming soon!', 'info');
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                window.location.href = '?logout=1';
-            }
-        }
-
-        function filterAppointments(status) {
-            const currentUrl = new URL(window.location.href);
-            if (status === 'all') {
-                currentUrl.searchParams.delete('status');
-            } else {
-                currentUrl.searchParams.set('status', status);
-            }
-            window.location.href = currentUrl.toString();
-        }
-
-        function getPageUrl(page) {
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set('page', page);
-            return currentUrl.toString();
-        }
-
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded - Initializing...');
-
-            // Initialize search functionality
-            initializeSearch();
-
-            // Export button - with null check
-            const exportBtn = document.getElementById('btnExportExcel');
-            if (exportBtn) {
-                console.log('Export button found, attaching listener');
-                exportBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    exportAppointments();
-                });
-            } else {
-                console.warn('Export button not found');
-            }
-
-            // Global search - only if element exists (this is in navbar)
-            const globalSearch = document.getElementById('globalSearch');
-            if (globalSearch) {
-                console.log('Global search found');
-                const searchInput = document.querySelector('input[name="search"]');
-                if (searchInput) {
-                    globalSearch.addEventListener('input', function() {
-                        searchInput.value = this.value;
-                        if (this.value.trim().length > 2 || this.value.trim().length === 0) {
-                            performRealTimeSearch(this.value.trim());
-                        }
-                    });
-                }
-            }
-
-            console.log('Initialization complete');
-        });
+    }
+    
+    console.log('Initialization complete');
+});
     </script>
 
 </body>
